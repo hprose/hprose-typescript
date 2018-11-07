@@ -1,30 +1,50 @@
+/**********************************************************\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: http://www.hprose.com/                 |
+|                   http://www.hprose.org/                 |
+|                                                          |
+\**********************************************************/
+
+/**********************************************************\
+ *                                                        *
+ * hprose/io/ByteStream.ts                                *
+ *                                                        *
+ * hprose ByteStream for TypeScript.                      *
+ *                                                        *
+ * LastModified: Nov 2, 2018                              *
+ * Author: Ma Bingyao <andot@hprose.com>                  *
+ *                                                        *
+\**********************************************************/
+
 const EMPTY_BYTES = new Uint8Array(0);
 const INIT_SIZE = 1024;
 
-function writeInt32BE(bytes: Uint8Array, offset: number, i: number): number {
-    bytes[offset++] = i >>> 24 & 0xFF;
-    bytes[offset++] = i >>> 16 & 0xFF;
-    bytes[offset++] = i >>> 8 & 0xFF;
-    bytes[offset++] = i & 0xFF;
+function writeInt32BE(bytes: Uint8Array, offset: number, value: number): number {
+    bytes[offset++] = value >>> 24 & 0xFF;
+    bytes[offset++] = value >>> 16 & 0xFF;
+    bytes[offset++] = value >>> 8 & 0xFF;
+    bytes[offset++] = value & 0xFF;
     return offset;
 }
 
-function writeInt32LE(bytes: Uint8Array, offset: number, i: number): number {
-    bytes[offset++] = i & 0xFF;
-    bytes[offset++] = i >>> 8 & 0xFF;
-    bytes[offset++] = i >>> 16 & 0xFF;
-    bytes[offset++] = i >>> 24 & 0xFF;
+function writeInt32LE(bytes: Uint8Array, offset: number, value: number): number {
+    bytes[offset++] = value & 0xFF;
+    bytes[offset++] = value >>> 8 & 0xFF;
+    bytes[offset++] = value >>> 16 & 0xFF;
+    bytes[offset++] = value >>> 24 & 0xFF;
     return offset;
 }
 
-function pow2roundup(i: number): number {
-    --i;
-    i |= i >> 1;
-    i |= i >> 2;
-    i |= i >> 4;
-    i |= i >> 8;
-    i |= i >> 16;
-    return i + 1;
+function pow2roundup(value: number): number {
+    --value;
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    return value + 1;
 }
 
 function fromCharCode(charCodes: ArrayLike<number>): string {
@@ -123,22 +143,25 @@ function toBinaryString(bytes: Uint8Array | ArrayBufferLike): string {
     return buf.join('');
 }
 
-function isBytesIO(value: BytesIO | any): value is BytesIO {
-    return value instanceof BytesIO;
+function isByteStream(value: ByteStream | any): value is ByteStream {
+    return value instanceof ByteStream;
 }
 
-class BytesIO {
+class ByteStream {
     private buffer: Uint8Array = EMPTY_BYTES;
     private size: number = 0;
     private offset: number = 0;
     private rmark: number = 0;
     private wmark: number = 0;
-
-    static toString(data: string | Uint8Array | BytesIO | ArrayBuffer | ArrayLike<number>): string {
+    /**
+     * Decodes data to a string according to the Type.
+     * @param data to be decoded to a string.
+     */
+    static toString(data: string | Uint8Array | ByteStream | ArrayBuffer | ArrayLike<number>): string {
         if (typeof data === 'string') {
             return data;
         }
-        else if (isBytesIO(data)) {
+        else if (isByteStream(data)) {
             return data.toString();
         }
         else if (data instanceof Uint8Array) {
@@ -151,41 +174,34 @@ class BytesIO {
             return fromCharCode(data);
         }
     }
-
+    /**
+     * Constructs a ByteStream object with no bytes in it and the specified initial capacity.
+     * @param capacity the initial capacity.
+     */
     constructor(capacity: number);
-    constructor(data: string | Uint8Array | BytesIO | ArrayLike<number> | ArrayBufferLike);
-    constructor(data: ArrayBufferLike, length: number);
-    constructor(data: ArrayBufferLike, offset: number, length: number);
-    constructor(a1: any, a2?: number, a3?: number) {
-        if (a2) {
-            if (a3) {
-                this.buffer = new Uint8Array(a1, a2, a3);
-                this.size = a3;
-            }
-            else {
-                this.buffer = new Uint8Array(a1, a2);
-                this.size = a2;
-            }
+    /**
+     * Constructs a ByteStream object initialized to the contents of the data.
+     * @param data the initial contents of this stream.
+     */
+    constructor(data: string | Uint8Array | ByteStream | ArrayLike<number> | ArrayBufferLike);
+    constructor(value: any) {
+        if (typeof value === 'number') {
+            this.buffer = new Uint8Array(value);
+        }
+        else if (typeof value === 'string') {
+            this.writeString(value);
         }
         else {
-            if (typeof a1 === 'number') {
-                this.buffer = new Uint8Array(a1);
+            if (value instanceof Uint8Array) {
+                this.buffer = value;
             }
-            else if (typeof a1 === 'string') {
-                this.writeString(a1);
+            else if (value instanceof ByteStream) {
+                this.buffer = value.toBytes();
             }
             else {
-                if (a1 instanceof Uint8Array) {
-                    this.buffer = a1;
-                }
-                else if (a1 instanceof BytesIO) {
-                    this.buffer = a1.toBytes();
-                }
-                else {
-                    this.buffer = new Uint8Array(a1);
-                }
-                this.size = a1.length;
+                this.buffer = new Uint8Array(value);
             }
+            this.size = value.length;
         }
         this.mark();
     }
@@ -206,31 +222,57 @@ class BytesIO {
             this.buffer = new Uint8Array(n);
         }
     }
-
+    /**
+     * Returns the current capacity of this stream.
+     */
     public get capacity(): number {
         return this.buffer.length;
     }
+    /**
+     * Returns the current length of the data in this stream.
+     */
     public get length(): number {
         return this.size;
     }
+    /**
+     * Returns the position of the next reading operation in this stream.
+     */
     public get position(): number {
         return this.offset;
     }
+    /**
+     * Returns all bytes data in this stream.
+     * If the returned data is changed, the data in this stream will be also changed.
+     */
     public get bytes(): Uint8Array {
         return this.buffer.subarray(0, this.size);
     }
+    /**
+     * Returns all bytes data in this stream that has not been read.
+     * If the returned data is changed, the data in this stream will be also changed.
+     */
     public get remains(): Uint8Array {
         return this.buffer.subarray(this.offset, this.size);
     }
-
+    /**
+     * Sets this stream's mark at its reading and writing position.
+     */
     public mark(): void {
         this.wmark = this.size;
         this.rmark = this.offset;
     }
+    /**
+     * Resets this stream's reading and writing position to the previously-marked position.
+     * Invoking this method neither changes nor discards the mark's value.
+     */
     public reset(): void {
         this.size = this.wmark;
         this.offset = this.rmark;
     }
+    /**
+     * Clears this stream.
+     * The position is set to zero, the limit is set to the capacity, and the mark is discarded.
+     */
     public clear(): void {
         this.buffer = EMPTY_BYTES;
         this.size = 0;
@@ -238,43 +280,71 @@ class BytesIO {
         this.wmark = 0;
         this.rmark = 0;
     }
+    /**
+     * Writes a byte to the stream as a 1-byte value.
+     * @param byte a byte value to be written.
+     */
     public writeByte(byte: number): void {
         this.grow(1);
         this.buffer[this.size++] = byte;
     }
-    public writeInt32BE(i: number): void {
-        if ((i === (i | 0)) && (i <= 2147483647)) {
+    /**
+     * Writes value to this stream with big endian format.
+     * @param value number to be written to this stream. value should be a valid signed 32-bit integer.
+     * TypeError will be throwed when value is anything other than a signed 32-bit integer.
+     */
+    public writeInt32BE(value: number): void {
+        if ((value === (value | 0)) && (value <= 2147483647)) {
             this.grow(4);
-            this.size = writeInt32BE(this.buffer, this.size, i);
+            this.size = writeInt32BE(this.buffer, this.size, value);
             return;
         }
         throw new TypeError('value is out of bounds');
     }
-    public writeUInt32BE(i: number): void {
-        if (((i & 0x7FFFFFFF) + 0x80000000 === i) && (i >= 0)) {
+    /**
+     * Writes value to this stream with big endian format.
+     * @param value number to be written to this stream. value should be a valid unsigned 32-bit integer.
+     * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
+     */
+    public writeUInt32BE(value: number): void {
+        if (((value & 0x7FFFFFFF) + 0x80000000 === value) && (value >= 0)) {
             this.grow(4);
-            this.size = writeInt32BE(this.buffer, this.size, i | 0);
+            this.size = writeInt32BE(this.buffer, this.size, value | 0);
             return;
         }
         throw new TypeError('value is out of bounds');
     }
-    public writeInt32LE(i: number): void {
-        if ((i === (i | 0)) && (i <= 2147483647)) {
+    /**
+     * Writes value to this stream with little endian format.
+     * @param value number to be written to this stream. value should be a valid signed 32-bit integer.
+     * TypeError will be throwed when value is anything other than a signed 32-bit integer.
+     */
+    public writeInt32LE(value: number): void {
+        if ((value === (value | 0)) && (value <= 2147483647)) {
             this.grow(4);
-            this.size = writeInt32LE(this.buffer, this.size, i);
+            this.size = writeInt32LE(this.buffer, this.size, value);
             return;
         }
         throw new TypeError('value is out of bounds');
     }
-    public writeUInt32LE(i: number): void {
-        if (((i & 0x7FFFFFFF) + 0x80000000 === i) && (i >= 0)) {
+    /**
+     * Writes value to this stream with little endian format.
+     * @param value number to be written to this stream. value should be a valid unsigned 32-bit integer.
+     * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
+     */
+    public writeUInt32LE(value: number): void {
+        if (((value & 0x7FFFFFFF) + 0x80000000 === value) && (value >= 0)) {
             this.grow(4);
-            this.size = writeInt32LE(this.buffer, this.size, i | 0);
+            this.size = writeInt32LE(this.buffer, this.size, value | 0);
             return;
         }
         throw new TypeError('value is out of bounds');
     }
-    public write(data: Uint8Array | BytesIO | ArrayLike<number> | ArrayBuffer): void {
+    /**
+     * Writes data to this stream.
+     * @param data to be written to this stream.
+     */
+    public write(data: Uint8Array | ByteStream | ArrayLike<number> | ArrayBuffer): void {
         const n = (data instanceof ArrayBuffer) ? data.byteLength : data.length;
         if (n === 0) {
             return;
@@ -285,7 +355,7 @@ class BytesIO {
         if (data instanceof Uint8Array) {
             bytes.set(data, offset);
         }
-        else if (isBytesIO(data)) {
+        else if (isByteStream(data)) {
             bytes.set(data.bytes, offset);
         }
         else {
@@ -293,6 +363,10 @@ class BytesIO {
         }
         this.size += n;
     }
+    /**
+     * Writes str to this stream with ascii encoding.
+     * @param str to be written to this stream.
+     */
     public writeAsciiString(str: string): void {
         const n = str.length;
         if (n === 0) {
@@ -305,13 +379,16 @@ class BytesIO {
         }
         this.size += n;
     }
+    /**
+     * Writes str to this stream with utf8 encoding.
+     * @param str to be written to this stream.
+     */
     public writeString(str: string): void {
         const n = str.length;
         if (n === 0) {
             return;
         }
-        // Single code unit uses at most 3 bytes.
-        // Double code units use at most 4 bytes.
+        // The single code unit occupies up to 3 bytes.
         this.grow(n * 3);
         const bytes = this.buffer;
         let offset = this.size;
@@ -347,12 +424,20 @@ class BytesIO {
         }
         this.size = offset;
     }
+    /**
+     * Reads and returns a single byte.
+     * If no byte is available, returns -1.
+     */
     public readByte(): number {
         if (this.offset < this.size) {
             return this.buffer[this.offset++];
         }
         return -1;
     }
+    /**
+     * Reads a signed 32-bit integer from this stream with the big endian format.
+     * If the remaining data is less than 4 bytes, Error('EOF') will be throw.
+     */
     public readInt32BE(): number {
         const bytes = this.buffer;
         let offset = this.offset;
@@ -418,9 +503,10 @@ class BytesIO {
      * Returns a Uint8Array from the current position to the delimiter. The result includes delimiter.
      * Returns all remaining data if no delimiter is found.
      * After this method is called, The new position is after the delimiter.
+     * @param delimiter a byte, which represents the end of reading data.
      */
     public readBytes(delimiter: number): Uint8Array {
-        const pos = Array.prototype.indexOf.call(this.buffer, delimiter, this.offset);
+        const pos = this.buffer.indexOf(delimiter, this.offset);
         let result;
         if (pos === -1) {
             result = this.buffer.subarray(this.offset, this.size);
@@ -436,9 +522,10 @@ class BytesIO {
      * Returns a string from the current position to the delimiter. The result doesn't include delimiter.
      * Returns all remaining data if no delimiter is found.
      * After this method is called, the new position is after the delimiter.
+     * @param delimiter a byte, which represents the end of reading data.
      */
     public readUntil(delimiter: number): string {
-        const pos = Array.prototype.indexOf.call(this.buffer, delimiter, this.offset);
+        const pos = this.buffer.indexOf(delimiter, this.offset);
         let result = '';
         if (pos === this.offset) {
             this.offset++;
@@ -543,8 +630,8 @@ class BytesIO {
     public toString(): string {
         return fromUint8Array(this.bytes);
     }
-    public clone(): BytesIO {
-        return new BytesIO(this.toBytes());
+    public clone(): ByteStream {
+        return new ByteStream(this.toBytes());
     }
     public trunc(): void {
         this.buffer = this.remains;
@@ -555,4 +642,4 @@ class BytesIO {
     }
 }
 
-export default BytesIO;
+export default ByteStream;
