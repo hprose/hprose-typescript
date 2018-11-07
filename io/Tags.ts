@@ -1,3 +1,23 @@
+/**********************************************************\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: http://www.hprose.com/                 |
+|                   http://www.hprose.org/                 |
+|                                                          |
+\**********************************************************/
+
+/**********************************************************\
+ *                                                        *
+ * hprose/io/Tags.ts                                      *
+ *                                                        *
+ * hprose Tags for TypeScript.                            *
+ *                                                        *
+ * LastModified: Nov 1, 2018                              *
+ * Author: Ma Bingyao <andot@hprose.com>                  *
+ *                                                        *
+\**********************************************************/
+
 const enum Tags {
     /* Serialize Tags */
     TagInteger     = 0x69, //  'i'
