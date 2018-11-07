@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ByteStream for TypeScript.                      *
  *                                                        *
- * LastModified: Nov 2, 2018                              *
+ * LastModified: Nov 8, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -128,6 +128,9 @@ function fromUint8Array(bytes: Uint8Array): string {
 function toBinaryString(bytes: Uint8Array | ArrayBufferLike): string {
     let data = (bytes instanceof Uint8Array) ? bytes : new Uint8Array(bytes);
     const n = data.length;
+    if (n === 0) {
+        return '';
+    }
     if (n < 0xFFFF) {
         return fromCharCode(data);
     }
@@ -452,6 +455,10 @@ class ByteStream {
         }
         throw new Error('EOF');
     }
+    /**
+     * Reads an unsigned 32-bit integer from this stream with the big endian format.
+     * If the remaining data is less than 4 bytes, Error('EOF') will be throw.
+     */
     public readUInt32BE(): number {
         const result = this.readInt32BE();
         if (result < 0) {
@@ -459,6 +466,10 @@ class ByteStream {
         }
         return result;
     }
+    /**
+     * Reads a signed 32-bit integer from this stream with the little endian format.
+     * If the remaining data is less than 4 bytes, Error('EOF') will be throw.
+     */
     public readInt32LE(): number {
         const bytes = this.buffer;
         let offset = this.offset;
@@ -473,6 +484,10 @@ class ByteStream {
         }
         throw new Error('EOF');
     }
+    /**
+     * Reads an unsigned 32-bit integer from this stream with the little endian format.
+     * If the remaining data is less than 4 bytes, Error('EOF') will be throw.
+     */
     public readUInt32LE(): number {
         const result = this.readInt32LE();
         if (result < 0) {
@@ -480,24 +495,38 @@ class ByteStream {
         }
         return result;
     }
-    public read(length: number): Uint8Array {
-        if (this.offset + length > this.size) {
-            length = this.size - this.offset;
+    /**
+     * Reads n bytes of data from this stream and returns the result as a Uint8Array. 
+     * If n is negative, reads to the end of this stream.
+     * @param n The maximum number of bytes to read.
+     */
+    public read(n: number): Uint8Array {
+        if (n < 0 || this.offset + n > this.size) {
+            n = this.size - this.offset;
         }
-        if (length === 0) {
+        if (n === 0) {
             return EMPTY_BYTES;
         }
-        return this.buffer.subarray(this.offset, this.offset += length);
+        return this.buffer.subarray(this.offset, this.offset += n);
     }
-    public skip(length: number): number {
-        if (this.offset + length > this.size) {
-            length = this.size - this.offset;
+    /**
+     * Skips over and discards n bytes of data from this stream.
+     * The actual number of bytes skipped is returned.
+     * If n is negative, all remaining bytes are skipped.
+     * @param n the number of bytes to be skipped.
+     */
+    public skip(n: number): number {
+        if (n === 0) {
+            return 0;
+        }
+        if (n < 0 || this.offset + n > this.size) {
+            n = this.size - this.offset;
             this.offset = this.size;
         }
         else {
-            this.offset += length;
+            this.offset += n;
         }
-        return length;
+        return n;
     }
     /**
      * Returns a Uint8Array from the current position to the delimiter. The result includes delimiter.
@@ -540,17 +569,17 @@ class ByteStream {
         }
         return result;
     }
+    /**
+     * Reads n bytes of data from this stream and returns the result as an ascii string. 
+     * If n is negative, reads to the end of this stream.
+     * @param n The maximum number of bytes to read.
+     */    
     public readAsciiString(n: number): string {
-        if (this.offset + n > this.size) {
-            n = this.size - this.offset;
-        }
-        if (n === 0) {
-            return '';
-        }
-        return toBinaryString(this.buffer.subarray(this.offset, this.offset += n));
+        return toBinaryString(this.read(n));
     }
     /**
      * Returns a Uint8Array containing a string of length n.
+     * If n is negative, reads to the end of this stream.
      * @param n is the string(UTF16) length.
      */
     public readStringAsBytes(n: number): Uint8Array {
@@ -558,6 +587,10 @@ class ByteStream {
             return EMPTY_BYTES;
         }
         let bytes = this.buffer.subarray(this.offset, this.size);
+        if (n < 0) {
+            this.offset = this.size;
+            return bytes;
+        }
         let offset = 0;
         for (let i = 0, length = bytes.length; i < n && offset < length; i++) {
             const unit = bytes[offset++];
@@ -606,6 +639,7 @@ class ByteStream {
     }
     /**
      * Returns a string of length n.
+     * If n is negative, reads to the end of this stream.
      * @param n is the string(UTF16) length.
      */
     public readString(n: number): string {
@@ -627,12 +661,23 @@ class ByteStream {
     public toBytes(): Uint8Array {
         return new Uint8Array(this.bytes);
     }
+    /**
+     * Returns a string representation of this stream.
+     */
     public toString(): string {
         return fromUint8Array(this.bytes);
     }
+    /**
+     * Creates an exact copy of this stream.
+     */
     public clone(): ByteStream {
         return new ByteStream(this.toBytes());
     }
+    /**
+     * Truncates this stream, only leaves the unread data.
+     * The position is reset to 0.
+     * The mark is cleared.
+     */
     public trunc(): void {
         this.buffer = this.remains;
         this.size = this.buffer.length;
