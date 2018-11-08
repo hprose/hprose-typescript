@@ -146,11 +146,11 @@ function toBinaryString(bytes: Uint8Array | ArrayBufferLike): string {
     return buf.join('');
 }
 
-function isByteStream(value: ByteStream | any): value is ByteStream {
+function isByteStream(value: any): value is ByteStream {
     return value instanceof ByteStream;
 }
 
-class ByteStream {
+export default class ByteStream {
     private buffer: Uint8Array = EMPTY_BYTES;
     private size: number = 0;
     private offset: number = 0;
@@ -160,7 +160,7 @@ class ByteStream {
      * Decodes data to a string according to the Type.
      * @param data to be decoded to a string.
      */
-    static toString(data: string | Uint8Array | ByteStream | ArrayBuffer | ArrayLike<number>): string {
+    public static toString(data: string | Uint8Array | ByteStream | ArrayBuffer | ArrayLike<number>): string {
         if (typeof data === 'string') {
             return data;
         }
@@ -186,27 +186,29 @@ class ByteStream {
      * Constructs a ByteStream object initialized to the contents of the data.
      * @param data the initial contents of this stream.
      */
-    constructor(data: string | Uint8Array | ByteStream | ArrayLike<number> | ArrayBufferLike);
+    constructor(data?: string | Uint8Array | ByteStream | ArrayLike<number> | ArrayBufferLike);
     constructor(value: any) {
-        if (typeof value === 'number') {
-            this.buffer = new Uint8Array(value);
-        }
-        else if (typeof value === 'string') {
-            this.writeString(value);
-        }
-        else {
-            if (value instanceof Uint8Array) {
-                this.buffer = value;
-            }
-            else if (value instanceof ByteStream) {
-                this.buffer = value.toBytes();
-            }
-            else {
+        if (value) {
+            if (typeof value === 'number') {
                 this.buffer = new Uint8Array(value);
             }
-            this.size = value.length;
+            else if (typeof value === 'string') {
+                this.writeString(value);
+            }
+            else {
+                if (value instanceof Uint8Array) {
+                    this.buffer = value;
+                }
+                else if (value instanceof ByteStream) {
+                    this.buffer = value.toBytes();
+                }
+                else {
+                    this.buffer = new Uint8Array(value);
+                }
+                this.size = value.length;
+            }
+            this.mark();
         }
-        this.mark();
     }
 
     private grow(n: number): void {
@@ -686,5 +688,3 @@ class ByteStream {
         this.rmark = 0;
     }
 }
-
-export default ByteStream;
