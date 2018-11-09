@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ClassManager for TypeScript.                    *
  *                                                        *
- * LastModified: Nov 8, 2018                              *
+ * LastModified: Nov 9, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -24,20 +24,20 @@ const aliasCache = new WeakMap();
 /**
  * Registers a class with an alias.
  */
-function register(cls: object, alias: string): void {
+function register(cls: any, alias: string): void {
     aliasCache.set(cls, alias);
     classCache[alias] = cls;
 }
 /**
  * Gets class alias by class.
  */
-function getClassAlias(cls: object): string {
+function getClassAlias(cls: any): string | undefined {
     return aliasCache.get(cls);
 }
 /**
  * Gets class by class alias.
  */
-function getClass(alias: string): object {
+function getClass(alias: string): any {
     return classCache[alias];
 }
 
