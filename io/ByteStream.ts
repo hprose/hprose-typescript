@@ -300,7 +300,7 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than a signed 32-bit integer.
      */
     public writeInt32BE(value: number): void {
-        if ((value === (value | 0)) && (value <= 2147483647)) {
+        if (value === (value | 0)) {
             this.grow(4);
             this.size = writeInt32BE(this.buffer, this.size, value);
             return;
@@ -313,7 +313,7 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
      */
     public writeUInt32BE(value: number): void {
-        if (((value & 0x7FFFFFFF) + 0x80000000 === value) && (value >= 0)) {
+        if (value === (value | 0) && value >= 0 || (value & 0x7FFFFFFF) + 0x80000000 === value) {
             this.grow(4);
             this.size = writeInt32BE(this.buffer, this.size, value | 0);
             return;
@@ -326,7 +326,7 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than a signed 32-bit integer.
      */
     public writeInt32LE(value: number): void {
-        if ((value === (value | 0)) && (value <= 2147483647)) {
+        if (value === (value | 0)) {
             this.grow(4);
             this.size = writeInt32LE(this.buffer, this.size, value);
             return;
@@ -339,7 +339,7 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
      */
     public writeUInt32LE(value: number): void {
-        if (((value & 0x7FFFFFFF) + 0x80000000 === value) && (value >= 0)) {
+        if (value === (value | 0) && value >= 0 || (value & 0x7FFFFFFF) + 0x80000000 === value) {
             this.grow(4);
             this.size = writeInt32LE(this.buffer, this.size, value | 0);
             return;
