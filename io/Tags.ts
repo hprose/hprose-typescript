@@ -1,22 +1,21 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
 | Official WebSite: http://www.hprose.com/                 |
 |                   http://www.hprose.org/                 |
 |                                                          |
-\**********************************************************/
-
-/**********************************************************\
- *                                                        *
- * hprose/io/Tags.ts                                      *
- *                                                        *
- * hprose Tags for TypeScript.                            *
- *                                                        *
- * LastModified: Nov 1, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+\*________________________________________________________*/
+/*--------------------------------------------------------*\
+|                                                          |
+| hprose/io/Tags.ts                                        |
+|                                                          |
+| hprose Tags for TypeScript.                              |
+|                                                          |
+| LastModified: Dec 5, 2018                                |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
 
 const enum Tags {
     /* Serialize Tags */
@@ -49,6 +48,7 @@ const enum Tags {
     TagClosebrace  = 0x7D, //  '}'
     TagQuote       = 0x22, //  '"'
     TagPoint       = 0x2E, //  '.'
+    TagZero        = 0x30, //  '0'
     /* Protocol Tags */
     TagHeader      = 0x48, //  'H'
     TagFunctions   = 0x46, //  'F'

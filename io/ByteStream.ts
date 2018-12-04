@@ -1,22 +1,21 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
 | Official WebSite: http://www.hprose.com/                 |
 |                   http://www.hprose.org/                 |
 |                                                          |
-\**********************************************************/
-
-/**********************************************************\
- *                                                        *
- * hprose/io/ByteStream.ts                                *
- *                                                        *
- * hprose ByteStream for TypeScript.                      *
- *                                                        *
- * LastModified: Dec 4, 2018                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+\*________________________________________________________*/
+/*--------------------------------------------------------*\
+|                                                          |
+| hprose/io/ByteStream.ts                                  |
+|                                                          |
+| hprose ByteStream for TypeScript.                        |
+|                                                          |
+| LastModified: Dec 5, 2018                                |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
 
 const EMPTY_BYTES = new Uint8Array(0);
 const INIT_SIZE = 1024;
