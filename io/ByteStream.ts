@@ -13,7 +13,7 @@
  *                                                        *
  * hprose ByteStream for TypeScript.                      *
  *                                                        *
- * LastModified: Nov 8, 2018                              *
+ * LastModified: Dec 4, 2018                              *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -151,11 +151,11 @@ function isByteStream(value: any): value is ByteStream {
 }
 
 export default class ByteStream {
-    private buffer: Uint8Array = EMPTY_BYTES;
-    private size: number = 0;
-    private offset: number = 0;
-    private rmark: number = 0;
-    private wmark: number = 0;
+    protected buffer: Uint8Array = EMPTY_BYTES;
+    protected size: number = 0;
+    protected offset: number = 0;
+    protected rmark: number = 0;
+    protected wmark: number = 0;
     /**
      * Decodes data to a string according to the Type.
      * @param data to be decoded to a string.
@@ -164,18 +164,16 @@ export default class ByteStream {
         if (typeof data === 'string') {
             return data;
         }
-        else if (isByteStream(data)) {
+        if (isByteStream(data)) {
             return data.toString();
         }
-        else if (data instanceof Uint8Array) {
+        if (data instanceof Uint8Array) {
             return fromUint8Array(data);
         }
-        else if (data instanceof ArrayBuffer) {
+        if (data instanceof ArrayBuffer) {
             return fromUint8Array(new Uint8Array(data, 0));
         }
-        else {
-            return fromCharCode(data);
-        }
+        return fromCharCode(data);
     }
     /**
      * Constructs a ByteStream object with no bytes in it and the specified initial capacity.
@@ -186,7 +184,7 @@ export default class ByteStream {
      * Constructs a ByteStream object initialized to the contents of the data.
      * @param data the initial contents of this stream.
      */
-    constructor(data?: string | Uint8Array | ByteStream | ArrayLike<number> | ArrayBufferLike);
+    constructor(data?: string | Uint8Array | Uint8ClampedArray | ByteStream | ArrayLike<number> | ArrayBufferLike);
     constructor(value: any) {
         if (value) {
             if (typeof value === 'number') {
@@ -196,11 +194,14 @@ export default class ByteStream {
                 this.writeString(value);
             }
             else {
-                if (value instanceof Uint8Array) {
+                if (isByteStream(value)) {
+                    this.buffer = value.toBytes();
+                }
+                else if (value instanceof Uint8Array) {
                     this.buffer = value;
                 }
-                else if (value instanceof ByteStream) {
-                    this.buffer = value.toBytes();
+                else if (value instanceof Uint8ClampedArray) {
+                    this.buffer = new Uint8Array(value.buffer, value.byteOffset, value.length);
                 }
                 else {
                     this.buffer = new Uint8Array(value);
@@ -211,7 +212,7 @@ export default class ByteStream {
         }
     }
 
-    private grow(n: number): void {
+    protected grow(n: number): void {
         n = pow2roundup(this.size + n);
         const capacity = this.capacity;
         if (capacity > 0) {
@@ -346,10 +347,10 @@ export default class ByteStream {
         throw new TypeError('value is out of bounds');
     }
     /**
-     * Writes data to this stream.
+     * Writes binary data to this stream.
      * @param data to be written to this stream.
      */
-    public write(data: Uint8Array | ByteStream | ArrayLike<number> | ArrayBuffer): void {
+    public write(data: Uint8Array | Uint8ClampedArray | ByteStream | ArrayLike<number> | ArrayBuffer): void {
         const n = (data instanceof ArrayBuffer) ? data.byteLength : data.length;
         if (n === 0) {
             return;
@@ -357,14 +358,14 @@ export default class ByteStream {
         this.grow(n);
         const bytes = this.buffer;
         const offset = this.size;
-        if (data instanceof Uint8Array) {
-            bytes.set(data, offset);
-        }
-        else if (isByteStream(data)) {
+        if (isByteStream(data)) {
             bytes.set(data.bytes, offset);
         }
-        else {
+        else if (data instanceof ArrayBuffer) {
             bytes.set(new Uint8Array(data), offset);
+        }
+        else {
+            bytes.set(data, offset);
         }
         this.size += n;
     }
