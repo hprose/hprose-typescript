@@ -12,7 +12,7 @@
 |                                                          |
 | hprose ByteStream for TypeScript.                        |
 |                                                          |
-| LastModified: Dec 5, 2018                                |
+| LastModified: Dec 10, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -47,7 +47,7 @@ function pow2roundup(value: number): number {
 }
 
 function fromCharCode(charCodes: ArrayLike<number>): string {
-    return String.fromCharCode.apply(String, charCodes);
+    return String.fromCharCode.apply(String, charCodes as number[]);
 }
 
 function readString(bytes: Uint8Array, charLength: number): [string, number] {

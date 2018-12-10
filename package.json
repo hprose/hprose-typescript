@@ -1,0 +1,40 @@
+{
+  "name": "hprose-ts",
+  "version": "3.0.0",
+  "homepage": "https://github.com/hprose/hprose-ts",
+  "description": "hprose for TypeScript",
+  "keywords": [
+    "hprose",
+    "rpc",
+    "webservice",
+    "serialize",
+    "serialization"
+  ],
+  "author": {
+    "name": "Ma Bingyao",
+    "email": "mabingyao@gmail.com",
+    "url": "http://hprose.com/"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hprose/hprose-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hprose/hprose-ts/issues",
+    "email": "andot@hprose.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
+  }
+}
