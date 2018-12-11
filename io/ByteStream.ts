@@ -12,7 +12,7 @@
 |                                                          |
 | hprose ByteStream for TypeScript.                        |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Dec 11, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -51,12 +51,8 @@ function fromCharCode(charCodes: ArrayLike<number>): string {
 }
 
 function readString(bytes: Uint8Array, charLength: number): [string, number] {
-    if (charLength < 0) {
-        charLength = bytes.length;
-    }
-    if (charLength === 0) {
-        return ['', 0];
-    }
+    if (charLength < 0) charLength = bytes.length;
+    if (charLength === 0) return ['', 0];
     let charOffset = 0, byteOffset = 0;
     let n = (charLength < 0x7FFF) ? charLength : 0x7FFF;
     const charCodes = new Uint16Array(n + 1);
@@ -79,25 +75,25 @@ function readString(bytes: Uint8Array, charLength: number): [string, number] {
                 case 12:
                 case 13:
                     if (byteOffset < byteLength) {
-                        charCodes[charOffset] = ((unit & 0x1F) << 6) |
-                            (bytes[byteOffset++] & 0x3F);
+                        charCodes[charOffset] = ((unit & 0x1F) << 6)
+                            | (bytes[byteOffset++] & 0x3F);
                         break;
                     }
                     throw new Error('Unfinished UTF-8 octet sequence');
                 case 14:
                     if (byteOffset + 1 < byteLength) {
-                        charCodes[charOffset] = ((unit & 0x0F) << 12) |
-                            ((bytes[byteOffset++] & 0x3F) << 6) |
-                            (bytes[byteOffset++] & 0x3F);
+                        charCodes[charOffset] = ((unit & 0x0F) << 12)
+                            | ((bytes[byteOffset++] & 0x3F) << 6)
+                            | (bytes[byteOffset++] & 0x3F);
                         break;
                     }
                     throw new Error('Unfinished UTF-8 octet sequence');
                 case 15:
                     if (byteOffset + 2 < byteLength) {
-                        const rune = (((unit & 0x07) << 18) |
-                            ((bytes[byteOffset++] & 0x3F) << 12) |
-                            ((bytes[byteOffset++] & 0x3F) << 6) |
-                            (bytes[byteOffset++] & 0x3F)) - 0x10000;
+                        const rune = (((unit & 0x07) << 18)
+                            | ((bytes[byteOffset++] & 0x3F) << 12)
+                            | ((bytes[byteOffset++] & 0x3F) << 6)
+                            | (bytes[byteOffset++] & 0x3F)) - 0x10000;
                         if (0 <= rune && rune <= 0xFFFFF) {
                             charCodes[charOffset++] = (((rune >> 10) & 0x03FF) | 0xD800);
                             charCodes[charOffset] = ((rune & 0x03FF) | 0xDC00);
@@ -113,9 +109,7 @@ function readString(bytes: Uint8Array, charLength: number): [string, number] {
         buf.push(fromCharCode(charCodes.subarray(0, charOffset)));
         charLength -= charOffset;
         charOffset = 0;
-        if (n > charLength) {
-            n = charLength;
-        }
+        if (n > charLength) n = charLength;
     } while (charOffset < charLength && byteOffset < byteLength);
     return [buf.length === 1 ? buf[0] : buf.join(''), byteOffset];
 }
@@ -127,26 +121,14 @@ function fromUint8Array(bytes: Uint8Array): string {
 function toBinaryString(bytes: Uint8Array | ArrayBufferLike): string {
     let data = (bytes instanceof Uint8Array) ? bytes : new Uint8Array(bytes);
     const n = data.length;
-    if (n === 0) {
-        return '';
-    }
-    if (n < 0xFFFF) {
-        return fromCharCode(data);
-    }
+    if (n === 0) return '';
+    if (n < 0xFFFF) return fromCharCode(data);
     const remain = n & 0x7FFF;
     const count = n >> 15;
     const buf = new Array(remain ? count + 1 : count);
-    for (let i = 0; i < count; ++i) {
-        buf[i] = fromCharCode(data.subarray(i << 15, (i + 1) << 15));
-    }
-    if (remain) {
-        buf[count] = fromCharCode(data.subarray(count << 15, n));
-    }
+    for (let i = 0; i < count; ++i) buf[i] = fromCharCode(data.subarray(i << 15, (i + 1) << 15));
+    if (remain) buf[count] = fromCharCode(data.subarray(count << 15, n));
     return buf.join('');
-}
-
-function isByteStream(value: any): value is ByteStream {
-    return value instanceof ByteStream;
 }
 
 export default class ByteStream {
@@ -159,19 +141,12 @@ export default class ByteStream {
      * Decodes data to a string according to the Type.
      * @param data to be decoded to a string.
      */
-    public static toString(data: string | Uint8Array | ByteStream | ArrayBuffer | ArrayLike<number>): string {
-        if (typeof data === 'string') {
-            return data;
-        }
-        if (isByteStream(data)) {
-            return data.toString();
-        }
-        if (data instanceof Uint8Array) {
-            return fromUint8Array(data);
-        }
-        if (data instanceof ArrayBuffer) {
-            return fromUint8Array(new Uint8Array(data, 0));
-        }
+    public static toString(data?: string | Uint8Array | ByteStream | ArrayBuffer | ArrayLike<number>): string {
+        if (data === undefined) return Object.toString.apply(ByteStream);
+        if (typeof data === 'string') return data;
+        if (data instanceof ByteStream) return data.toString();
+        if (data instanceof Uint8Array) return fromUint8Array(data);
+        if (data instanceof ArrayBuffer) return fromUint8Array(new Uint8Array(data, 0));
         return fromCharCode(data);
     }
     /**
@@ -188,21 +163,16 @@ export default class ByteStream {
         if (value) {
             if (typeof value === 'number') {
                 this.buffer = new Uint8Array(value);
-            }
-            else if (typeof value === 'string') {
+            } else if (typeof value === 'string') {
                 this.writeString(value);
-            }
-            else {
-                if (isByteStream(value)) {
+            } else {
+                if (value instanceof ByteStream) {
                     this.buffer = value.toBytes();
-                }
-                else if (value instanceof Uint8Array) {
+                } else if (value instanceof Uint8Array) {
                     this.buffer = value;
-                }
-                else if (value instanceof Uint8ClampedArray) {
+                } else if (value instanceof Uint8ClampedArray) {
                     this.buffer = new Uint8Array(value.buffer, value.byteOffset, value.length);
-                }
-                else {
+                } else {
                     this.buffer = new Uint8Array(value);
                 }
                 this.size = value.length;
@@ -221,8 +191,7 @@ export default class ByteStream {
                 buf.set(this.buffer);
                 this.buffer = buf;
             }
-        }
-        else {
+        } else {
             n = Math.max(n, INIT_SIZE);
             this.buffer = new Uint8Array(n);
         }
@@ -299,12 +268,11 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than a signed 32-bit integer.
      */
     public writeInt32BE(value: number): void {
-        if (value === (value | 0)) {
-            this.grow(4);
-            this.size = writeInt32BE(this.buffer, this.size, value);
-            return;
+        if (value !== (value | 0)) {
+            throw new TypeError('value is out of bounds');
         }
-        throw new TypeError('value is out of bounds');
+        this.grow(4);
+        this.size = writeInt32BE(this.buffer, this.size, value);
     }
     /**
      * Writes value to this stream with big endian format.
@@ -312,12 +280,11 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
      */
     public writeUInt32BE(value: number): void {
-        if (value === (value | 0) && value >= 0 || (value & 0x7FFFFFFF) + 0x80000000 === value) {
-            this.grow(4);
-            this.size = writeInt32BE(this.buffer, this.size, value | 0);
-            return;
+        if (value < 0 || value !== (value | 0) && (value & 0x7FFFFFFF) + 0x80000000 !== value) {
+            throw new TypeError('value is out of bounds');
         }
-        throw new TypeError('value is out of bounds');
+        this.grow(4);
+        this.size = writeInt32BE(this.buffer, this.size, value | 0);
     }
     /**
      * Writes value to this stream with little endian format.
@@ -325,12 +292,11 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than a signed 32-bit integer.
      */
     public writeInt32LE(value: number): void {
-        if (value === (value | 0)) {
-            this.grow(4);
-            this.size = writeInt32LE(this.buffer, this.size, value);
-            return;
+        if (value !== (value | 0)) {
+            throw new TypeError('value is out of bounds');
         }
-        throw new TypeError('value is out of bounds');
+        this.grow(4);
+        this.size = writeInt32LE(this.buffer, this.size, value);
     }
     /**
      * Writes value to this stream with little endian format.
@@ -338,12 +304,11 @@ export default class ByteStream {
      * TypeError will be throwed when value is anything other than an unsigned 32-bit integer.
      */
     public writeUInt32LE(value: number): void {
-        if (value === (value | 0) && value >= 0 || (value & 0x7FFFFFFF) + 0x80000000 === value) {
-            this.grow(4);
-            this.size = writeInt32LE(this.buffer, this.size, value | 0);
-            return;
+        if (value < 0 || value !== (value | 0) && (value & 0x7FFFFFFF) + 0x80000000 !== value) {
+            throw new TypeError('value is out of bounds');
         }
-        throw new TypeError('value is out of bounds');
+        this.grow(4);
+        this.size = writeInt32LE(this.buffer, this.size, value | 0);
     }
     /**
      * Writes binary data to this stream.
@@ -351,19 +316,15 @@ export default class ByteStream {
      */
     public write(data: Uint8Array | Uint8ClampedArray | ByteStream | ArrayLike<number> | ArrayBuffer): void {
         const n = (data instanceof ArrayBuffer) ? data.byteLength : data.length;
-        if (n === 0) {
-            return;
-        }
+        if (n === 0) return;
         this.grow(n);
         const bytes = this.buffer;
         const offset = this.size;
-        if (isByteStream(data)) {
+        if (data instanceof ByteStream) {
             bytes.set(data.bytes, offset);
-        }
-        else if (data instanceof ArrayBuffer) {
+        } else if (data instanceof ArrayBuffer) {
             bytes.set(new Uint8Array(data), offset);
-        }
-        else {
+        } else {
             bytes.set(data, offset);
         }
         this.size += n;
@@ -374,9 +335,7 @@ export default class ByteStream {
      */
     public writeAsciiString(str: string): void {
         const n = str.length;
-        if (n === 0) {
-            return;
-        }
+        if (n === 0) return;
         this.grow(n);
         const bytes = this.buffer.subarray(this.size);
         for (let i = 0; i < n; ++i) {
@@ -390,9 +349,7 @@ export default class ByteStream {
      */
     public writeString(str: string): void {
         const n = str.length;
-        if (n === 0) {
-            return;
-        }
+        if (n === 0) return;
         // The single code unit occupies up to 3 bytes.
         this.grow(n * 3);
         const bytes = this.buffer;
@@ -401,17 +358,14 @@ export default class ByteStream {
             const charCode = str.charCodeAt(i);
             if (charCode < 0x80) {
                 bytes[offset++] = charCode;
-            }
-            else if (charCode < 0x800) {
+            } else if (charCode < 0x800) {
                 bytes[offset++] = 0xC0 | (charCode >> 6);
                 bytes[offset++] = 0x80 | (charCode & 0x3F);
-            }
-            else if (charCode < 0xD800 || charCode > 0xDFFF) {
+            } else if (charCode < 0xD800 || charCode > 0xDFFF) {
                 bytes[offset++] = 0xE0 | (charCode >> 12);
                 bytes[offset++] = 0x80 | ((charCode >> 6) & 0x3F);
                 bytes[offset++] = 0x80 | (charCode & 0x3F);
-            }
-            else {
+            } else {
                 if (i + 1 < n) {
                     const nextCharCode = str.charCodeAt(i + 1);
                     if (charCode < 0xDC00 && 0xDC00 <= nextCharCode && nextCharCode <= 0xDFFF) {
@@ -434,10 +388,8 @@ export default class ByteStream {
      * If no byte is available, returns -1.
      */
     public readByte(): number {
-        if (this.offset < this.size) {
-            return this.buffer[this.offset++];
-        }
-        return -1;
+        if (this.offset >= this.size) return -1;
+        return this.buffer[this.offset++];
     }
     /**
      * Reads a signed 32-bit integer from this stream with the big endian format.
@@ -446,16 +398,12 @@ export default class ByteStream {
     public readInt32BE(): number {
         const bytes = this.buffer;
         let offset = this.offset;
-        if (offset + 3 < this.size) {
-            const result =
-                bytes[offset++] << 24 |
-                bytes[offset++] << 16 |
-                bytes[offset++] << 8 |
-                bytes[offset++];
-            this.offset = offset;
-            return result;
+        if (offset + 3 >= this.size) {
+            throw new Error('EOF');
         }
-        throw new Error('EOF');
+        const result = bytes[offset++] << 24 | bytes[offset++] << 16 | bytes[offset++] << 8 | bytes[offset++];
+        this.offset = offset;
+        return result;
     }
     /**
      * Reads an unsigned 32-bit integer from this stream with the big endian format.
@@ -463,10 +411,8 @@ export default class ByteStream {
      */
     public readUInt32BE(): number {
         const result = this.readInt32BE();
-        if (result < 0) {
-            return (result & 0x7FFFFFFF) + 0x80000000;
-        }
-        return result;
+        if (result >= 0) return result;
+        return (result & 0x7FFFFFFF) + 0x80000000;
     }
     /**
      * Reads a signed 32-bit integer from this stream with the little endian format.
@@ -475,16 +421,12 @@ export default class ByteStream {
     public readInt32LE(): number {
         const bytes = this.buffer;
         let offset = this.offset;
-        if (offset + 3 < this.size) {
-            let result =
-                bytes[offset++] |
-                bytes[offset++] << 8 |
-                bytes[offset++] << 16 |
-                bytes[offset++] << 24;
-            this.offset = offset;
-            return result;
+        if (offset + 3 >= this.size) {
+            throw new Error('EOF');
         }
-        throw new Error('EOF');
+        let result = bytes[offset++] | bytes[offset++] << 8 | bytes[offset++] << 16 | bytes[offset++] << 24;
+        this.offset = offset;
+        return result;
     }
     /**
      * Reads an unsigned 32-bit integer from this stream with the little endian format.
@@ -492,10 +434,8 @@ export default class ByteStream {
      */
     public readUInt32LE(): number {
         const result = this.readInt32LE();
-        if (result < 0) {
-            return (result & 0x7FFFFFFF) + 0x80000000;
-        }
-        return result;
+        if (result >= 0) return result;
+        return (result & 0x7FFFFFFF) + 0x80000000;
     }
     /**
      * Reads n bytes of data from this stream and returns the result as a Uint8Array. 
@@ -503,12 +443,8 @@ export default class ByteStream {
      * @param n The maximum number of bytes to read.
      */
     public read(n: number): Uint8Array {
-        if (n < 0 || this.offset + n > this.size) {
-            n = this.size - this.offset;
-        }
-        if (n === 0) {
-            return EMPTY_BYTES;
-        }
+        if (n < 0 || this.offset + n > this.size) n = this.size - this.offset;
+        if (n === 0) return EMPTY_BYTES;
         return this.buffer.subarray(this.offset, this.offset += n);
     }
     /**
@@ -518,14 +454,11 @@ export default class ByteStream {
      * @param n the number of bytes to be skipped.
      */
     public skip(n: number): number {
-        if (n === 0) {
-            return 0;
-        }
+        if (n === 0) return 0;
         if (n < 0 || this.offset + n > this.size) {
             n = this.size - this.offset;
             this.offset = this.size;
-        }
-        else {
+        } else {
             this.offset += n;
         }
         return n;
@@ -542,8 +475,7 @@ export default class ByteStream {
         if (pos === -1) {
             result = this.buffer.subarray(this.offset, this.size);
             this.offset = this.size;
-        }
-        else {
+        } else {
             result = this.buffer.subarray(this.offset, pos + 1);
             this.offset = pos + 1;
         }
@@ -560,12 +492,10 @@ export default class ByteStream {
         let result = '';
         if (pos === this.offset) {
             this.offset++;
-        }
-        else if (pos === -1) {
+        } else if (pos === -1) {
             result = fromUint8Array(this.buffer.subarray(this.offset, this.size));
             this.offset = this.size;
-        }
-        else {
+        } else {
             result = fromUint8Array(this.buffer.subarray(this.offset, pos));
             this.offset = pos + 1;
         }
@@ -575,7 +505,7 @@ export default class ByteStream {
      * Reads n bytes of data from this stream and returns the result as an ascii string. 
      * If n is negative, reads to the end of this stream.
      * @param n The maximum number of bytes to read.
-     */    
+     */
     public readAsciiString(n: number): string {
         return toBinaryString(this.read(n));
     }
@@ -585,9 +515,7 @@ export default class ByteStream {
      * @param n is the string(UTF16) length.
      */
     public readStringAsBytes(n: number): Uint8Array {
-        if (n === 0) {
-            return EMPTY_BYTES;
-        }
+        if (n === 0) return EMPTY_BYTES;
         let bytes = this.buffer.subarray(this.offset, this.size);
         if (n < 0) {
             this.offset = this.size;
@@ -597,43 +525,43 @@ export default class ByteStream {
         for (let i = 0, length = bytes.length; i < n && offset < length; i++) {
             const unit = bytes[offset++];
             switch (unit >> 4) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-                break;
-            case 12:
-            case 13:
-                if (offset < length) {
-                    offset++;
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
                     break;
-                }
-                throw new Error('Unfinished UTF-8 octet sequence');
-            case 14:
-                if (offset + 1 < length) {
-                    offset += 2;
-                    break;
-                }
-                throw new Error('Unfinished UTF-8 octet sequence');
-            case 15:
-                if (offset + 2 < length) {
-                    const rune = (((unit & 0x07) << 18) |
-                                ((bytes[offset++] & 0x3F) << 12) |
-                                ((bytes[offset++] & 0x3F) << 6) |
-                                (bytes[offset++] & 0x3F)) - 0x10000;
-                    if (0 <= rune && rune <= 0xFFFFF) {
-                        i++;
+                case 12:
+                case 13:
+                    if (offset < length) {
+                        offset++;
                         break;
                     }
-                    throw new Error('Character outside valid Unicode range: 0x' + rune.toString(16));
-                }
-                throw new Error('Unfinished UTF-8 octet sequence');
-            default:
-                throw new Error('Bad UTF-8 encoding 0x' + unit.toString(16));
+                    throw new Error('Unfinished UTF-8 octet sequence');
+                case 14:
+                    if (offset + 1 < length) {
+                        offset += 2;
+                        break;
+                    }
+                    throw new Error('Unfinished UTF-8 octet sequence');
+                case 15:
+                    if (offset + 2 < length) {
+                        const rune = (((unit & 0x07) << 18)
+                            | ((bytes[offset++] & 0x3F) << 12)
+                            | ((bytes[offset++] & 0x3F) << 6)
+                            | (bytes[offset++] & 0x3F)) - 0x10000;
+                        if (0 <= rune && rune <= 0xFFFFF) {
+                            i++;
+                            break;
+                        }
+                        throw new Error('Character outside valid Unicode range: 0x' + rune.toString(16));
+                    }
+                    throw new Error('Unfinished UTF-8 octet sequence');
+                default:
+                    throw new Error('Bad UTF-8 encoding 0x' + unit.toString(16));
             }
         }
         this.offset += offset;
