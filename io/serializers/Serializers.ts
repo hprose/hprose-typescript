@@ -18,7 +18,7 @@
 \*________________________________________________________*/
 
 import ByteStream from '../ByteStream';
-import ClassManager from '../ClassManager';
+import TypeManager from '../TypeManager';
 import SerializerInterface from './SerializerInterface';
 import Serializer from './Serializer';
 import NumberSerializer from './NumberSerializer';
@@ -47,21 +47,6 @@ const arraySerializer: SerializerInterface = new ArraySerializer();
 const setSerializer: SerializerInterface = new SetSerializer();
 const mapSerializer: SerializerInterface = new MapSerializer();
 const dictionarySerializer: SerializerInterface = new DictionarySerializer();
-
-function getClassName(type: Function): string {
-    if (!type) return '';
-    let name = ClassManager.getClassAlias(type);
-    if (name) return name;
-    if (type.name) {
-        name = type.name;
-    } else {
-        const ctor = type.toString();
-        name = ctor.substr(0, ctor.indexOf('(')).replace(/(^\s*function\s*)|(\s*$)/ig, '');
-    }
-    if (name === '' || name === 'Object') return '';
-    ClassManager.register(type, name);
-    return name;
-}
 
 function register(type: Function, serializer: SerializerInterface) {
     serializers.set(type, serializer);
@@ -93,10 +78,10 @@ function getInstance<T>(value: T): SerializerInterface {
     const serializer = serializers.get(type);
     if (serializer !== undefined) return serializer;
     if (Array.isArray(value) || Object.prototype.toString.call(value) === '[object Arguments]') return arraySerializer;
-    const className = getClassName(type);
-    if (className === 'GeneratorFunction') return nullSerializer;
-    if (className === '') return dictionarySerializer;
-    const objectSerializer: SerializerInterface = new ObjectSerializer<T>(value, className);
+    const name = TypeManager.getName(type);
+    if (name === 'GeneratorFunction') return nullSerializer;
+    if (name === '') return dictionarySerializer;
+    const objectSerializer: SerializerInterface = new ObjectSerializer<T>(value, name);
     register(type, objectSerializer);
     return objectSerializer;
 }

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose object serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 13, 2018                               |
+| LastModified: Dec 14, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,7 +27,7 @@ export default class ObjectSerializer<T> extends ReferenceSerializer<T> {
     public readonly type: Function;
     public readonly fields: string[];
     public readonly metadata: Uint8Array;
-    constructor(obj: T, className: string, fields: string[] = []) {
+    constructor(obj: T, name: string, fields: string[] = []) {
         super();
         this.type = obj.constructor;
         if (fields.length === 0) {
@@ -40,7 +40,7 @@ export default class ObjectSerializer<T> extends ReferenceSerializer<T> {
         this.fields = fields;
         const stream: ByteStream = new ByteStream();
         stream.writeByte(Tags.TagClass);
-        writeStringBody(stream, className);
+        writeStringBody(stream, name);
         const n = fields.length;
         if (n > 0) stream.writeAsciiString('' + n);
         stream.writeByte(Tags.TagOpenbrace);
