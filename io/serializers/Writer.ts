@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Writer for TypeScript.                            |
 |                                                          |
-| LastModified: Dec 11, 2018                               |
+| LastModified: Dec 14, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -58,14 +58,14 @@ export default class Writer implements WriterInterface {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            Serializers.get<T>(value).serialize(this, value);
+            Serializers.getInstance<T>(value).serialize(this, value);
         }
     }
     public write<T>(value: T): void {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            Serializers.get<T>(value).write(this, value);
+            Serializers.getInstance<T>(value).write(this, value);
         }
     }
     public writeReference(value: any): boolean {

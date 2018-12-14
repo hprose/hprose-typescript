@@ -67,7 +67,7 @@ function register(type: Function, serializer: SerializerInterface) {
     serializers.set(type, serializer);
 }
 
-function get<T>(value: T): SerializerInterface {
+function getInstance<T>(value: T): SerializerInterface {
     const type = value.constructor;
     switch (type) {
         case Function: return nullSerializer;
@@ -101,4 +101,4 @@ function get<T>(value: T): SerializerInterface {
     return objectSerializer;
 }
 
-export default { register, get };
+export default { register, getInstance };
