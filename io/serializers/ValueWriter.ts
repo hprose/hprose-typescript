@@ -22,7 +22,7 @@ import Tags from '../Tags';
 
 export function writeInteger(stream: ByteStream, value: number): void {
     if (0 <= value && value <= 9) {
-        stream.writeByte(Tags.TagZero + value);
+        stream.writeByte(0x30 + value);
     } else {
         if (value === (value | 0)) {
             stream.writeByte(Tags.TagInteger);

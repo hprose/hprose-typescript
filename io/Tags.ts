@@ -48,7 +48,6 @@ const enum Tags {
     TagClosebrace  = 0x7D, //  '}'
     TagQuote       = 0x22, //  '"'
     TagPoint       = 0x2E, //  '.'
-    TagZero        = 0x30, //  '0'
     /* Protocol Tags */
     TagHeader      = 0x48, //  'H'
     TagFunctions   = 0x46, //  'F'
