@@ -20,7 +20,7 @@
 import ByteStream from '../ByteStream';
 import Tags from '../Tags';
 import WriterInterface from './WriterInterface';
-import SerializerFactory from './SerializerFactory';
+import Serializers from './Serializers';
 
 class WriterRefer {
     private readonly ref: Map<any, number> = new Map<any, number>();
@@ -58,14 +58,14 @@ export default class Writer implements WriterInterface {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            SerializerFactory.get<T>(value).serialize(this, value);
+            Serializers.get<T>(value).serialize(this, value);
         }
     }
     public write<T>(value: T): void {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            SerializerFactory.get<T>(value).write(this, value);
+            Serializers.get<T>(value).write(this, value);
         }
     }
     public writeReference(value: any): boolean {

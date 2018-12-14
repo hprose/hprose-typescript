@@ -8,11 +8,11 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/serializers/SerializerFactory.ts               |
+| hprose/io/serializers/Serializers.ts                     |
 |                                                          |
-| hprose serializer factory for TypeScript.                |
+| hprose serializers for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 12, 2018                               |
+| LastModified: Dec 14, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
