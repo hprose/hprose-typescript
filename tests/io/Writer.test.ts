@@ -1,5 +1,6 @@
 import ByteStream from '../../io/ByteStream'
 import Writer from '../../io/serializers/Writer'
+import { Guid } from 'guid-typescript';
 
 test('test boolean serialization', () => {
     let writer = new Writer(new ByteStream());
@@ -47,7 +48,7 @@ test('test map serialization', () => {
 });
 
 test('test object serialization', () => {
-        class User {
+    class User {
         public name: string = '';
         public age: number = 0;
     }
@@ -63,6 +64,13 @@ test('test object serialization', () => {
     expect(writer.stream.toString()).toBe('c4"User"2{s4"name"s3"age"}o0{s3"Tom"i18;}o0{s5"Jerry"i17;}');
 })
 
+test('test guid serialization', () => {
+    let guid: Guid = Guid.parse('bf3066cf-7b5b-1edf-731e-05b2d25a4408');
+    let writer = new Writer(new ByteStream());
+    writer.serialize(guid);
+    writer.serialize(guid);
+    expect(writer.stream.toString()).toBe('g{bf3066cf-7b5b-1edf-731e-05b2d25a4408}r0;');
+})
 // hproseWriter.serialize(undefined);
 // hproseWriter.serialize(null);
 // hproseWriter.serialize(0);
