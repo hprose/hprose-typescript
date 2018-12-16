@@ -83,8 +83,9 @@ function getInstance<T>(value: T): SerializerInterface {
     if (serializer !== undefined) return serializer;
     if (Array.isArray(value) || Object.prototype.toString.call(value) === '[object Arguments]') return arraySerializer;
     const name = TypeManager.getName(type);
-    if (name === 'GeneratorFunction') return nullSerializer;
     if (name === '') return dictionarySerializer;
+    if (name === 'GeneratorFunction') return nullSerializer;
+    if (name === 'AsyncFunction') return nullSerializer;
     const objectSerializer: SerializerInterface = new ObjectSerializer<T>(value, name);
     register(type, objectSerializer);
     return objectSerializer;
