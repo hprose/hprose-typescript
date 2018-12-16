@@ -12,7 +12,7 @@
 |                                                          |
 | hprose serializers for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 14, 2018                               |
+| LastModified: Dec 16, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,20 +36,20 @@ import ObjectSerializer from './ObjectSerializer';
 import { writeInteger, writeDouble } from './ValueWriter';
 import { Guid } from 'guid-typescript';
 
-const serializers: Map<Function, SerializerInterface> = new Map<Function, SerializerInterface>();
-const nullSerializer: SerializerInterface = new Serializer<any>();
-const numberSerializer: SerializerInterface = new NumberSerializer();
-const booleanSerializer: SerializerInterface = new BooleanSerializer();
-const stringSerializer: SerializerInterface = new StringSerializer();
-const dateSerializer: SerializerInterface = new DateSerializer();
-const bytesSerializer: SerializerInterface = new BytesSerializer();
-const guidSerializer: SerializerInterface = new GuidSerializer();
-const intArraySerializer: SerializerInterface = new NumberArraySerializer(writeInteger);
-const doubleArraySerializer: SerializerInterface = new NumberArraySerializer(writeDouble);
-const arraySerializer: SerializerInterface = new ArraySerializer();
-const setSerializer: SerializerInterface = new SetSerializer();
-const mapSerializer: SerializerInterface = new MapSerializer();
-const dictionarySerializer: SerializerInterface = new DictionarySerializer();
+const serializers = new Map<Function, SerializerInterface>();
+const nullSerializer = new Serializer<any>();
+const numberSerializer = new NumberSerializer();
+const booleanSerializer = new BooleanSerializer();
+const stringSerializer = new StringSerializer();
+const dateSerializer = new DateSerializer();
+const bytesSerializer = new BytesSerializer();
+const guidSerializer = new GuidSerializer();
+const intArraySerializer = new NumberArraySerializer(writeInteger);
+const doubleArraySerializer = new NumberArraySerializer(writeDouble);
+const arraySerializer = new ArraySerializer();
+const setSerializer = new SetSerializer();
+const mapSerializer = new MapSerializer();
+const dictionarySerializer = new DictionarySerializer();
 
 function register(type: Function, serializer: SerializerInterface) {
     serializers.set(type, serializer);
@@ -86,7 +86,7 @@ function getInstance<T>(value: T): SerializerInterface {
     if (name === '') return dictionarySerializer;
     if (name === 'GeneratorFunction') return nullSerializer;
     if (name === 'AsyncFunction') return nullSerializer;
-    const objectSerializer: SerializerInterface = new ObjectSerializer<T>(value, name);
+    const objectSerializer = new ObjectSerializer<T>(value, name);
     register(type, objectSerializer);
     return objectSerializer;
 }
