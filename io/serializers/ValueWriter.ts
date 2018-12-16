@@ -8,11 +8,11 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/ValueWriter.ts                                 |
+| hprose/io/serializers/ValueWriter.ts                     |
 |                                                          |
 | hprose value writer for TypeScript.                      |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Dec 16, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
