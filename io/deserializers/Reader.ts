@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Reader for TypeScript.                            |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Dec 24, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -52,10 +52,10 @@ export default class Reader implements ReaderInterface {
         this.refer = simple ? undefined : new ReaderRefer();
     }
     deserialize(type?: Function): any {
-        Deserializers.getInstance(type).deserialize(this);
+        return Deserializers.getInstance(type).deserialize(this);
     }
     read(tag: number, type?: Function): any {
-        Deserializers.getInstance(type).read(this, tag);
+        return Deserializers.getInstance(type).read(this, tag);
     }
     readClass(): void {
         const stream = this.stream;
