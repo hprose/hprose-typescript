@@ -12,7 +12,7 @@
 |                                                          |
 | hprose serializers for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Dec 20, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,7 +27,7 @@ import StringSerializer from './StringSerializer';
 import DateSerializer from './DateSerializer';
 import BytesSerializer from './BytesSerializer';
 import GuidSerializer from './GuidSerializer';
-import NumberArraySerializer from './NumberArraySerializer';
+import TypedArraySerializer from './TypedArraySerializer';
 import ArraySerializer from './ArraySerializer';
 import SetSerializer from './SetSerializer';
 import MapSerializer from './MapSerializer';
@@ -44,8 +44,8 @@ const stringSerializer = new StringSerializer();
 const dateSerializer = new DateSerializer();
 const bytesSerializer = new BytesSerializer();
 const guidSerializer = new GuidSerializer();
-const intArraySerializer = new NumberArraySerializer(writeInteger);
-const doubleArraySerializer = new NumberArraySerializer(writeDouble);
+const intArraySerializer = new TypedArraySerializer(writeInteger);
+const doubleArraySerializer = new TypedArraySerializer(writeDouble);
 const arraySerializer = new ArraySerializer();
 const setSerializer = new SetSerializer();
 const mapSerializer = new MapSerializer();
