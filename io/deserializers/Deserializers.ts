@@ -20,6 +20,7 @@
 import ByteStream from '../ByteStream';
 import DeserializerInterface from './DeserializerInterface';
 import Deserializer from './Deserializer';
+import NullDeserializer from './NullDeserializer';
 import FunctionDeserializer from './FunctionDeserializer';
 import NumberDeserializer from './NumberDeserializer';
 import BooleanDeserializer from './BooleanDeserializer';
@@ -45,7 +46,7 @@ function register(type: Function, deserializer: DeserializerInterface) {
     deserializers.set(type, deserializer);
 }
 
-function getInstance(type?: Function): DeserializerInterface {
+function getInstance(type?: Function | null): DeserializerInterface {
     if (type) {
         switch (type) {
             case Function: return FunctionDeserializer.instance;
@@ -70,6 +71,7 @@ function getInstance(type?: Function): DeserializerInterface {
         const deserializer = deserializers.get(type);
         if (deserializer !== undefined) return deserializer;
     }
+    if (type === null) return NullDeserializer.instance;
     return Deserializer.instance;
  }
 

@@ -51,10 +51,10 @@ export default class Reader implements ReaderInterface {
     constructor(public readonly stream: ByteStream, simple: boolean = false) {
         this.refer = simple ? undefined : new ReaderRefer();
     }
-    deserialize(type?: Function): any {
+    deserialize(type?: Function | null): any {
         return Deserializers.getInstance(type).deserialize(this);
     }
-    read(tag: number, type?: Function): any {
+    read(tag: number, type?: Function | null): any {
         return Deserializers.getInstance(type).read(this, tag);
     }
     readClass(): void {
