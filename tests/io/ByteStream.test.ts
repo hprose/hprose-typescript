@@ -1,4 +1,4 @@
-import ByteStream from '../../lib/io/ByteStream'
+import { ByteStream } from '../../lib/io'
 
 test('test writeByte & readAsciiString', () => {
     const stream = new ByteStream();

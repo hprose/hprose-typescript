@@ -1,5 +1,4 @@
-import ByteStream from '../../lib/io/ByteStream'
-import Reader from '../../lib/io/Reader'
+import { ByteStream, Reader } from '../../lib/io'
 import { Guid } from 'guid-typescript';
 
 test('test boolean deserialization', () => {

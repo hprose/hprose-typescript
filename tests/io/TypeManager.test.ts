@@ -1,4 +1,4 @@
-import TypeManager from '../../lib/io/TypeManager';
+import { TypeManager } from '../../lib/io';
 
 test('test getType', () => {
     let type = TypeManager.getType('Test');
