@@ -12,7 +12,7 @@
 |                                                          |
 | hprose deserializers for TypeScript.                     |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,6 +27,7 @@ import BooleanDeserializer from './BooleanDeserializer';
 import StringDeserializer from './StringDeserializer';
 import DateDeserializer from './DateDeserializer';
 import ArrayDeserializer from './ArrayDeserializer';
+import ByteStreamDeserializer from './ByteStreamDeserializer';
 import Uint8ArrayDeserializer from './Uint8ArrayDeserializer';
 import Uint8ClampedArrayDeserializer from './Uint8ClampedArrayDeserializer';
 import Uint16ArrayDeserializer from './Uint16ArrayDeserializer';
@@ -38,8 +39,6 @@ import Float32ArrayDeserializer from './Float32ArrayDeserializer';
 import Float64ArrayDeserializer from './Float64ArrayDeserializer';
 import SetDeserializer from './SetDeserializer';
 import MapDeserializer from './MapDeserializer';
-import ByteStreamDeserializer from './ByteStreamDeserializer';
-import BigIntDeserializer from './BigIntDeserializer';
 
 const deserializers: Map<Function, DeserializerInterface> = new Map<Function, DeserializerInterface>();
 
@@ -52,7 +51,6 @@ function getInstance(type?: Function | null): DeserializerInterface {
         switch (type) {
             case Function: return FunctionDeserializer.instance;
             case Number: return NumberDeserializer.instance;
-            case BigInt: return BigIntDeserializer.instance;
             case Boolean: return BooleanDeserializer.instance;
             case String: return StringDeserializer.instance;
             case Date: return DateDeserializer.instance;

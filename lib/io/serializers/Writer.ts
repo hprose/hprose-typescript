@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Writer for TypeScript.                            |
 |                                                          |
-| LastModified: Dec 14, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,6 +21,8 @@ import ByteStream from '../ByteStream';
 import Tags from '../Tags';
 import WriterInterface from './WriterInterface';
 import Serializers from './Serializers';
+import './BigIntSerializer';
+import './BigIntArraySerializer';
 
 class WriterRefer {
     private readonly ref: Map<any, number> = new Map<any, number>();

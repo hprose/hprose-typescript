@@ -66,3 +66,13 @@ test('test guid deserialization', () => {
     expect(reader.deserialize()).toEqual(guid);
     expect(reader.deserialize()).toEqual(guid);
 })
+
+test('test bigint deserialization', () => {
+    let reader = new Reader(new ByteStream('l1234567890987654321234567890;'));
+    reader.longType = 'bigint';
+    if (typeof BigInt !== 'undefined') {
+        expect(reader.deserialize()).toEqual(BigInt('1234567890987654321234567890'));
+    } else {
+        expect(reader.deserialize()).toEqual('1234567890987654321234567890');
+    }
+});

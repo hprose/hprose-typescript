@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Reader for TypeScript.                            |
 |                                                          |
-| LastModified: Dec 24, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,6 +23,9 @@ import TypeInfo from './TypeInfo';
 import ReaderInterface from './ReaderInterface';
 import Deserializers from './Deserializers';
 import { readInt, readString, readCount } from './ValueReader';
+import './BigIntDeserializer';
+import './BigInt64ArrayDeserializer';
+import './BigUint64ArrayDeserializer';
 
 class ReaderRefer {
     private readonly ref: any[] = [];

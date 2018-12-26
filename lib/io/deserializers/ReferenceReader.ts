@@ -25,6 +25,7 @@ import NumberDeserializer from './NumberDeserializer';
 import StringDeserializer from './StringDeserializer';
 import * as ValueReader from './ValueReader';
 import { Guid } from 'guid-typescript';
+import Deserializers from './Deserializers';
 
 export function readBytes(reader: ReaderInterface): Uint8Array {
     const result = ValueReader.readBytes(reader.stream);
@@ -103,6 +104,28 @@ export function readNumberArray(reader: ReaderInterface, type: TypedArrayConstru
     const a = new type(count);
     reader.addReference(a);
     const deserializer = NumberDeserializer.instance;
+    for (let i = 0; i < count; ++i) {
+        a[i] = deserializer.deserialize(reader);
+    }
+    stream.readByte();
+    return a;
+}
+
+interface BigIntArrayConstructor extends Function {
+    new(length: number): BigIntArray;
+}
+
+interface BigIntArray {
+    [index: number]: bigint;
+    readonly length: number;
+}
+
+export function readBigIntArray(reader: ReaderInterface, type: BigIntArrayConstructor): BigIntArray {
+    const stream = reader.stream;
+    const count = ValueReader.readCount(stream);
+    const a = new type(count);
+    reader.addReference(a);
+    const deserializer = Deserializers.getInstance(BigInt);
     for (let i = 0; i < count; ++i) {
         a[i] = deserializer.deserialize(reader);
     }

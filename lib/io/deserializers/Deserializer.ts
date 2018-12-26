@@ -48,7 +48,9 @@ export default class Deserializer extends BaseDeserializer implements Deserializ
                     case 'number':
                         return ValueReader.readInt(stream);
                     case 'bigint':
-                        return BigInt(stream.readUntil(Tags.TagSemicolon));
+                        if (typeof BigInt !== 'undefined') {
+                            return BigInt(stream.readUntil(Tags.TagSemicolon));
+                        }
                     case 'string':
                         return stream.readUntil(Tags.TagSemicolon);
                 }

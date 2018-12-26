@@ -70,3 +70,11 @@ test('test guid serialization', () => {
     writer.serialize(guid);
     expect(writer.stream.toString()).toBe('g{bf3066cf-7b5b-1edf-731e-05b2d25a4408}r0;');
 })
+
+test('test bigint serialization', () => {
+    if (typeof BigInt !== 'undefined') {
+        let writer = new Writer(new ByteStream());
+        writer.write(BigInt('1234567890987654321234567890'));
+        expect(writer.stream.toString()).toBe('l1234567890987654321234567890;');
+    }
+});
