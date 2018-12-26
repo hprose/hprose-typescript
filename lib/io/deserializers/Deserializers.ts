@@ -39,6 +39,7 @@ import Float64ArrayDeserializer from './Float64ArrayDeserializer';
 import SetDeserializer from './SetDeserializer';
 import MapDeserializer from './MapDeserializer';
 import ByteStreamDeserializer from './ByteStreamDeserializer';
+import BigIntDeserializer from './BigIntDeserializer';
 
 const deserializers: Map<Function, DeserializerInterface> = new Map<Function, DeserializerInterface>();
 
@@ -51,6 +52,7 @@ function getInstance(type?: Function | null): DeserializerInterface {
         switch (type) {
             case Function: return FunctionDeserializer.instance;
             case Number: return NumberDeserializer.instance;
+            case BigInt: return BigIntDeserializer.instance;
             case Boolean: return BooleanDeserializer.instance;
             case String: return StringDeserializer.instance;
             case Date: return DateDeserializer.instance;

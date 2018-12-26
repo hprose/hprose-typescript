@@ -12,7 +12,7 @@
 |                                                          |
 | hprose value writer for TypeScript.                      |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -44,6 +44,16 @@ export function writeDouble(stream: ByteStream, value: number): void {
     } else {
         stream.writeByte(Tags.TagInfinity);
         stream.writeByte((value > 0) ? Tags.TagPos : Tags.TagNeg);
+    }
+}
+
+export function writeBigInt(stream: ByteStream, value: bigint): void {
+    if (0 <= value && value <= 9) {
+        stream.writeByte(0x30 + Number(value));
+    } else {
+        stream.writeByte(Tags.TagLong);
+        stream.writeAsciiString('' + value);
+        stream.writeByte(Tags.TagSemicolon);
     }
 }
 

@@ -46,8 +46,8 @@ class ReaderRefer {
 export default class Reader implements ReaderInterface {
     private readonly refer?: ReaderRefer;
     private readonly ref: TypeInfo[] = [];
-    public defaultLongType: 'number' | 'string' = 'string';
-    public defaultDictType: 'object' | 'map' = 'object';
+    public longType: 'number' | 'bigint' | 'string' = 'string';
+    public dictType: 'object' | 'map' = 'object';
     constructor(public readonly stream: ByteStream, simple: boolean = false) {
         this.refer = simple ? undefined : new ReaderRefer();
     }

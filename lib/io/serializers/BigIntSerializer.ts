@@ -8,29 +8,21 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/deserializers/ReaderInterface.ts               |
+| hprose/io/serializers/BigIntSerializer.ts                |
 |                                                          |
-| hprose ReaderInterface for TypeScript.                   |
+| hprose bigint serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from "../ByteStream";
-import TypeInfo from './TypeInfo';
+import WriterInterface from './WriterInterface';
+import Serializer from './Serializer';
+import { writeBigInt } from './ValueWriter';
 
-export default interface ReaderInterface {
-    readonly stream: ByteStream;
-    longType: 'number' | 'bigint' | 'string';
-    dictType: 'object' | 'map';
-    deserialize(type?: Function): any;
-    read(tag: number): any;
-    readClass(): void;
-    getTypeInfo(index: number): TypeInfo;
-    readReference(): any;
-    addReference(value: any): void;
-    setReference(index: number, value: any): void;
-    readonly lastReferenceIndex: number;
-    reset(): void;
+export default class BigIntSerializer extends Serializer<bigint> {
+    public write(writer: WriterInterface, value: bigint): void {
+        writeBigInt(writer.stream, value);
+    }
 }

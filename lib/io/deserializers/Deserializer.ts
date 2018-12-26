@@ -43,13 +43,22 @@ export default class Deserializer extends BaseDeserializer implements Deserializ
             case Tags.TagDate: return ReferenceReader.readDateTime(reader);
             case Tags.TagTime: return ReferenceReader.readTime(reader);
             case Tags.TagGuid: return ReferenceReader.readGuid(reader);
-            case Tags.TagLong: return (reader.defaultLongType === 'number') ? ValueReader.readInt(stream) : stream.readUntil(Tags.TagSemicolon);
+            case Tags.TagLong:
+                switch(reader.longType) {
+                    case 'number':
+                        return ValueReader.readInt(stream);
+                    case 'bigint':
+                        return BigInt(stream.readUntil(Tags.TagSemicolon));
+                    case 'string':
+                        return stream.readUntil(Tags.TagSemicolon);
+                }
+                break;
             case Tags.TagDouble: return ValueReader.readDouble(stream);
             case Tags.TagNaN: return NaN;
             case Tags.TagInfinity: return ValueReader.readInfinity(stream);
             case Tags.TagUTF8Char: return stream.readString(1);
             case Tags.TagList: return ReferenceReader.readArray(reader);
-            case Tags.TagMap: return (reader.defaultDictType === 'map') ? ReferenceReader.readMap(reader) : ReferenceReader.readDict(reader);
+            case Tags.TagMap: return (reader.dictType === 'map') ? ReferenceReader.readMap(reader) : ReferenceReader.readDict(reader);
             default: return super.read(reader, tag);
         }
     }

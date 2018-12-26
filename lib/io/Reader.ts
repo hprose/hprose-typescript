@@ -28,17 +28,17 @@ export default class Reader {
     public get stream(): ByteStream {
         return this.reader.stream;
     }
-    public get defaultLongType(): 'number' | 'string' {
-        return this.reader.defaultLongType;
+    public get longType(): 'number' | 'bigint' | 'string' {
+        return this.reader.longType;
     }
-    public set defaultLongType(value: 'number' | 'string') {
-        this.reader.defaultLongType = value;
+    public set longType(value: 'number' | 'bigint' | 'string') {
+        this.reader.longType = value;
     }
-    public get defaultDictType(): 'object' | 'map' {
-        return this.reader.defaultDictType;
+    public get dictType(): 'object' | 'map' {
+        return this.reader.dictType;
     }
-    public set defaultDictType(value: 'object' | 'map') {
-        this.reader.defaultDictType = value;
+    public set dictType(value: 'object' | 'map') {
+        this.reader.dictType = value;
     }
     deserialize(type?: Function | null): any {
         return this.reader.deserialize(type);

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose serializers for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 20, 2018                               |
+| LastModified: Dec 26, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,6 +22,7 @@ import TypeManager from '../TypeManager';
 import SerializerInterface from './SerializerInterface';
 import Serializer from './Serializer';
 import NumberSerializer from './NumberSerializer';
+import BigIntSerializer from './BigIntSerializer';
 import BooleanSerializer from './BooleanSerializer';
 import StringSerializer from './StringSerializer';
 import DateSerializer from './DateSerializer';
@@ -39,6 +40,7 @@ import { Guid } from 'guid-typescript';
 const serializers = new Map<Function, SerializerInterface>();
 const nullSerializer = new Serializer<any>();
 const numberSerializer = new NumberSerializer();
+const bigintSerializer = new BigIntSerializer();
 const booleanSerializer = new BooleanSerializer();
 const stringSerializer = new StringSerializer();
 const dateSerializer = new DateSerializer();
@@ -60,6 +62,7 @@ function getInstance<T>(value: T): SerializerInterface {
     switch (type) {
         case Function: return nullSerializer;
         case Number: return numberSerializer;
+        case BigInt: return bigintSerializer;
         case Boolean: return booleanSerializer;
         case String: return stringSerializer;
         case Date: return dateSerializer;
