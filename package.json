@@ -15,13 +15,14 @@
     "email": "mabingyao@gmail.com",
     "url": "http://hprose.com/"
   },
-  "main": "index.js",
+  "main": "./dist/hprose.js",
+  "types": "./dist/hprose.d.ts",
   "engines": {
     "node": "*"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hprose/hprose-ts.git"
+    "url": "https://github.com/hprose/hprose-ts"
   },
   "bugs": {
     "url": "https://github.com/hprose/hprose-ts/issues",
@@ -29,7 +30,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "verify": ".\\node_modules\\.bin\\tslint .\\lib\\**",
+    "build": ".\\node_modules\\.bin\\tsc -p lib -t es5 -m commonjs -d --outDir dist"
   },
   "devDependencies": {
     "@types/jest": "^23.3.10",
@@ -39,5 +42,8 @@
   },
   "dependencies": {
     "guid-typescript": "^1.0.9"
-  }
+  },
+  "files": [
+    "/dist/"
+  ]
 }

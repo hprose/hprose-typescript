@@ -1,5 +1,5 @@
-import ByteStream from '../../io/ByteStream'
-import Writer from '../../io/serializers/Writer'
+import ByteStream from '../../lib/io/ByteStream'
+import Writer from '../../lib/io/serializers/Writer'
 import { Guid } from 'guid-typescript';
 
 test('test boolean serialization', () => {
