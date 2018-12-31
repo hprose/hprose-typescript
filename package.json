@@ -1,5 +1,5 @@
 {
-  "name": "hprose-ts",
+  "name": "hprose",
   "version": "3.0.0",
   "homepage": "https://github.com/hprose/hprose-ts",
   "description": "hprose for TypeScript",
@@ -31,8 +31,8 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "verify": ".\\node_modules\\.bin\\tslint .\\lib\\**",
-    "build": ".\\node_modules\\.bin\\tsc -p lib -t es5 -m commonjs -d --outDir dist"
+    "compile": "rm -rf dist && tsc -p lib",
+    "prepublish": "npm run compile"
   },
   "devDependencies": {
     "@types/jest": "^23.3.10",
