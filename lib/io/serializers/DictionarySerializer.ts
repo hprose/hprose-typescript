@@ -12,7 +12,7 @@
 |                                                          |
 | hprose dictionary serializer for TypeScript.             |
 |                                                          |
-| LastModified: Dec 12, 2018                               |
+| LastModified: Dec 31, 2018                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -26,9 +26,17 @@ export default class DictionarySerializer extends ReferenceSerializer<any> {
         super.write(writer, value);
         const stream = writer.stream;
         const fields = [];
-        for (const key in value) {
-            if (value.hasOwnProperty(key) && typeof value[key] !== 'function') {
-                fields[fields.length] = key;
+        if (value.hasOwnProperty === undefined) {
+            for (const key in value) {
+                if (typeof value[key] !== 'function') {
+                    fields[fields.length] = key;
+                }
+            }
+        } else {
+            for (const key in value) {
+                if (value.hasOwnProperty(key) && typeof value[key] !== 'function') {
+                    fields[fields.length] = key;
+                }
             }
         }
         const n = fields.length;
