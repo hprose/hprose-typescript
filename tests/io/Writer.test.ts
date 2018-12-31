@@ -43,7 +43,13 @@ test('test map serialization', () => {
     map.set("age", 17);
     writer.serialize(map);
     writer.serialize(map);
-    expect(writer.stream.toString()).toBe('m{}m{}m2{s4"name"s3"Tom"s3"age"i18;}m2{r3;s5"Jerry"r5;i17;}r6;');
+    let obj = Object.create(null);
+    obj.field1 = 1;
+    obj.field2 = 2;
+    obj.field3 = 3;
+    writer.serialize(obj);
+    writer.serialize(obj);
+    expect(writer.stream.toString()).toBe('m{}m{}m2{s4"name"s3"Tom"s3"age"i18;}m2{r3;s5"Jerry"r5;i17;}r6;m3{s6"field1"1s6"field2"2s6"field3"3}r8;');
 });
 
 test('test object serialization', () => {
