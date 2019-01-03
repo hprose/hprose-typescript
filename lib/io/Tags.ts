@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Tags for TypeScript.                              |
 |                                                          |
-| LastModified: Dec 5, 2018                                |
+| LastModified: Jan 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -53,7 +53,6 @@ const enum Tags {
     TagFunctions   = 0x46, //  'F'
     TagCall        = 0x43, //  'C'
     TagResult      = 0x52, //  'R'
-    TagArgument    = 0x41, //  'A'
     TagError       = 0x45, //  'E'
     TagEnd         = 0x7A  //  'z'
 }
