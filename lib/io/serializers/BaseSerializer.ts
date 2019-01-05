@@ -8,18 +8,24 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/deserializers/DeserializerInterface.ts         |
+| hprose/io/serializers/BaseSerializer.ts                  |
 |                                                          |
-| hprose DeserializerInterface for TypeScript.             |
+| hprose BaseSerializer for TypeScript.                    |
 |                                                          |
-| LastModified: Dec 13, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ReaderInterface from './ReaderInterface';
+import { Tags } from '../Tags';
+import { Serializer } from './Serializer';
+import { Writer } from "./Writer";
 
-export default interface DeserializerInterface {
-    read(reader: ReaderInterface, tag: number): any;
-    deserialize(reader: ReaderInterface): any;
+export class BaseSerializer<T> implements Serializer {
+    public write(writer: Writer, value: T): void {
+        writer.stream.writeByte(Tags.TagNull);
+    }
+    public serialize(writer: Writer, value: T): void {
+        this.write(writer, value);
+    }
 }

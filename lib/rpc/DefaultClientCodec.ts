@@ -17,7 +17,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Tags, ByteStream, Writer, Reader } from '../io'
+import { Tags, ByteStream, Writer, Reader } from '../hprose.io'
 import ClientContext from "./ClientContext";
 import ClientCodec from "./ClientCodec";
 

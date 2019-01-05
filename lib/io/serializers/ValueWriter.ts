@@ -12,13 +12,13 @@
 |                                                          |
 | hprose value writer for TypeScript.                      |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from '../ByteStream';
-import Tags from '../Tags';
+import { ByteStream } from '../ByteStream';
+import { Tags } from '../Tags';
 
 export function writeInteger(stream: ByteStream, value: number): void {
     if (0 <= value && value <= 9) {

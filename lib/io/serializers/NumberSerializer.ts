@@ -12,17 +12,17 @@
 |                                                          |
 | hprose number serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import WriterInterface from './WriterInterface';
-import Serializer from './Serializer';
+import { BaseSerializer } from './BaseSerializer';
+import { Writer } from "./Writer";
 import { writeInteger, writeDouble } from './ValueWriter';
 
-export default class NumberSerializer extends Serializer<number> {
-    public write(writer: WriterInterface, value: number): void {
+export class NumberSerializer extends BaseSerializer<number> {
+    public write(writer: Writer, value: number): void {
         value = value.valueOf();
         if (Number.isSafeInteger(value)) {
             writeInteger(writer.stream, value);

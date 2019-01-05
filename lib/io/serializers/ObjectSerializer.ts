@@ -12,18 +12,18 @@
 |                                                          |
 | hprose object serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 14, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReferenceSerializer from './ReferenceSerializer';
-import WriterInterface from './WriterInterface';
-import ByteStream from '../ByteStream';
+import { Tags } from '../Tags';
+import { ByteStream } from '../ByteStream';
+import { ReferenceSerializer } from './ReferenceSerializer';
+import { Writer } from "./Writer";
 import { writeStringBody } from './ValueWriter';
 
-export default class ObjectSerializer<T> extends ReferenceSerializer<T> {
+export class ObjectSerializer<T> extends ReferenceSerializer<T> {
     public readonly type: Function;
     public readonly fields: string[];
     public readonly metadata: Uint8Array;
@@ -51,7 +51,7 @@ export default class ObjectSerializer<T> extends ReferenceSerializer<T> {
         stream.writeByte(Tags.TagClosebrace);
         this.metadata = stream.takeBytes();
     }
-    public write(writer: WriterInterface, value: any): void {
+    public write(writer: Writer, value: any): void {
         const stream = writer.stream;
         const fields = this.fields;
         const metadata = this.metadata;

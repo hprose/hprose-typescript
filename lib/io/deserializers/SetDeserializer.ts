@@ -12,24 +12,24 @@
 |                                                          |
 | hprose Set deserializer for TypeScript.                  |
 |                                                          |
-| LastModified: Dec 24, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
-import * as ReferenceReader from './ReferenceReader';
+import { Tags } from '../Tags';
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
+import { readSet } from './ReferenceReader';
 
-export default class SetDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new SetDeserializer();
+export class SetDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new SetDeserializer();
     constructor() { super('Set'); }
-    public read(reader: ReaderInterface, tag: number): Set<any> {
+    public read(reader: Reader, tag: number): Set<any> {
         switch (tag) {
             case Tags.TagEmpty: return new Set();
-            case Tags.TagList: return ReferenceReader.readSet(reader);
+            case Tags.TagList: return readSet(reader);
             default:
                 return super.read(reader, tag);
         }

@@ -12,22 +12,22 @@
 |                                                          |
 | hprose date deserializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
+import { Tags } from '../Tags';
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
 import * as ValueReader from './ValueReader';
 import * as ReferenceReader from './ReferenceReader';
 
-export default class DateDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new DateDeserializer();
+export class DateDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new DateDeserializer();
     constructor() { super('Date'); }
-    public read(reader: ReaderInterface, tag: number): Date {
+    public read(reader: Reader, tag: number): Date {
         const stream = reader.stream;
         switch (tag) {
             case Tags.TagDate: return ReferenceReader.readDateTime(reader);

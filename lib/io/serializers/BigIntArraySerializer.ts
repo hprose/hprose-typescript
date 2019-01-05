@@ -12,21 +12,21 @@
 |                                                          |
 | hprose bigint array serializer for TypeScript.           |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReferenceSerializer from './ReferenceSerializer';
-import WriterInterface from './WriterInterface';
+import { Tags } from '../Tags';
+import { ReferenceSerializer } from './ReferenceSerializer';
+import { Writer } from "./Writer";
 import { writeBigInt } from './ValueWriter';
-import Serializers from './Serializers';
+import { register } from '../Serializers';
 
 if ((typeof BigInt64Array !== 'undefined') && (typeof BigUint64Array !== 'undefined')) {
     class BigIntArraySerializer extends ReferenceSerializer<ArrayLike<bigint>> {
         constructor () { super(); }
-        public write(writer: WriterInterface, value: ArrayLike<bigint>): void {
+        public write(writer: Writer, value: ArrayLike<bigint>): void {
             super.write(writer, value);
             const stream = writer.stream;
             stream.writeByte(Tags.TagList);
@@ -40,6 +40,6 @@ if ((typeof BigInt64Array !== 'undefined') && (typeof BigUint64Array !== 'undefi
         }
     }
     const bigintArraySerializer = new BigIntArraySerializer();
-    Serializers.register(BigInt64Array, bigintArraySerializer);
-    Serializers.register(BigUint64Array, bigintArraySerializer);
+    register(BigInt64Array, bigintArraySerializer);
+    register(BigUint64Array, bigintArraySerializer);
 }

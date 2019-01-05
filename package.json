@@ -37,6 +37,8 @@
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "jest": "^23.6.0",
+    "rollup": "^1.0.2",
+    "rollup-plugin-typescript2": "^0.18.1",
     "ts-jest": "^23.10.5",
     "typescript": "^3.2.2"
   },

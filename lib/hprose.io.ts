@@ -8,29 +8,31 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/deserializers/ReaderInterface.ts               |
+| hprose.io.ts                                             |
 |                                                          |
-| hprose ReaderInterface for TypeScript.                   |
+| hprose io for TypeScript.                                |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from "../ByteStream";
-import TypeInfo from './TypeInfo';
+import { ByteStream } from "./io/ByteStream";
+import { Tags } from "./io/Tags";
+import { Writer } from "./io/Writer";
+import { Reader } from "./io/Reader";
+import * as TypeManager from "./io/TypeManager";
+import * as Serializers from "./io/Serializers";
+import * as Deserializers from "./io/Deserializers";
+import * as Formatter from "./io/Formatter";
 
-export default interface ReaderInterface {
-    readonly stream: ByteStream;
-    longType: 'number' | 'bigint' | 'string';
-    dictType: 'object' | 'map';
-    deserialize(type?: Function): any;
-    read(tag: number): any;
-    readClass(): void;
-    getTypeInfo(index: number): TypeInfo;
-    readReference(): any;
-    addReference(value: any): void;
-    setReference(index: number, value: any): void;
-    readonly lastReferenceIndex: number;
-    reset(): void;
+export {
+    ByteStream,
+    Tags,
+    Writer,
+    Reader,
+    TypeManager,
+    Serializers,
+    Deserializers,
+    Formatter
 }

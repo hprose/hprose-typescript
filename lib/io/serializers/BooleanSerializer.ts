@@ -12,17 +12,17 @@
 |                                                          |
 | hprose boolean serializer for TypeScript.                |
 |                                                          |
-| LastModified: Dec 11, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import Serializer from './Serializer';
-import WriterInterface from './WriterInterface';
+import { Tags } from '../Tags';
+import { BaseSerializer } from './BaseSerializer';
+import { Writer } from "./Writer";
 
-export default class BooleanSerializer extends Serializer<boolean> {
-    public write(writer: WriterInterface, value: boolean): void {
+export class BooleanSerializer extends BaseSerializer<boolean> {
+    public write(writer: Writer, value: boolean): void {
         writer.stream.writeByte(value.valueOf() ? Tags.TagTrue : Tags.TagFalse);
     }
 }

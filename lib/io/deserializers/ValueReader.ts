@@ -12,13 +12,13 @@
 |                                                          |
 | hprose value reader for TypeScript.                      |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from '../ByteStream';
-import Tags from '../Tags';
+import { ByteStream } from '../ByteStream';
+import { Tags } from '../Tags';
 import { Guid } from 'guid-typescript';
 
 export function readInt(stream: ByteStream, tag: number = Tags.TagSemicolon): number {

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose TypeManager for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 14, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,19 +20,23 @@
 const typeCache = Object.create(null);
 const nameCache = new WeakMap();
 
-function getFunctionName(type: Function): string {
-    if (type.name) {
-        return type.name;
-    }
-    const ctor = type.toString();
-    return ctor.substr(0, ctor.indexOf('(')).replace(/(^\s*function\s*)|(\s*$)/ig, '');
+if (!('name' in Function.prototype)) {
+    Object.defineProperty(Function.prototype, 'name', {
+        get: function() {
+            const ctor = this.toString();
+            return ctor.substr(0, ctor.indexOf('(')).replace(/(^\s*function\s*)|(\s*$)/ig, '');        
+        },
+        writable: false,
+        enumerable: false,
+        configurable: true
+    });
 }
 
 /**
  * Registers a type.
  */
-function register(type: Function, name?: string): void {
-    if (name === undefined) name = getFunctionName(type);
+export function register(type: Function, name?: string): void {
+    if (name === undefined) name = type.name;
     nameCache.set(type, name);
     typeCache[name] = type;
 }
@@ -40,18 +44,18 @@ function register(type: Function, name?: string): void {
 /**
  * Returns whether the name has been registered.
  */
-function isRegistered(name: string): boolean {
+export function isRegistered(name: string): boolean {
     return name in typeCache;
 }
 
 /**
  * Gets name by type.
  */
-function getName(type: Function): string {
+export function getName(type: Function): string {
     if (!type) return '';
     let name = nameCache.get(type);
     if (name) return name;
-    name = getFunctionName(type);
+    name = type.name;
     if (name === '' || name === 'Object') return '';
     nameCache.set(type, name);
     typeCache[name] = type;
@@ -66,7 +70,7 @@ var root: any = null;
 try {
     root = typeof global === 'object' ? global : window;
 }
-catch(e) {}
+catch (e) { }
 
 function loadType(name: string): Function | undefined {
     if (!root) { return undefined; }
@@ -78,7 +82,7 @@ function loadType(name: string): Function | undefined {
             return undefined;
         }
     }
-    if (typeof(obj) !== 'function') return undefined;
+    if (typeof (obj) !== 'function') return undefined;
     return obj;
 }
 
@@ -97,7 +101,7 @@ function findType(alias: string[], positions: number[], i: number, c: string): F
 /**
  * Gets type by name.
  */
-function getType(name: string): Function {
+export function getType(name: string): Function {
     let type: Function | undefined = typeCache[name];
     if (type) { return type; }
     type = loadType(name);
@@ -122,10 +126,8 @@ function getType(name: string): Function {
             return type;
         }
     }
-    type = function(){};
+    type = function () { };
     Object.defineProperty(type, 'name', { value: name });
     register(type, name);
     return type;
 }
-
-export default { register, isRegistered, getName, getType };

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose ByteStream for TypeScript.                        |
 |                                                          |
-| LastModified: Dec 11, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -131,7 +131,7 @@ function toBinaryString(bytes: Uint8Array | ArrayBufferLike): string {
     return buf.join('');
 }
 
-export default class ByteStream {
+export class ByteStream {
     protected buffer: Uint8Array = EMPTY_BYTES;
     protected size: number = 0;
     protected offset: number = 0;

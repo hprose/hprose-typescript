@@ -12,19 +12,19 @@
 |                                                          |
 | hprose null deserializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 24, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import Deserializer from './Deserializer';
+import { Tags } from '../Tags';
+import { DefaultDeserializer } from './DefaultDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
 
-export default class NullDeserializer extends Deserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new NullDeserializer();
-    public read(reader: ReaderInterface, tag: number): any {
+export class NullDeserializer extends DefaultDeserializer implements Deserializer {
+    public static instance: Deserializer = new NullDeserializer();
+    public read(reader: Reader, tag: number): any {
         if (tag === Tags.TagNull) return null;
         return super.read(reader, tag);
     }

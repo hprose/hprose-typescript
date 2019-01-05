@@ -10,89 +10,27 @@
 |                                                          |
 | hprose/io/deserializers/Reader.ts                        |
 |                                                          |
-| hprose Reader for TypeScript.                            |
+| hprose Reader interface for TypeScript.                  |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from '../ByteStream';
-import TypeManager from '../TypeManager';
-import TypeInfo from './TypeInfo';
-import ReaderInterface from './ReaderInterface';
-import Deserializers from './Deserializers';
-import { readInt, readString, readCount } from './ValueReader';
-import './BigIntDeserializer';
-import './BigInt64ArrayDeserializer';
-import './BigUint64ArrayDeserializer';
+import { ByteStream } from "../ByteStream";
+import { TypeInfo } from "./TypeInfo";
 
-class ReaderRefer {
-    private readonly ref: any[] = [];
-    public get lastIndex(): number {
-        return this.ref.length - 1;
-    };
-    public add(value: any): void {
-        this.ref.push(value);
-    }
-    public set(index: number, value: any): void {
-        this.ref[index] = value;
-    }
-    public read(index: number): any {
-        return this.ref[index];
-    }
-    public reset(): void {
-        this.ref.length = 0;
-    }
-}
-
-export default class Reader implements ReaderInterface {
-    private readonly refer?: ReaderRefer;
-    private readonly ref: TypeInfo[] = [];
-    public longType: 'number' | 'bigint' | 'string' = 'number';
-    public dictType: 'object' | 'map' = 'object';
-    constructor(public readonly stream: ByteStream, simple: boolean = false) {
-        this.refer = simple ? undefined : new ReaderRefer();
-    }
-    deserialize(type?: Function | null): any {
-        return Deserializers.getInstance(type).deserialize(this);
-    }
-    read(tag: number, type?: Function | null): any {
-        return Deserializers.getInstance(type).read(this, tag);
-    }
-    readClass(): void {
-        const stream = this.stream;
-        const name = readString(stream);
-        const count = readCount(stream);
-        const names: string[] = new Array<string>(count);
-        const strDeserialize = Deserializers.getInstance(String);
-        for (let i = 0; i < count; ++i) {
-            names[i] = strDeserialize.deserialize(this);
-        }
-        stream.readByte();
-        this.ref.push({
-            name: name,
-            names: names,
-            type: TypeManager.getType(name)
-        });
-    }
-    getTypeInfo(index: number): TypeInfo {
-        return this.ref[index];
-    }
-    readReference(): any {
-        return this.refer ? this.refer.read(readInt(this.stream)) : undefined;
-    }
-    addReference(value: any): void {
-        if (this.refer) this.refer.add(value);
-    }
-    setReference(index: number, value: any): void {
-        if (this.refer) this.refer.set(index, value);
-    }
-    get lastReferenceIndex(): number {
-        return this.refer ? this.refer.lastIndex : -1;
-    }
-    reset(): void {
-        if (this.refer) this.refer.reset();
-        this.ref.length = 0;
-    }
+export interface Reader {
+    readonly stream: ByteStream;
+    longType: 'number' | 'bigint' | 'string';
+    dictType: 'object' | 'map';
+    deserialize(type?: Function): any;
+    read(tag: number): any;
+    readClass(): void;
+    getTypeInfo(index: number): TypeInfo;
+    readReference(): any;
+    addReference(value: any): void;
+    setReference(index: number, value: any): void;
+    readonly lastReferenceIndex: number;
+    reset(): void;
 }

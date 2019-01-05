@@ -12,21 +12,21 @@
 |                                                          |
 | hprose array deserializer for TypeScript.                |
 |                                                          |
-| LastModified: Dec 17, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
+import { Tags } from '../Tags';
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
 import * as ReferenceReader from './ReferenceReader';
 
-export default class ArrayDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new ArrayDeserializer();
+export class ArrayDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new ArrayDeserializer();
     constructor() { super('Array'); }
-    public read(reader: ReaderInterface, tag: number): Array<any> {
+    public read(reader: Reader, tag: number): Array<any> {
         switch (tag) {
             case Tags.TagList: return ReferenceReader.readArray(reader);
             case Tags.TagEmpty: return [];

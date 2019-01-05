@@ -12,22 +12,22 @@
 |                                                          |
 | hprose string deserializer for TypeScript.               |
 |                                                          |
-| LastModified: Dec 16, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
+import { Tags } from '../Tags';
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
 import * as ValueReader from './ValueReader';
 import * as ReferenceReader from './ReferenceReader';
 
-export default class StringDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new StringDeserializer();
+export class StringDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new StringDeserializer();
     constructor() { super('string'); }
-    public read(reader: ReaderInterface, tag: number): string {
+    public read(reader: Reader, tag: number): string {
         if (tag >= 0x30 && tag <= 0x39) {
             return String.fromCharCode(tag);
         }

@@ -12,15 +12,15 @@
 |                                                          |
 | hprose function deserializer for TypeScript.             |
 |                                                          |
-| LastModified: Dec 31, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
+import { BaseDeserializer } from "./BaseDeserializer";
+import { Deserializer } from "./Deserializer";
 
-export default class FunctionDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new FunctionDeserializer();
+export class FunctionDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new FunctionDeserializer();
     constructor() { super('function'); }
 }

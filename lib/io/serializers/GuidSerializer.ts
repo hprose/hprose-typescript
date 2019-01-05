@@ -12,18 +12,18 @@
 |                                                          |
 | hprose Guid serializer for TypeScript.                   |
 |                                                          |
-| LastModified: Dec 15, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import WriterInterface from './WriterInterface';
-import ReferenceSerializer from './ReferenceSerializer';
+import { Tags } from '../Tags';
+import { ReferenceSerializer } from './ReferenceSerializer';
+import { Writer } from "./Writer";
 import { Guid } from 'guid-typescript';
 
-export default class GuidSerializer extends ReferenceSerializer<Guid> {
-    public write(writer: WriterInterface, value: Guid): void {
+export class GuidSerializer extends ReferenceSerializer<Guid> {
+    public write(writer: Writer, value: Guid): void {
         super.write(writer, value);
         const stream = writer.stream;
         stream.writeByte(Tags.TagGuid);

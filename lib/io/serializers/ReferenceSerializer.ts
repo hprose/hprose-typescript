@@ -12,19 +12,19 @@
 |                                                          |
 | hprose reference serializer for TypeScript.              |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import WriterInterface from './WriterInterface';
-import Serializer from './Serializer';
+import { BaseSerializer } from './BaseSerializer';
+import { Writer } from "./Writer";
 
-export default class ReferenceSerializer<T> extends Serializer<T> {
-    public write(writer: WriterInterface, value: T): void {
+export class ReferenceSerializer<T> extends BaseSerializer<T> {
+    public write(writer: Writer, value: T): void {
         writer.setReference(value);
     }
-    public serialize(writer: WriterInterface, value: T): void {
+    public serialize(writer: Writer, value: T): void {
         if (!writer.writeReference(value)) this.write(writer, value);
     }
 }

@@ -12,21 +12,21 @@
 |                                                          |
 | hprose bigint serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import WriterInterface from './WriterInterface';
-import Serializer from './Serializer';
 import { writeBigInt } from './ValueWriter';
-import Serializers from './Serializers';
+import { BaseSerializer } from './BaseSerializer';
+import { Writer } from "./Writer";
+import { register } from '../Serializers';
 
 if (typeof BigInt !== 'undefined') {
-    class BigIntSerializer extends Serializer<bigint> {
-        public write(writer: WriterInterface, value: bigint): void {
+    class BigIntSerializer extends BaseSerializer<bigint> {
+        public write(writer: Writer, value: bigint): void {
             writeBigInt(writer.stream, value);
         }
     }
-    Serializers.register(BigInt, new BigIntSerializer());
+    register(BigInt, new BigIntSerializer());
 }

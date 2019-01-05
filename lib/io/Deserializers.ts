@@ -8,45 +8,47 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/deserializers/Deserializers.ts                 |
+| hprose/io/Deserializers.ts                               |
 |                                                          |
-| hprose deserializers for TypeScript.                     |
+| hprose Deserializers for TypeScript.                     |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from '../ByteStream';
-import DeserializerInterface from './DeserializerInterface';
-import Deserializer from './Deserializer';
-import NullDeserializer from './NullDeserializer';
-import FunctionDeserializer from './FunctionDeserializer';
-import NumberDeserializer from './NumberDeserializer';
-import BooleanDeserializer from './BooleanDeserializer';
-import StringDeserializer from './StringDeserializer';
-import DateDeserializer from './DateDeserializer';
-import ArrayDeserializer from './ArrayDeserializer';
-import ByteStreamDeserializer from './ByteStreamDeserializer';
-import Uint8ArrayDeserializer from './Uint8ArrayDeserializer';
-import Uint8ClampedArrayDeserializer from './Uint8ClampedArrayDeserializer';
-import Uint16ArrayDeserializer from './Uint16ArrayDeserializer';
-import Uint32ArrayDeserializer from './Uint32ArrayDeserializer';
-import Int8ArrayDeserializer from './Int8ArrayDeserializer';
-import Int16ArrayDeserializer from './Int16ArrayDeserializer';
-import Int32ArrayDeserializer from './Int32ArrayDeserializer';
-import Float32ArrayDeserializer from './Float32ArrayDeserializer';
-import Float64ArrayDeserializer from './Float64ArrayDeserializer';
-import SetDeserializer from './SetDeserializer';
-import MapDeserializer from './MapDeserializer';
+import { ByteStream } from './ByteStream';
+import { ArrayDeserializer } from './deserializers/ArrayDeserializer';
+import {
+    Uint8ArrayDeserializer,
+    Uint8ClampedArrayDeserializer,
+    Uint16ArrayDeserializer,
+    Uint32ArrayDeserializer,
+    Int8ArrayDeserializer,
+    Int16ArrayDeserializer,
+    Int32ArrayDeserializer,
+    Float32ArrayDeserializer,
+    Float64ArrayDeserializer
+} from './deserializers/TypedArrayDeserializer';
+import { FunctionDeserializer } from './deserializers/FunctionDeserializer';
+import { NumberDeserializer } from './deserializers/NumberDeserializer';
+import { BooleanDeserializer } from './deserializers/BooleanDeserializer';
+import { StringDeserializer } from './deserializers/StringDeserializer';
+import { DateDeserializer } from './deserializers/DateDeserializer';
+import { ByteStreamDeserializer } from './deserializers/ByteStreamDeserializer';
+import { SetDeserializer } from './deserializers/SetDeserializer';
+import { MapDeserializer } from './deserializers/MapDeserializer';
+import { NullDeserializer } from './deserializers/NullDeserializer';
+import { DefaultDeserializer } from './deserializers/DefaultDeserializer';
+import { Deserializer } from './deserializers/Deserializer';
 
-const deserializers: Map<Function, DeserializerInterface> = new Map<Function, DeserializerInterface>();
+const deserializers: Map<Function, Deserializer> = new Map<Function, Deserializer>();
 
-function register(type: Function, deserializer: DeserializerInterface) {
+export function register(type: Function, deserializer: Deserializer) {
     deserializers.set(type, deserializer);
 }
 
-function getInstance(type?: Function | null): DeserializerInterface {
+export function getInstance(type?: Function | null): Deserializer {
     if (type) {
         switch (type) {
             case Function: return FunctionDeserializer.instance;
@@ -58,21 +60,19 @@ function getInstance(type?: Function | null): DeserializerInterface {
             case ByteStream: return ByteStreamDeserializer.instance;
             case Uint8Array: return Uint8ArrayDeserializer.instance;
             case Uint8ClampedArray: return Uint8ClampedArrayDeserializer.instance;
-            case Uint16Array: return Uint16ArrayDeserializer.instance; 
-            case Uint32Array: return Uint32ArrayDeserializer.instance; 
+            case Uint16Array: return Uint16ArrayDeserializer.instance;
+            case Uint32Array: return Uint32ArrayDeserializer.instance;
             case Int8Array: return Int8ArrayDeserializer.instance;
             case Int16Array: return Int16ArrayDeserializer.instance;
             case Int32Array: return Int32ArrayDeserializer.instance;
             case Float32Array: return Float32ArrayDeserializer.instance;
             case Float64Array: return Float64ArrayDeserializer.instance;
-            case Set: return SetDeserializer.instance; 
+            case Set: return SetDeserializer.instance;
             case Map: return MapDeserializer.instance;
         }
         const deserializer = deserializers.get(type);
         if (deserializer !== undefined) return deserializer;
     }
     if (type === null) return NullDeserializer.instance;
-    return Deserializer.instance;
- }
-
-export default { register, getInstance };
+    return DefaultDeserializer.instance;
+}

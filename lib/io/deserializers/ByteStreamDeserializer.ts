@@ -12,30 +12,31 @@
 |                                                          |
 | hprose ByteStream deserializer for TypeScript.           |
 |                                                          |
-| LastModified: Dec 20, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ByteStream from '../ByteStream';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
-import BaseDeserializer from './BaseDeserializer';
-import * as ReferenceReader from './ReferenceReader';
+import { Tags } from '../Tags';
+import { ByteStream } from '../ByteStream';
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
+import { readIntArray } from './TypedArrayDeserializer';
+import { readBytes, readString } from './ReferenceReader';
 
 const empty = new ByteStream(0);
 
-export default class ByteStreamDeserializer extends BaseDeserializer implements DeserializerInterface {
-    public static instance: DeserializerInterface = new ByteStreamDeserializer();
+export class ByteStreamDeserializer extends BaseDeserializer implements Deserializer {
+    public static instance: Deserializer = new ByteStreamDeserializer();
     constructor() { super('ByteStream'); }
-    public read(reader: ReaderInterface, tag: number): ByteStream {
+    public read(reader: Reader, tag: number): ByteStream {
         switch (tag) {
-            case Tags.TagBytes: return new ByteStream(ReferenceReader.readBytes(reader));
+            case Tags.TagBytes: return new ByteStream(readBytes(reader));
             case Tags.TagEmpty: return new ByteStream(0);
-            case Tags.TagList: return new ByteStream(ReferenceReader.readIntArray(reader, Uint8Array) as Uint8Array);
+            case Tags.TagList: return new ByteStream(readIntArray(reader, Uint8Array) as Uint8Array);
             case Tags.TagUTF8Char: return new ByteStream(reader.stream.readString(1));
-            case Tags.TagString: return new ByteStream(ReferenceReader.readString(reader));
+            case Tags.TagString: return new ByteStream(readString(reader));
             default:
                 return super.read(reader, tag);
         }

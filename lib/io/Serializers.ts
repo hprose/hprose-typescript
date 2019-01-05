@@ -8,36 +8,36 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/serializers/Serializers.ts                     |
+| hprose/io/Serializers.ts                                 |
 |                                                          |
-| hprose serializers for TypeScript.                       |
+| hprose Serializers for TypeScript.                       |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from '../ByteStream';
-import TypeManager from '../TypeManager';
-import SerializerInterface from './SerializerInterface';
-import Serializer from './Serializer';
-import NumberSerializer from './NumberSerializer';
-import BooleanSerializer from './BooleanSerializer';
-import StringSerializer from './StringSerializer';
-import DateSerializer from './DateSerializer';
-import BytesSerializer from './BytesSerializer';
-import GuidSerializer from './GuidSerializer';
-import TypedArraySerializer from './TypedArraySerializer';
-import ArraySerializer from './ArraySerializer';
-import SetSerializer from './SetSerializer';
-import MapSerializer from './MapSerializer';
-import DictionarySerializer from './DictionarySerializer';
-import ObjectSerializer from './ObjectSerializer';
-import { writeInteger, writeDouble } from './ValueWriter';
+import { ByteStream } from './ByteStream';
+import { Serializer } from './serializers/Serializer';
+import { BaseSerializer } from './serializers/BaseSerializer';
+import { NumberSerializer } from './serializers/NumberSerializer';
+import { BooleanSerializer } from './serializers/BooleanSerializer';
+import { StringSerializer } from './serializers/StringSerializer';
+import { DateSerializer } from './serializers/DateSerializer';
+import { BytesSerializer } from './serializers/BytesSerializer';
+import { GuidSerializer } from './serializers/GuidSerializer';
+import { TypedArraySerializer } from './serializers/TypedArraySerializer';
+import { ArraySerializer } from './serializers/ArraySerializer';
+import { SetSerializer } from './serializers/SetSerializer';
+import { MapSerializer } from './serializers/MapSerializer';
+import { DictionarySerializer } from './serializers/DictionarySerializer';
+import { ObjectSerializer } from './serializers/ObjectSerializer';
+import * as TypeManager from './TypeManager';
+import { writeInteger, writeDouble } from './serializers/ValueWriter';
 import { Guid } from 'guid-typescript';
 
-const serializers = new Map<Function, SerializerInterface>();
-const nullSerializer = new Serializer<any>();
+const serializers = new Map<Function, Serializer>();
+const nullSerializer = new BaseSerializer<any>();
 const numberSerializer = new NumberSerializer();
 const booleanSerializer = new BooleanSerializer();
 const stringSerializer = new StringSerializer();
@@ -51,11 +51,11 @@ const setSerializer = new SetSerializer();
 const mapSerializer = new MapSerializer();
 const dictionarySerializer = new DictionarySerializer();
 
-function register(type: Function, serializer: SerializerInterface) {
+export function register(type: Function, serializer: Serializer) {
     serializers.set(type, serializer);
 }
 
-function getInstance<T>(value: T): SerializerInterface {
+export function getInstance<T>(value: T): Serializer {
     const type = value.constructor;
     switch (type) {
         case Function: return nullSerializer;
@@ -90,5 +90,3 @@ function getInstance<T>(value: T): SerializerInterface {
     register(type, objectSerializer);
     return objectSerializer;
 }
-
-export default { register, getInstance };

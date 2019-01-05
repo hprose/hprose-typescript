@@ -12,14 +12,14 @@
 |                                                          |
 | hprose base deserializer for TypeScript.                 |
 |                                                          |
-| LastModified: Dec 14, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ReaderInterface from './ReaderInterface';
-import DeserializerInterface from './DeserializerInterface';
+import { Tags } from '../Tags';
+import { Deserializer } from './Deserializer';
+import { Reader } from './Reader';
 
 function tagToString(tag: number): string {
     switch (tag) {
@@ -58,9 +58,9 @@ function tagToString(tag: number): string {
     }
 }
 
-export default class BaseDeserializer implements DeserializerInterface {
-    constructor(public type: string = 'undefined') {};
-    public read(reader: ReaderInterface, tag: number): any {
+export class BaseDeserializer implements Deserializer {
+    constructor(public type: string = 'undefined') { };
+    public read(reader: Reader, tag: number): any {
         switch (tag) {
             case Tags.TagNull: return undefined;
             case Tags.TagRef: return reader.readReference();
@@ -72,7 +72,7 @@ export default class BaseDeserializer implements DeserializerInterface {
         }
         throw new Error('Cannot convert ' + tagToString(tag) + ' to ' + this.type + '.');
     }
-    public deserialize(reader: ReaderInterface): any {
+    public deserialize(reader: Reader): any {
         return this.read(reader, reader.stream.readByte());
     }
 }

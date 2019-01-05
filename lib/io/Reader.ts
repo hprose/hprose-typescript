@@ -8,45 +8,89 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/Reader.ts                                      |
+| hprose/io/deserializers/Reader.ts                        |
 |                                                          |
 | hprose Reader for TypeScript.                            |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import ByteStream from './ByteStream';
-import PrivateReader from './deserializers/Reader';
+import { ByteStream } from './ByteStream';
+import { TypeInfo } from './deserializers/TypeInfo';
+import { readInt, readString, readCount } from './deserializers/ValueReader';
+import * as TypeManager from './TypeManager';
+import * as Deserializers from './Deserializers';
+import './deserializers/BigIntDeserializer';
+import './deserializers/BigIntArrayDeserializer';
 
-export default class Reader {
-    private readonly reader: PrivateReader;
-    constructor(stream: ByteStream, simple: boolean = false) {
-        this.reader = new PrivateReader(stream, simple);
+class ReaderRefer {
+    private readonly ref: any[] = [];
+    public get lastIndex(): number {
+        return this.ref.length - 1;
+    };
+    public add(value: any): void {
+        this.ref.push(value);
     }
-    public get stream(): ByteStream {
-        return this.reader.stream;
+    public set(index: number, value: any): void {
+        this.ref[index] = value;
     }
-    public get longType(): 'number' | 'bigint' | 'string' {
-        return this.reader.longType;
+    public read(index: number): any {
+        return this.ref[index];
     }
-    public set longType(value: 'number' | 'bigint' | 'string') {
-        this.reader.longType = value;
+    public reset(): void {
+        this.ref.length = 0;
     }
-    public get dictType(): 'object' | 'map' {
-        return this.reader.dictType;
-    }
-    public set dictType(value: 'object' | 'map') {
-        this.reader.dictType = value;
+}
+
+export class Reader {
+    private readonly refer?: ReaderRefer;
+    private readonly ref: TypeInfo[] = [];
+    public longType: 'number' | 'bigint' | 'string' = 'number';
+    public dictType: 'object' | 'map' = 'object';
+    constructor(public readonly stream: ByteStream, simple: boolean = false) {
+        this.refer = simple ? undefined : new ReaderRefer();
     }
     deserialize(type?: Function | null): any {
-        return this.reader.deserialize(type);
+        return Deserializers.getInstance(type).deserialize(this);
     }
     read(tag: number, type?: Function | null): any {
-        return this.reader.read(tag, type);
+        return Deserializers.getInstance(type).read(this, tag);
+    }
+    readClass(): void {
+        const stream = this.stream;
+        const name = readString(stream);
+        const count = readCount(stream);
+        const names: string[] = new Array<string>(count);
+        const strDeserialize = Deserializers.getInstance(String);
+        for (let i = 0; i < count; ++i) {
+            names[i] = strDeserialize.deserialize(this);
+        }
+        stream.readByte();
+        this.ref.push({
+            name: name,
+            names: names,
+            type: TypeManager.getType(name)
+        });
+    }
+    getTypeInfo(index: number): TypeInfo {
+        return this.ref[index];
+    }
+    readReference(): any {
+        return this.refer ? this.refer.read(readInt(this.stream)) : undefined;
+    }
+    addReference(value: any): void {
+        if (this.refer) this.refer.add(value);
+    }
+    setReference(index: number, value: any): void {
+        if (this.refer) this.refer.set(index, value);
+    }
+    get lastReferenceIndex(): number {
+        return this.refer ? this.refer.lastIndex : -1;
     }
     reset(): void {
-        this.reader.reset();
+        if (this.refer) this.refer.reset();
+        this.ref.length = 0;
     }
 }

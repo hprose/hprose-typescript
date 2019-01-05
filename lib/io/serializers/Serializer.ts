@@ -8,24 +8,18 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/io/serializers/Serializer.ts                      |
+| hprose/io/Serializer.ts                                  |
 |                                                          |
-| hprose serializer class for TypeScript.                  |
+| hprose Serializer interface for TypeScript.              |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import WriterInterface from './WriterInterface';
-import SerializerInterface from './SerializerInterface';
+import { Writer } from "./Writer";
 
-export default class Serializer<T> implements SerializerInterface {
-    public write(writer: WriterInterface, value: T): void {
-        writer.stream.writeByte(Tags.TagNull);
-    }
-    public serialize(writer: WriterInterface, value: T): void {
-        this.write(writer, value);
-    }
+export interface Serializer {
+    write(writer: Writer, value: any): void;
+    serialize(writer: Writer, value: any): void;
 }

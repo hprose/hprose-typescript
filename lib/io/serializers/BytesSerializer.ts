@@ -12,18 +12,18 @@
 |                                                          |
 | hprose bytes serializer for TypeScript.                  |
 |                                                          |
-| LastModified: Dec 10, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Tags from '../Tags';
-import ByteStream from '../ByteStream';
-import WriterInterface from './WriterInterface';
-import ReferenceSerializer from './ReferenceSerializer';
+import { Tags } from '../Tags';
+import { ByteStream } from '../ByteStream';
+import { ReferenceSerializer } from './ReferenceSerializer';
+import { Writer } from "./Writer";
 
-export default class BytesSerializer extends ReferenceSerializer<ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream> {
-    public write(writer: WriterInterface, value: ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream): void {
+export class BytesSerializer extends ReferenceSerializer<ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream> {
+    public write(writer: Writer, value: ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream): void {
         super.write(writer, value);
         const stream = writer.stream;
         stream.writeByte(Tags.TagBytes);
