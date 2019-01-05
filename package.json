@@ -31,7 +31,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "compile": "rm -rf dist && tsc -p lib",
+    "compile": "rm -rf dist && cd src && rollup -c && rm -rf .rpt2_cache",
     "prepublish": "npm run compile"
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "rollup": "^1.0.2",
     "rollup-plugin-typescript2": "^0.18.1",
     "ts-jest": "^23.10.5",
+    "tslint": "^5.12.0",
     "typescript": "^3.2.2"
   },
   "dependencies": {

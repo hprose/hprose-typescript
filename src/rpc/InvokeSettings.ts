@@ -12,12 +12,12 @@
 |                                                          |
 | hprose InvokeSettings for TypeScript.                    |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export default interface InvokeSettings {
+export interface InvokeSettings {
     simple?: boolean;
     utc?: boolean;
     longType?: 'number' | 'bigint' | 'string';

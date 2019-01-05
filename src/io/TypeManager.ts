@@ -22,9 +22,9 @@ const nameCache = new WeakMap();
 
 if (!('name' in Function.prototype)) {
     Object.defineProperty(Function.prototype, 'name', {
-        get: function() {
+        get() {
             const ctor = this.toString();
-            return ctor.substr(0, ctor.indexOf('(')).replace(/(^\s*function\s*)|(\s*$)/ig, '');        
+            return ctor.substr(0, ctor.indexOf('(')).replace(/(^\s*function\s*)|(\s*$)/ig, '');
         },
         writable: false,
         enumerable: false,
@@ -65,7 +65,7 @@ export function getName(type: Function): string {
 declare var global: any;
 declare var window: any;
 
-var root: any = null;
+let root: any = null;
 
 try {
     root = typeof global === 'object' ? global : window;

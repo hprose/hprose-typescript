@@ -25,8 +25,6 @@ import { Reader } from './Reader';
 import { readIntArray } from './TypedArrayDeserializer';
 import { readBytes, readString } from './ReferenceReader';
 
-const empty = new ByteStream(0);
-
 export class ByteStreamDeserializer extends BaseDeserializer implements Deserializer {
     public static instance: Deserializer = new ByteStreamDeserializer();
     constructor() { super('ByteStream'); }

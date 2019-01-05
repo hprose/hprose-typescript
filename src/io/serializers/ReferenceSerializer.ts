@@ -18,7 +18,7 @@
 \*________________________________________________________*/
 
 import { BaseSerializer } from './BaseSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class ReferenceSerializer<T> extends BaseSerializer<T> {
     public write(writer: Writer, value: T): void {

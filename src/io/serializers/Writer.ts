@@ -17,7 +17,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { ByteStream } from "../ByteStream";
+import { ByteStream } from '../ByteStream';
 
 export interface Writer {
     readonly stream: ByteStream;

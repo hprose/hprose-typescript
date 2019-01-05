@@ -20,7 +20,7 @@
 import { Tags } from '../Tags';
 import { ByteStream } from '../ByteStream';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 import { writeStringBody } from './ValueWriter';
 
 export class ObjectSerializer<T> extends ReferenceSerializer<T> {

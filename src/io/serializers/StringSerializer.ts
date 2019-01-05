@@ -19,7 +19,7 @@
 
 import { Tags } from '../Tags';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 import { writeStringBody } from './ValueWriter';
 
 export class StringSerializer extends ReferenceSerializer<string> {

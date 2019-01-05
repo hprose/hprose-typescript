@@ -12,12 +12,12 @@
 |                                                          |
 | hprose onewayHandler for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 4, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Context from './Context'
+import { Context } from './Context';
 import { NextInvokeHandler } from './HandlerManager';
 
 export default async function onewayHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {

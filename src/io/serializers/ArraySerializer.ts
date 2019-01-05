@@ -19,7 +19,7 @@
 
 import { Tags } from '../Tags';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class ArraySerializer extends ReferenceSerializer<ArrayLike<any>> {
     public write(writer: Writer, value: ArrayLike<any>): void {

@@ -20,7 +20,7 @@
 import { Tags } from '../Tags';
 import { ByteStream } from '../ByteStream';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class BytesSerializer extends ReferenceSerializer<ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream> {
     public write(writer: Writer, value: ArrayBuffer | Uint8Array | Uint8ClampedArray | ByteStream): void {

@@ -54,12 +54,12 @@ function tagToString(tag: number): string {
         case Tags.TagObject: return 'Object';
         case Tags.TagRef: return 'Reference';
         case Tags.TagError: return 'Error';
-        default: throw new Error('Unexpected Tag: 0x' + (tag & 0xff).toString(16));
+        default: throw new Error('Unexpected Tag: 0x' + (tag & 0xFF).toString(16));
     }
 }
 
 export class BaseDeserializer implements Deserializer {
-    constructor(public type: string = 'undefined') { };
+    constructor(public type: string = 'undefined') { }
     public read(reader: Reader, tag: number): any {
         switch (tag) {
             case Tags.TagNull: return undefined;

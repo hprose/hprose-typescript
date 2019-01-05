@@ -12,7 +12,7 @@
 |                                                          |
 | parseURI for TypeScript.                                 |
 |                                                          |
-| LastModified: Jan 5, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,7 +28,7 @@ interface URI {
 }
 
 export function parseURI(uri: string): URI {
-    const pattern: RegExp = new RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+    const pattern: RegExp = new RegExp('^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?');
     const matches: RegExpMatchArray | null = uri.match(pattern);
     if (matches) {
         const host = matches[4].split(':', 2);

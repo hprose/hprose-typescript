@@ -17,14 +17,14 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { ByteStream } from "./io/ByteStream";
-import { Tags } from "./io/Tags";
-import { Writer } from "./io/Writer";
-import { Reader } from "./io/Reader";
-import * as TypeManager from "./io/TypeManager";
-import * as Serializers from "./io/Serializers";
-import * as Deserializers from "./io/Deserializers";
-import * as Formatter from "./io/Formatter";
+import { ByteStream } from './io/ByteStream';
+import { Tags } from './io/Tags';
+import { Writer } from './io/Writer';
+import { Reader } from './io/Reader';
+import * as TypeManager from './io/TypeManager';
+import * as Serializers from './io/Serializers';
+import * as Deserializers from './io/Deserializers';
+import * as Formatter from './io/Formatter';
 
 export {
     ByteStream,
@@ -35,4 +35,4 @@ export {
     Serializers,
     Deserializers,
     Formatter
-}
+};

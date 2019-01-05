@@ -36,7 +36,7 @@ export const enum Tags {
     TagString      = 0x73, //  's'
     TagGuid        = 0x67, //  'g'
     TagList        = 0x61, //  'a'
-    TagMap         = 0x6d, //  'm'
+    TagMap         = 0x6D, //  'm'
     TagClass       = 0x63, //  'c'
     TagObject      = 0x6F, //  'o'
     TagRef         = 0x72, //  'r'

@@ -53,7 +53,8 @@ function fromCharCode(charCodes: ArrayLike<number>): string {
 function readString(bytes: Uint8Array, charLength: number): [string, number] {
     if (charLength < 0) charLength = bytes.length;
     if (charLength === 0) return ['', 0];
-    let charOffset = 0, byteOffset = 0;
+    let charOffset = 0;
+    let byteOffset = 0;
     let n = (charLength < 0x7FFF) ? charLength : 0x7FFF;
     const charCodes = new Uint16Array(n + 1);
     const byteLength = bytes.length;
@@ -438,7 +439,7 @@ export class ByteStream {
         return (result & 0x7FFFFFFF) + 0x80000000;
     }
     /**
-     * Reads n bytes of data from this stream and returns the result as a Uint8Array. 
+     * Reads n bytes of data from this stream and returns the result as a Uint8Array.
      * If n is negative, reads to the end of this stream.
      * @param n The maximum number of bytes to read.
      */
@@ -502,7 +503,7 @@ export class ByteStream {
         return result;
     }
     /**
-     * Reads n bytes of data from this stream and returns the result as an ascii string. 
+     * Reads n bytes of data from this stream and returns the result as an ascii string.
      * If n is negative, reads to the end of this stream.
      * @param n The maximum number of bytes to read.
      */
@@ -582,7 +583,7 @@ export class ByteStream {
      */
     public takeBytes(): Uint8Array {
         const bytes = this.bytes;
-        this.clear;
+        this.clear();
         return bytes;
     }
     /**

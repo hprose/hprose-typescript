@@ -12,12 +12,12 @@
 |                                                          |
 | hprose HandlerManager for TypeScript.                    |
 |                                                          |
-| LastModified: Dec 31, 2018                               |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Context from './Context'
+import { Context } from './Context';
 
 export type NextInvokeHandler = (name: string, args: any[], context: Context) => Promise<any>;
 export type NextIOHandler = (request: Uint8Array, context: Context) => Promise<Uint8Array>;

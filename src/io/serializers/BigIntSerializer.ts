@@ -19,7 +19,7 @@
 
 import { writeBigInt } from './ValueWriter';
 import { BaseSerializer } from './BaseSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 import { register } from '../Serializers';
 
 if (typeof BigInt !== 'undefined') {

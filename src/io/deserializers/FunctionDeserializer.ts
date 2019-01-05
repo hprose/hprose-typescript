@@ -17,8 +17,8 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { BaseDeserializer } from "./BaseDeserializer";
-import { Deserializer } from "./Deserializer";
+import { BaseDeserializer } from './BaseDeserializer';
+import { Deserializer } from './Deserializer';
 
 export class FunctionDeserializer extends BaseDeserializer implements Deserializer {
     public static instance: Deserializer = new FunctionDeserializer();

@@ -19,7 +19,7 @@
 
 import { Tags } from '../Tags';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class MapSerializer extends ReferenceSerializer<Map<any, any>> {
     public write(writer: Writer, value: Map<any, any>): void {

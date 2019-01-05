@@ -82,7 +82,7 @@ function read2Digit(stream: ByteStream): number {
     let n = stream.readByte() - 0x30;
     return n * 10 + stream.readByte() - 0x30;
 }
- 
+
 function readMillisecond(stream: ByteStream): [number, number] {
     let millisecond = stream.readByte() - 0x30;
     millisecond = millisecond * 10 + stream.readByte() - 0x30;

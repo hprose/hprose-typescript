@@ -1,4 +1,4 @@
-import { ByteStream } from '../../lib/io'
+import { ByteStream } from '../../src/hprose.io';
 
 test('test writeByte & readAsciiString', () => {
     const stream = new ByteStream();
@@ -12,8 +12,8 @@ test('test writeByte & readAsciiString', () => {
 
 test('test writeString & toString', () => {
     const stream = new ByteStream();
-    stream.writeString("你好🌏");
-    expect(stream.toString()).toBe("你好🌏");
+    stream.writeString('你好🌏');
+    expect(stream.toString()).toBe('你好🌏');
 });
 
 test('test writeInt32BE & readInt32BE', () => {
@@ -42,7 +42,7 @@ test('test writeInt32LE & readInt32LE', () => {
     expect(stream.readInt32LE()).toBe(0);
     expect(stream.readInt32LE()).toBe(1);
     expect(stream.readInt32LE()).toBe(-1);
-})
+});
 
 test('test writeUInt32BE & readUInt32BE', () => {
     const stream = new ByteStream();

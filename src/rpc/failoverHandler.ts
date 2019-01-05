@@ -12,14 +12,14 @@
 |                                                          |
 | hprose failoverHandler for TypeScript.                   |
 |                                                          |
-| LastModified: Jan 4, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Context from './Context'
+import { Client } from './Client';
+import { Context } from './Context';
 import { NextIOHandler, IOHandler } from './HandlerManager';
-import Client from './Client';
 
 export default function failoverHandler(
     client: Client,
@@ -29,13 +29,13 @@ export default function failoverHandler(
     onFailure?: (round: number) => void
 ): IOHandler {
     let round: number = 0;
-    let handler: IOHandler = async(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
+    let handler: IOHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         try {
             const result = await next(request, context);
             round = 0;
             return result;
         }
-        catch(e) {
+        catch (e) {
             const uriList = client.uriList;
             const uriIndex = client.uriIndex;
             const _failswitch = context.failswitch === undefined ? failswitch : context.failswitch;
@@ -72,8 +72,8 @@ export default function failoverHandler(
                     return new Promise<Uint8Array>((resolve, reject) => {
                         setTimeout(() => {
                             handler(request, context, next)
-                            .then((result) => resolve(result))
-                            .catch((reason) => reject(reason));
+                                .then((result) => resolve(result))
+                                .catch((reason) => reject(reason));
                         }, interval);
                     });
                 } else {

@@ -1,4 +1,4 @@
-import { ByteStream, Reader } from '../../lib/io'
+import { ByteStream, Reader } from '../../src/hprose.io';
 import { Guid } from 'guid-typescript';
 
 test('test boolean deserialization', () => {
@@ -35,11 +35,11 @@ test('test map deserialization', () => {
     let reader = new Reader(new ByteStream('m{}m{}m2{s4"name"s3"Tom"s3"age"i18;}r2;m2{r3;s5"Jerry"r5;i17;}r6;'));
     expect(reader.deserialize()).toEqual({});
     expect(reader.deserialize()).toEqual(Object.create(null));
-    expect(reader.deserialize()).toEqual({name: "Tom", age: 18});
-    expect(reader.deserialize()).toEqual({name: "Tom", age: 18});
+    expect(reader.deserialize()).toEqual({name: 'Tom', age: 18});
+    expect(reader.deserialize()).toEqual({name: 'Tom', age: 18});
     let map = new Map<string, any>();
-    map.set("name", "Jerry");
-    map.set("age", 17);
+    map.set('name', 'Jerry');
+    map.set('age', 17);
     expect(reader.deserialize(Map)).toEqual(map);
     expect(reader.deserialize()).toEqual(map);
 });
@@ -50,22 +50,22 @@ test('test object deserialization', () => {
         public age: number = 0;
     }
     let user = new User();
-    user.name = "Tom";
+    user.name = 'Tom';
     user.age = 18;
     let user2 = new User();
-    user2.name = "Jerry";
+    user2.name = 'Jerry';
     user2.age = 17;
     let reader = new Reader(new ByteStream('c4"User"2{s4"name"s3"age"}o0{s3"Tom"i18;}o0{s5"Jerry"i17;}'));
     expect(reader.deserialize()).toEqual(user);
     expect(reader.deserialize(User)).toEqual(user2);
-})
+});
 
 test('test guid deserialization', () => {
     let reader = new Reader(new ByteStream('g{bf3066cf-7b5b-1edf-731e-05b2d25a4408}r0;'));
     let guid: Guid = Guid.parse('bf3066cf-7b5b-1edf-731e-05b2d25a4408');
     expect(reader.deserialize()).toEqual(guid);
     expect(reader.deserialize()).toEqual(guid);
-})
+});
 
 test('test bigint deserialization', () => {
     let reader = new Reader(new ByteStream('l1234567890987654321234567890;'));

@@ -12,16 +12,16 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 5, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import InvokeSettings from './InvokeSettings';
-import ClientCodec from './ClientCodec';
-import DefaultClientCodec from './DefaultClientCodec';
-import Context from './Context';
-import ClientContext from './ClientContext';
+import { InvokeSettings } from './InvokeSettings';
+import { ClientCodec } from './ClientCodec';
+import { DefaultClientCodec } from './DefaultClientCodec';
+import { Context } from './Context';
+import { ClientContext } from './ClientContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
 
 function makeInvoke(client: Client, fullname: string): () => Promise<any> {
@@ -32,7 +32,7 @@ function makeInvoke(client: Client, fullname: string): () => Promise<any> {
 
 function normalize(functions: string[]): any[] {
     const root = [Object.create(null)];
-    for (let i in functions) {
+    for (let i = 0, n = functions.length; i < n; ++i) {
         const func = functions[i].split('_');
         const n = func.length - 1;
         if (n > 0) {
@@ -63,7 +63,7 @@ function setMethods(client: Client, service: any, namespace: string, name: strin
         if (typeof node === 'string') {
             service[name][node] = makeInvoke(client, namespace + node);
         } else {
-            for (let n in node) {
+            for (const n in node) {
                 setMethods(client, service[name], namespace, n, node[n]);
             }
         }
@@ -91,7 +91,7 @@ function useService(client: Client, functions: string[]): any {
 class ServiceProxyHandler implements ProxyHandler<any> {
     constructor(private client: Client, private namespace?: string) { }
     public get(target: any, p: PropertyKey, receiver: any): any {
-        if (typeof p === 'symbol') { return undefined }
+        if (typeof p === 'symbol') { return undefined; }
         if (p === 'then') { return undefined; }
         if (!target.hasOwnProperty(p)) {
             target[p] = makeInvoke(this.client, this.namespace ? this.namespace + '_' + p : '' + p);
@@ -100,7 +100,7 @@ class ServiceProxyHandler implements ProxyHandler<any> {
     }
 }
 
-interface ClientSettings {
+export interface ClientSettings {
     headers?: { [name: string]: any };
     timeout?: number;
     simple?: boolean;
@@ -111,7 +111,7 @@ interface ClientSettings {
     codec?: ClientCodec;
 }
 
-export default abstract class Client {
+export abstract class Client {
     public readonly settings: { [fullname: string]: InvokeSettings } = Object.create(null);
     public readonly headers: { [name: string]: any } = Object.create(null);
     public timeout: number = 30000;
@@ -166,6 +166,7 @@ export default abstract class Client {
                 } else {
                     settings = args[0];
                 }
+                break;
             case 2:
                 namespace = args[0];
                 settings = args[1];
@@ -203,7 +204,7 @@ export default abstract class Client {
         args = await Promise.all(args);
         const context = new ClientContext(this, fullname, settings);
         const invokeHandler = this.handlerManager.invokeHandler;
-        return await invokeHandler(fullname, args, context);
+        return invokeHandler(fullname, args, context);
     }
     public async call(fullname: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;

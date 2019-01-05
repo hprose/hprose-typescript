@@ -12,14 +12,14 @@
 |                                                          |
 | hprose useService for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 5, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { Tags, ByteStream, Reader } from '../hprose.io';
-import Client from './Client';
-import Context from './Context';
+import { Client } from './Client';
+import { Context } from './Context';
 
 const GET_FUNCTIONS = new Uint8Array([Tags.TagEnd]);
 

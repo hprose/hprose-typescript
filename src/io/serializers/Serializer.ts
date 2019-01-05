@@ -17,7 +17,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export interface Serializer {
     write(writer: Writer, value: any): void;

@@ -25,22 +25,6 @@ import { StringDeserializer } from './StringDeserializer';
 import * as ValueReader from './ValueReader';
 import * as ReferenceReader from './ReferenceReader';
 
-function readDict(reader: Reader): any {
-    const stream = reader.stream;
-    const dict = Object.create(null);
-    reader.addReference(dict);
-    let count = ValueReader.readCount(stream);
-    const strDeserializer = StringDeserializer.instance;
-    const deserializer = DefaultDeserializer.instance;
-    for (; count > 0; --count) {
-        const key = strDeserializer.deserialize(reader);
-        const value = deserializer.deserialize(reader);
-        dict[key] = value;
-    }
-    stream.readByte();
-    return dict;
-}
-
 export class DefaultDeserializer extends BaseDeserializer implements Deserializer {
     public static instance: Deserializer = new DefaultDeserializer();
     constructor() { super('any'); }
@@ -68,6 +52,7 @@ export class DefaultDeserializer extends BaseDeserializer implements Deserialize
                         if (typeof BigInt !== 'undefined') {
                             return BigInt(stream.readUntil(Tags.TagSemicolon));
                         }
+                    // tslint:disable-next-line:no-switch-case-fall-through
                     case 'string':
                         return stream.readUntil(Tags.TagSemicolon);
                 }
@@ -81,4 +66,20 @@ export class DefaultDeserializer extends BaseDeserializer implements Deserialize
             default: return super.read(reader, tag);
         }
     }
+}
+
+function readDict(reader: Reader): any {
+    const stream = reader.stream;
+    const dict = Object.create(null);
+    reader.addReference(dict);
+    let count = ValueReader.readCount(stream);
+    const strDeserializer = StringDeserializer.instance;
+    const deserializer = DefaultDeserializer.instance;
+    for (; count > 0; --count) {
+        const key = strDeserializer.deserialize(reader);
+        const value = deserializer.deserialize(reader);
+        dict[key] = value;
+    }
+    stream.readByte();
+    return dict;
 }

@@ -1,4 +1,4 @@
-import { TypeManager } from '../../lib/io';
+import { TypeManager } from '../../src/hprose.io';
 
 test('test getType', () => {
     let type = TypeManager.getType('Test');
@@ -10,4 +10,4 @@ test('test getType', () => {
     TypeManager.register(User, 'MyUser');
     type = TypeManager.getType('MyUser');
     expect(type.name).toBe('User');
-})
+});

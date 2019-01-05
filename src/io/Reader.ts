@@ -29,7 +29,7 @@ class ReaderRefer {
     private readonly ref: any[] = [];
     public get lastIndex(): number {
         return this.ref.length - 1;
-    };
+    }
     public add(value: any): void {
         this.ref.push(value);
     }
@@ -69,8 +69,8 @@ export class Reader {
         }
         stream.readByte();
         this.ref.push({
-            name: name,
-            names: names,
+            name,
+            names,
             type: TypeManager.getType(name)
         });
     }

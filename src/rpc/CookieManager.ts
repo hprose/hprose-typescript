@@ -12,15 +12,14 @@
 |                                                          |
 | CookieManager for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 5, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 const cookieManager = Object.create(null);
 
-function setCookie(headers: { [name: string]: string | string[] }, host: string): void {
-    let name: string, values: string[];
+export function setCookie(headers: { [name: string]: string | string[] }, host: string): void {
     function _setCookie(value: string) {
         let cookies: string[] = value.trim().split(';');
         let cookie = Object.create(null);
@@ -58,17 +57,12 @@ function setCookie(headers: { [name: string]: string | string[] }, host: string)
         name = name.toLowerCase();
         if ((name === 'set-cookie') || (name === 'set-cookie2')) {
             const value = headers[name];
-            if (typeof value === 'string') {
-                values = [value];
-            } else {
-                values = value;
-            }
-            values.forEach(_setCookie);
+            (typeof value === 'string' ? [value] : value).forEach(_setCookie);
         }
     }
 }
 
-function getCookie(host: string, path: string, secure: boolean) {
+export function getCookie(host: string, path: string, secure: boolean) {
     let cookies: string[] = [];
     for (const domain in cookieManager) {
         if (host.indexOf(domain) > -1) {
@@ -85,7 +79,7 @@ function getCookie(host: string, path: string, secure: boolean) {
                     }
                 }
             }
-            for (let i in names) {
+            for (let i = 0, n = names.length; i < n; ++i) {
                 delete cookieManager[domain][names[i]];
             }
         }
@@ -95,5 +89,3 @@ function getCookie(host: string, path: string, secure: boolean) {
     }
     return '';
 }
-
-export default { setCookie, getCookie }

@@ -19,7 +19,7 @@
 
 import { Tags } from '../Tags';
 import { BaseSerializer } from './BaseSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class BooleanSerializer extends BaseSerializer<boolean> {
     public write(writer: Writer, value: boolean): void {

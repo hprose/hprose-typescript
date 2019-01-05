@@ -18,7 +18,7 @@
 \*________________________________________________________*/
 
 import { BaseSerializer } from './BaseSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 import { writeInteger, writeDouble } from './ValueWriter';
 
 export class NumberSerializer extends BaseSerializer<number> {

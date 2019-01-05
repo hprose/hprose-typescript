@@ -17,8 +17,8 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { ByteStream } from "../ByteStream";
-import { TypeInfo } from "./TypeInfo";
+import { ByteStream } from '../ByteStream';
+import { TypeInfo } from './TypeInfo';
 
 export interface Reader {
     readonly stream: ByteStream;

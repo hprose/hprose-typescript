@@ -1,4 +1,4 @@
-import { ByteStream, Writer } from '../../lib/io'
+import { ByteStream, Writer } from '../../src/hprose.io';
 import { Guid } from 'guid-typescript';
 
 test('test boolean serialization', () => {
@@ -7,8 +7,8 @@ test('test boolean serialization', () => {
     writer.write(false);
     writer.serialize(true);
     writer.serialize(false);
-    writer.serialize(new Boolean(true));
-    writer.serialize(new Boolean(false));
+    writer.serialize(Boolean(1));
+    writer.serialize(Boolean(0));
     expect(writer.stream.toString()).toBe('tftftf');
 });
 
@@ -16,17 +16,17 @@ test('test null serialization', () => {
     let writer = new Writer(new ByteStream());
     writer.write(null);
     writer.write(undefined);
-    writer.serialize(function() {});
+    writer.serialize(function f1() {});
     writer.serialize(()=>{});
     writer.serialize(function*() {yield 1;});
-    writer.serialize(async function(){});
+    writer.serialize(async function f2(){});
     writer.serialize(async()=>{});
     expect(writer.stream.toString()).toBe('nnnnnnn');
 });
 
 test('test array serialization', () => {
     let writer = new Writer(new ByteStream());
-    (function(x, y, z) {
+    (function f(x, y, z) {
         writer.write(arguments);
     })(1, 2, 3);
     writer.write([4, 5, 6]);
@@ -37,10 +37,10 @@ test('test map serialization', () => {
     let writer = new Writer(new ByteStream());
     writer.write(Object.create(null));
     writer.write({});
-    writer.write({name: "Tom", age: 18});
+    writer.write({name: 'Tom', age: 18});
     let map = new Map<string, any>();
-    map.set("name", "Jerry");
-    map.set("age", 17);
+    map.set('name', 'Jerry');
+    map.set('age', 17);
     writer.serialize(map);
     writer.serialize(map);
     let obj = Object.create(null);
@@ -58,16 +58,16 @@ test('test object serialization', () => {
         public age: number = 0;
     }
     let user = new User();
-    user.name = "Tom";
+    user.name = 'Tom';
     user.age = 18;
     let user2 = new User();
-    user2.name = "Jerry";
+    user2.name = 'Jerry';
     user2.age = 17;
     let writer = new Writer(new ByteStream());
     writer.write(user);
     writer.write(user2);
     expect(writer.stream.toString()).toBe('c4"User"2{s4"name"s3"age"}o0{s3"Tom"i18;}o0{s5"Jerry"i17;}');
-})
+});
 
 test('test guid serialization', () => {
     let guid: Guid = Guid.parse('bf3066cf-7b5b-1edf-731e-05b2d25a4408');
@@ -75,7 +75,7 @@ test('test guid serialization', () => {
     writer.serialize(guid);
     writer.serialize(guid);
     expect(writer.stream.toString()).toBe('g{bf3066cf-7b5b-1edf-731e-05b2d25a4408}r0;');
-})
+});
 
 test('test bigint serialization', () => {
     if (typeof BigInt !== 'undefined') {

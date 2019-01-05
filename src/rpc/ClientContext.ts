@@ -12,14 +12,14 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 4, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import Context from "./Context";
-import Client from "./Client";
-import InvokeSettings from "./InvokeSettings";
+import { Context } from './Context';
+import { Client } from './Client';
+import { InvokeSettings } from './InvokeSettings';
 
 function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
     if (src) {
@@ -37,7 +37,7 @@ function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: 
     }
 }
 
-export default class ClientContext implements Context {
+export class ClientContext implements Context {
     public headers: { [name: string]: any } = Object.create(null);
     public simple: boolean;
     public utc: boolean;
@@ -47,13 +47,13 @@ export default class ClientContext implements Context {
     [name: string]: any;
     constructor(client: Client, fullname: string, settings: InvokeSettings = Object.create(null)) {
         const defaultSettings = client.settings[fullname];
-        const getValue = function (name: keyof InvokeSettings, defaultValue: any): any {
+        const getValue = (name: keyof InvokeSettings, defaultValue: any): any  => {
             return (settings[name] !== undefined)
                 ? settings[name]
                 : (defaultSettings[name] !== undefined)
                     ? defaultSettings[name]
                     : defaultValue;
-        }
+        };
         this.simple = getValue('simple', client.simple);
         this.utc = getValue('utc', client.utc);
         this.longType = getValue('longType', client.longType);

@@ -19,7 +19,7 @@
 
 import { Tags } from '../Tags';
 import { Serializer } from './Serializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class BaseSerializer<T> implements Serializer {
     public write(writer: Writer, value: T): void {

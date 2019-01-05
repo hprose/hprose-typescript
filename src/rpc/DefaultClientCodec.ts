@@ -12,16 +12,16 @@
 |                                                          |
 | Default ClientCodec for TypeScript.                      |
 |                                                          |
-| LastModified: Jan 3, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Tags, ByteStream, Writer, Reader } from '../hprose.io'
-import ClientContext from "./ClientContext";
-import ClientCodec from "./ClientCodec";
+import { Tags, ByteStream, Writer, Reader } from '../hprose.io';
+import { ClientContext } from './ClientContext';
+import { ClientCodec } from './ClientCodec';
 
-export default class DefaultClientCodec implements ClientCodec {
+export class DefaultClientCodec implements ClientCodec {
     public static instance: ClientCodec = new DefaultClientCodec();
     public encode(name: string, args: any[], context: ClientContext): Uint8Array {
         const stream = new ByteStream();

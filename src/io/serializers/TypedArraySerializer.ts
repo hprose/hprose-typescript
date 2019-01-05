@@ -20,7 +20,7 @@
 import { Tags } from '../Tags';
 import { ByteStream } from '../ByteStream';
 import { ReferenceSerializer } from './ReferenceSerializer';
-import { Writer } from "./Writer";
+import { Writer } from './Writer';
 
 export class TypedArraySerializer extends ReferenceSerializer<ArrayLike<number>> {
     constructor (private readonly writeNumber: (stream: ByteStream, value: number) => void) { super(); }

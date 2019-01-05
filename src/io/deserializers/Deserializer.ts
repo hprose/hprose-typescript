@@ -17,7 +17,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Reader } from "./Reader";
+import { Reader } from './Reader';
 
 export interface Deserializer {
     read(reader: Reader, tag: number): any;

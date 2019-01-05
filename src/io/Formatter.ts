@@ -18,8 +18,8 @@
 \*________________________________________________________*/
 
 import { ByteStream } from './ByteStream';
-import { Writer } from "./Writer";
-import { Reader } from "./Reader";
+import { Writer } from './Writer';
+import { Reader } from './Reader';
 
 export function serialize(value: any, simple?: boolean, utc?: boolean): ByteStream {
     const stream = new ByteStream();
