@@ -46,7 +46,7 @@ export class ClientContext implements Context {
     public dictType: 'object' | 'map';
     public type: Function | null;
     [name: string]: any;
-    constructor(client: Client, fullname: string, settings: InvokeSettings = Object.create(null)) {
+    constructor(public client: Client, fullname: string, settings: InvokeSettings = Object.create(null)) {
         const uris = client.uris;
         if (uris.length <= 0) {
             throw new Error('The service URIs has not been set up yet');
@@ -70,5 +70,10 @@ export class ClientContext implements Context {
         copy(settings.headers, this.headers);
         copy(defaultSettings.context, this);
         copy(settings.context, this);
+    }
+    public clone(): ClientContext {
+        let result: ClientContext = Object.create(ClientContext.prototype);
+        copy(this, result);
+        return result;
     }
 }
