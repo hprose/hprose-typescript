@@ -24,10 +24,9 @@ export interface WeightedURIList {
     [uri: string]: number
 }
 
-export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+function parseWeightedURIList(urilist?: WeightedURIList): [string[], number[]] {
     const uris: string[] = [];
     const weights: number[] = [];
-    const effectiveWeights: number[] = [];
     if (urilist) {
         for (const uri in urilist) {
             if (urilist.hasOwnProperty && urilist.hasOwnProperty(uri)) {
@@ -37,10 +36,14 @@ export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
                     throw new Error('Wrong weight value.');
                 }
                 weights.push(weight);
-                effectiveWeights.push(weight);
             }
         }
     }
+    return [uris, weights];
+}
+
+export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+    const [uris, weights] = parseWeightedURIList(urilist);
     if (weights.length === 0) {
         // Random Load Balance
         return (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
@@ -51,6 +54,7 @@ export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
         };
     }
     // Weighted Random Load Balance
+    const effectiveWeights = weights.slice();
     return async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const totalWeight = effectiveWeights.reduce((x, y) => x + y);
         const n = uris.length;
@@ -65,7 +69,7 @@ export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
                 }
             }
         } else {
-            index = Math.floor(Math.random() * uris.length);
+            index = Math.floor(Math.random() * n);
         }
         context.uri = uris[index];
         try {
@@ -95,24 +99,7 @@ export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
 // }
 
 export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
-    const uris: string[] = [];
-    const weights: number[] = [];
-    const effectiveWeights: number[] = [];
-    const currentWeights: number[] = [];
-    if (urilist) {
-        for (const uri in urilist) {
-            if (urilist.hasOwnProperty && urilist.hasOwnProperty(uri)) {
-                uris.push(uri);
-                const weight = urilist[uri] | 0;
-                if (weight <= 0) {
-                    throw new Error('Wrong weight value.');
-                }
-                weights.push(weight);
-                effectiveWeights.push(weight);
-                currentWeights.push(0);
-            }
-        }
-    }
+    const [uris, weights] = parseWeightedURIList(urilist);
     if (weights.length === 0) {
         //  Round Robin Load Balance
         let index = -1;
@@ -150,6 +137,9 @@ export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandl
     // };
 
     // Nginx Weighted Round Robin Load Balance
+    const effectiveWeights: number[] = weights.slice();
+    const n = weights.length;
+    const currentWeights: number[] = new Array(n).fill(0);
     return async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const totalWeight = effectiveWeights.reduce((x, y) => x + y);
         let index: number;
@@ -161,7 +151,7 @@ export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandl
             }, [-Infinity, -1]);
             currentWeights[index] = currentWeight - totalWeight;
         } else {
-            index = Math.floor(Math.random() * uris.length);
+            index = Math.floor(Math.random() * n);
         }
         context.uri = uris[index];
         try {
@@ -172,6 +162,91 @@ export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandl
             return response;
         }
         catch(e) {
+            if (effectiveWeights[index] > 0) {
+                effectiveWeights[index]--;
+            }
+            throw e;
+        }
+    };
+}
+
+export function leastActiveLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+    const [uris, weights] = parseWeightedURIList(urilist);
+    const actives: number[] = [];
+    if (weights.length === 0) {
+        // Least Active Load Balance
+        return async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
+            const uris = context.client.uris;
+            if (actives.length === 0) {
+                actives.length = uris.length;
+                actives.fill(0);
+            }
+            const leastActive = Math.min(...actives);
+            const leastActiveIndexes = actives.reduce((indexes, active, index) => {
+                if (active === leastActive) {
+                    indexes.push(index);
+                }
+                return indexes;
+            }, [] as number[]);
+            let index = leastActiveIndexes[0];
+            const n = leastActiveIndexes.length;
+            if (n > 1) {
+                index = leastActiveIndexes[Math.floor(Math.random() * n)];
+            }
+            context.uri = uris[index];
+            actives[index]++;
+            try {
+                const response = await next(request, context);
+                actives[index]--;
+                return response;
+            }
+            catch(e) {
+                actives[index]--;
+                throw e;
+            }
+        };
+    }
+    // Weighted Least Active Load Balance
+    const effectiveWeights: number[] = weights.slice();
+    actives.length = weights.length;
+    actives.fill(0);
+    return async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
+        const leastActive = Math.min(...actives);
+        const leastActiveIndexes = actives.reduce((indexes, active, index) => {
+            if (active === leastActive) {
+                indexes.push(index);
+            }
+            return indexes;
+        }, [] as number[]);
+        let index = leastActiveIndexes[0];
+        const n = leastActiveIndexes.length;
+        if (n > 1) {
+            const totalWeight = effectiveWeights.reduce((x, y, i) => leastActiveIndexes.indexOf(i) > -1 ? x + y : x, 0);
+            if (totalWeight > 0) {
+                let currentWeight = Math.floor(Math.random() * totalWeight);
+                for (let i = 0; i < n; ++i) {
+                    currentWeight -= effectiveWeights[leastActiveIndexes[i]];
+                    if (currentWeight < 0) {
+                        index = leastActiveIndexes[i];
+                        break;
+                    }
+                }
+            } else {
+                index = leastActiveIndexes[Math.floor(Math.random() * n)];
+            }
+        }
+        context.uri = uris[index];
+        actives[index]++;
+        try {
+            const response = await next(request, context);
+            actives[index]--;
+            if (effectiveWeights[index] < weights[index]) {
+                effectiveWeights[index]++;
+            }
+            return response;
+        }
+        catch(e) {
+            actives[index]--;
             if (effectiveWeights[index] > 0) {
                 effectiveWeights[index]--;
             }
