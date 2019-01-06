@@ -39,11 +39,7 @@ export class FailoverSettings implements ClusterSettings {
             const uris = context.client.uris;
             const n = uris.length;
             if (n > 1) {
-                let i = index + 1;
-                if (i >= n) {
-                    i = 0;
-                }
-                index = i;
+                index = (index + 1) % n;
                 context.uri = uris[index];
             }
         };
