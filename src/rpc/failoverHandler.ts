@@ -20,14 +20,26 @@
 import { Client } from './Client';
 import { Context } from './Context';
 import { NextIOHandler, IOHandler } from './HandlerManager';
+import { ClientContext } from './ClientContext';
 
-export default function failoverHandler(
+export interface FailOverSettings {
+    retry: number;
+    failswitch: boolean;
+    idempotent: boolean;
+}
+
+const defaultFailOverSettings: FailOverSettings = {
+    retry: 10,
+    failswitch: true,
+    idempotent: false,
+};
+
+export function failoverHandler(
     client: Client,
-    retry: number = 10,
-    failswitch: boolean = true,
-    idempotent: boolean = false,
-    onFailure?: (round: number) => void
+    settings: FailOverSettings = defaultFailOverSettings,
+    onfailure?: (round: number) => void
 ): IOHandler {
+    let index: number = 0;
     let round: number = 0;
     let handler: IOHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         try {
@@ -36,33 +48,33 @@ export default function failoverHandler(
             return result;
         }
         catch (e) {
-            const uriList = client.uriList;
-            const uriIndex = client.uriIndex;
-            const _failswitch = context.failswitch === undefined ? failswitch : context.failswitch;
-            const n = uriList.length;
-            if (_failswitch) {
+            const uris = client.uris;
+            const failswitch = context.failswitch === undefined ? settings.failswitch : context.failswitch;
+            const n = uris.length;
+            if (failswitch) {
                 if (n > 1) {
-                    let i = uriIndex + 1;
+                    let i = index + 1;
                     if (i >= n) {
                         i = 0;
                         round++;
                     }
-                    client.uriIndex = i;
+                    index = i;
+                    (context as ClientContext).uri = uris[index];
                 } else {
                     round++;
                 }
             }
-            if (onFailure) {
-                onFailure(round);
+            if (onfailure) {
+                onfailure(round);
             }
-            const _idempotent = context.idempotent === undefined ? idempotent : context.idempotent;
-            const _retry = context.retry === undefined ? retry : context.retry;
+            const idempotent = context.idempotent === undefined ? settings.idempotent : context.idempotent;
+            const retry = context.retry === undefined ? settings.retry : context.retry;
             if (context.retried === undefined) {
                 context.retried = 0;
             }
-            if (_idempotent && context.retried < _retry) {
+            if (idempotent && context.retried < retry) {
                 let interval = ++context.retried * 500;
-                if (_failswitch) {
+                if (failswitch) {
                     interval -= (n - 1) * 500;
                 }
                 if (interval > 5000) {

@@ -39,6 +39,7 @@ function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: 
 
 export class ClientContext implements Context {
     public headers: { [name: string]: any } = Object.create(null);
+    public uri: string;
     public simple: boolean;
     public utc: boolean;
     public longType: 'number' | 'bigint' | 'string';
@@ -46,6 +47,11 @@ export class ClientContext implements Context {
     public type: Function | null;
     [name: string]: any;
     constructor(client: Client, fullname: string, settings: InvokeSettings = Object.create(null)) {
+        const uris = client.uris;
+        if (uris.length <= 0) {
+            throw new Error('The service URIs has not been set up yet');
+        }
+        this.uri = uris[0];
         const defaultSettings = client.settings[fullname];
         const getValue = (name: keyof InvokeSettings, defaultValue: any): any  => {
             return (settings[name] !== undefined)

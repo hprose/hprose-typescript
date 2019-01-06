@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 5, 2019                                |
+| LastModified: Jan 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -46,7 +46,7 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
 export default class HttpClient extends Client {
     public readonly httpHeaders: { [name: string]: string } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
-    private getRequestHeaders(httpHeaders: { [name: string]: string | string[] }): { [name: string]: string } {
+    private getRequestHeaders(httpHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
         const headers: { [name: string]: string } = Object.create(null);
         for (const name in this.httpHeaders) {
             headers[name] = this.httpHeaders[name];
@@ -65,9 +65,6 @@ export default class HttpClient extends Client {
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const xhr = new XMLHttpRequest();
-        if (this.uri === undefined) {
-            throw new Error('Invalid uri');
-        }
         let httpHeaders = this.getRequestHeaders(context.httpHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
             xhr.upload.onerror = xhr.onerror = function(this: XMLHttpRequest, ev: ProgressEvent): any {
@@ -108,7 +105,7 @@ export default class HttpClient extends Client {
                 }
             };
         });
-        xhr.open('POST', this.uri, true);
+        xhr.open('POST', context.uri, true);
         xhr.withCredentials = true;
         xhr.responseType = 'arraybuffer';
         xhr.timeout = this.timeout;

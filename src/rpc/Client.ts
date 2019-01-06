@@ -121,13 +121,12 @@ export abstract class Client {
     public dictType: 'object' | 'map' = 'object';
     public nullType: undefined | null = undefined;
     public codec: ClientCodec = DefaultClientCodec.instance;
-    public uriIndex: number = -1;
-    private _uriList: string[] = [];
+    private urilist: string[] = [];
     private handlerManager: HandlerManager = new HandlerManager(this.call.bind(this), this.transport.bind(this));
     constructor(uri?: string | string[], settings?: ClientSettings) {
         if (uri) {
             if (typeof uri === 'string') uri = [uri];
-            this.uriList = uri;
+            this.uris = uri;
         }
         if (settings) {
             for (const key in settings) {
@@ -135,20 +134,13 @@ export abstract class Client {
             }
         }
     }
-    public get uri(): string | undefined {
-        if (this.uriIndex >= 0) {
-            return this._uriList[this.uriIndex];
-        }
-        return undefined;
+    public get uris(): string[] {
+        return this.urilist;
     }
-    public get uriList(): string[] {
-        return this._uriList;
-    }
-    public set uriList(value: string[]) {
+    public set uris(value: string[]) {
         if (value.length > 0) {
-            this._uriList = value.slice(0);
-            this._uriList.sort(() => Math.random() - 0.5);
-            this.uriIndex = 0;
+            this.urilist = value.slice(0);
+            this.urilist.sort(() => Math.random() - 0.5);
         }
     }
     public useService<T extends object>(settings?: { [name in keyof T]: InvokeSettings }): T;
