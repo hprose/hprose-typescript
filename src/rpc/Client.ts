@@ -25,7 +25,7 @@ import { ClientContext } from './ClientContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
 
 function makeInvoke(client: Client, fullname: string): () => Promise<any> {
-    return function(): Promise<any> {
+    return function (): Promise<any> {
         return client.invoke(fullname, Array.prototype.slice.call(arguments));
     };
 }

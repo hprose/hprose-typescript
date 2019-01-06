@@ -74,7 +74,7 @@ export class FailbackSettings implements ClusterSettings {
 
 export class FailfastSettings implements ClusterSettings {
     public retry: number = 0;
-    constructor(public onfailure: (context: Context) => void) {}
+    constructor(public onfailure: (context: Context) => void) { }
 }
 
 export function clusterHandler(settings: ClusterSettings = FailoverSettings.default): IOHandler {
@@ -122,7 +122,7 @@ export function clusterHandler(settings: ClusterSettings = FailoverSettings.defa
 export function forkingClusterHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
     const clientContext = context as ClientContext;
     const uris = clientContext.client.uris;
-    const  n = uris.length;
+    const n = uris.length;
     const results: Promise<any>[] = new Array(n);
     for (let i = 0; i < n; i++) {
         const forkingContext = clientContext.clone();
@@ -146,7 +146,7 @@ export function forkingClusterHandler(name: string, args: any[], context: Contex
 export function broadcastClusterHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
     const clientContext = context as ClientContext;
     const uris = clientContext.client.uris;
-    const  n = uris.length;
+    const n = uris.length;
     const results: Promise<any>[] = new Array(n);
     for (let i = 0; i < n; i++) {
         const forkingContext = clientContext.clone();

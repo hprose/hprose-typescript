@@ -53,7 +53,7 @@ export class ClientContext implements Context {
         }
         this.uri = uris[0];
         const defaultSettings = client.settings[fullname];
-        const getValue = (name: keyof InvokeSettings, defaultValue: any): any  => {
+        const getValue = (name: keyof InvokeSettings, defaultValue: any): any => {
             return (settings[name] !== undefined)
                 ? settings[name]
                 : (defaultSettings[name] !== undefined)

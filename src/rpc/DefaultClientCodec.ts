@@ -50,7 +50,7 @@ export class DefaultClientCodec implements ClientCodec {
         if (tag === Tags.TagHeader) {
             const headers = reader.deserialize();
             for (const name in headers) {
-                 context.headers[name] = headers[name];
+                context.headers[name] = headers[name];
             }
             tag = stream.readByte();
         }

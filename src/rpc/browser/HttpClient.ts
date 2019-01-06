@@ -67,16 +67,16 @@ export default class HttpClient extends Client {
         const xhr = new XMLHttpRequest();
         let httpHeaders = this.getRequestHeaders(context.httpHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
-            xhr.upload.onerror = xhr.onerror = function(this: XMLHttpRequest, ev: ProgressEvent): any {
+            xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 reject(new Error('Network error'));
             };
-            xhr.upload.onabort = xhr.onabort = function(this: XMLHttpRequest, ev: ProgressEvent): any {
+            xhr.upload.onabort = xhr.onabort = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 reject(new Error('Transport abort'));
             };
-            xhr.upload.ontimeout = xhr.ontimeout = function(this: XMLHttpRequest, ev: ProgressEvent): any {
+            xhr.upload.ontimeout = xhr.ontimeout = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 reject(new TimeoutError('Transport timeout'));
             };
-            xhr.onreadystatechange = function(this: XMLHttpRequest, ev: Event): any {
+            xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
                 switch (this.readyState) {
                     case this.OPENED:
                         for (const name in httpHeaders) {
