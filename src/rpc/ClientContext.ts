@@ -12,7 +12,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,22 +20,7 @@
 import { Context } from './Context';
 import { Client } from './Client';
 import { InvokeSettings } from './InvokeSettings';
-
-function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
-    if (src) {
-        if (src.hasOwnProperty === undefined) {
-            for (let name in src) {
-                dist[name] = src[name];
-            }
-        } else {
-            for (let name in src) {
-                if (src.hasOwnProperty(name)) {
-                    dist[name] = src[name];
-                }
-            }
-        }
-    }
-}
+import { copy } from './Utils';
 
 export class ClientContext implements Context {
     public headers: { [name: string]: any } = Object.create(null);

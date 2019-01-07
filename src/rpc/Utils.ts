@@ -8,16 +8,16 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/rpc/parseURI.ts                                   |
+| hprose/rpc/Utils.ts                                      |
 |                                                          |
-| parseURI for TypeScript.                                 |
+| Utils for TypeScript.                                    |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-interface URI {
+export interface URI {
     protocol: string;
     host: string;
     hostname: string;
@@ -43,4 +43,20 @@ export function parseURI(uri: string): URI {
         };
     }
     throw new Error('Invalid URI');
+}
+
+export function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
+    if (src) {
+        if (src.hasOwnProperty === undefined) {
+            for (let name in src) {
+                dist[name] = src[name];
+            }
+        } else {
+            for (let name in src) {
+                if (src.hasOwnProperty(name)) {
+                    dist[name] = src[name];
+                }
+            }
+        }
+    }
 }
