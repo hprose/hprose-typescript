@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -145,7 +145,7 @@ export abstract class Client {
     }
     public useService<T extends object>(settings?: { [name in keyof T]: InvokeSettings }): T;
     public useService<T extends object>(namespace: string, settings?: { [name in keyof T]: InvokeSettings }): T;
-    public useService(functions: string[]): any;
+    public useService(fullnames: string[]): any;
     public useService(...args: any[]): any {
         let namespace: string | undefined;
         let settings: { [name in keyof any]: InvokeSettings } | undefined;
@@ -176,6 +176,10 @@ export abstract class Client {
         }
         return new Proxy(service, new ServiceProxyHandler(this, namespace));
     }
+    public async useServiceAsync(): Promise<any> {
+        const fullnames: string[] = await this.invoke('~');
+        return useService(this, fullnames);
+    }
     public use(handler: InvokeHandler | IOHandler): this {
         switch (handler.length) {
             case 4: this.handlerManager.addInvokeHandler(handler as InvokeHandler); break;
@@ -192,8 +196,10 @@ export abstract class Client {
         }
         return this;
     }
-    public async invoke<T>(fullname: string, args: any[], settings?: InvokeSettings): Promise<T> {
-        args = await Promise.all(args);
+    public async invoke<T>(fullname: string, args: any[] = [], settings?: InvokeSettings): Promise<T> {
+        if (args.length > 0) {
+            args = await Promise.all(args);
+        }
         const context = new ClientContext(this, fullname, settings);
         const invokeHandler = this.handlerManager.invokeHandler;
         return invokeHandler(fullname, args, context);
