@@ -12,15 +12,16 @@
 |                                                          |
 | CookieManager for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 const cookieManager = Object.create(null);
 
-export function setCookie(headers: { [name: string]: string | string[] }, host: string): void {
-    function _setCookie(value: string) {
+export function setCookie(headers: { [header: string]: string | string[] | undefined }, host: string = '@'): void {
+    function _setCookie(value?: string) {
+        if (value === undefined) return;
         let cookies: string[] = value.trim().split(';');
         let cookie = Object.create(null);
         [cookie.name, cookie.value] = cookies[0].trim().split('=', 2);
@@ -57,12 +58,12 @@ export function setCookie(headers: { [name: string]: string | string[] }, host: 
         name = name.toLowerCase();
         if ((name === 'set-cookie') || (name === 'set-cookie2')) {
             const value = headers[name];
-            (typeof value === 'string' ? [value] : value).forEach(_setCookie);
+            (Array.isArray(value) ? value : [value]).forEach(_setCookie);
         }
     }
 }
 
-export function getCookie(host: string, path: string, secure: boolean) {
+export function getCookie(host: string = '@', path: string = '/', secure: boolean) {
     let cookies: string[] = [];
     for (const domain in cookieManager) {
         if (host.indexOf(domain) > -1) {
