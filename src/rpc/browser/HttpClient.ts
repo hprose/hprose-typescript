@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -44,6 +44,8 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
 }
 
 export default class HttpClient extends Client {
+    private counter: number = 0;
+    private requests: { [id: number]: XMLHttpRequest } = Object.create(null);
     public readonly httpHeaders: { [name: string]: string } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
     private getRequestHeaders(httpHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
@@ -64,16 +66,22 @@ export default class HttpClient extends Client {
         return headers;
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
+        const id = this.counter++;
         const xhr = new XMLHttpRequest();
+        const client = this;
+        this.requests[id] = xhr;
         let httpHeaders = this.getRequestHeaders(context.httpHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
             xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
+                delete client.requests[id];
                 reject(new Error('Network error'));
             };
             xhr.upload.onabort = xhr.onabort = function (this: XMLHttpRequest, ev: ProgressEvent): any {
+                delete client.requests[id];
                 reject(new Error('Transport abort'));
             };
             xhr.upload.ontimeout = xhr.ontimeout = function (this: XMLHttpRequest, ev: ProgressEvent): any {
+                delete client.requests[id];
                 reject(new TimeoutError('Transport timeout'));
             };
             xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
@@ -96,6 +104,7 @@ export default class HttpClient extends Client {
                         context.httpHeaders = getResponseHeaders(this.getAllResponseHeaders());
                         break;
                     case this.DONE:
+                        delete client.requests[id];
                         if (this.status >= 200 && this.status < 300) {
                             resolve(new Uint8Array(this.response));
                         } else {
@@ -112,4 +121,13 @@ export default class HttpClient extends Client {
         xhr.upload.onprogress = xhr.onprogress = this.onprogress;
         return result;
     }
+    public abort(): void {
+        for (const id in this.requests) {
+            if (this.requests[id]) {
+                this.requests[id].abort();
+            }
+            delete this.requests[id];
+        }
+    }
+
 }
