@@ -42,7 +42,7 @@ function parseWeightedURIList(urilist?: WeightedURIList): [string[], number[]] {
     return [uris, weights];
 }
 
-export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+export function getRandomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
     const [uris, weights] = parseWeightedURIList(urilist);
     if (weights.length === 0) {
         // Random Load Balance
@@ -98,7 +98,7 @@ export function randomLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
 //     return x;
 // }
 
-export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+export function getRoundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
     const [uris, weights] = parseWeightedURIList(urilist);
     if (weights.length === 0) {
         //  Round Robin Load Balance
@@ -170,7 +170,7 @@ export function roundRobinLoadBalanceHandler(urilist?: WeightedURIList): IOHandl
     };
 }
 
-export function leastActiveLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
+export function getLeastActiveLoadBalanceHandler(urilist?: WeightedURIList): IOHandler {
     const [uris, weights] = parseWeightedURIList(urilist);
     const actives: number[] = [];
     if (weights.length === 0) {

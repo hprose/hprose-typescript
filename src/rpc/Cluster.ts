@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Cluster for TypeScript.                           |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -73,7 +73,7 @@ export class FailfastSettings implements ClusterSettings {
     constructor(public onfailure: (context: Context) => void) { }
 }
 
-export function clusterHandler(settings: ClusterSettings = FailoverSettings.default): IOHandler {
+export function getClusterHandler(settings: ClusterSettings = FailoverSettings.default): IOHandler {
     if (settings.retry === undefined) settings.retry = 10;
     if (settings.idempotent === undefined) settings.idempotent = false;
     async function handler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
