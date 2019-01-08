@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Tags for TypeScript.                              |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -50,7 +50,6 @@ export const enum Tags {
     TagPoint       = 0x2E, //  '.'
     /* RPC Protocol Tags */
     TagHeader      = 0x48, //  'H'
-    TagFunctions   = 0x46, //  'F'
     TagCall        = 0x43, //  'C'
     TagResult      = 0x52, //  'R'
     TagError       = 0x45, //  'E'
