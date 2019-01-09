@@ -22,12 +22,13 @@ import { DefaultServiceCodec } from './DefaultServiceCodec';
 import { Context } from './Context';
 import { ServiceContext } from './ServiceContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
-import { MethodLike } from './Method';
+import { MethodLike, Method } from './Method';
 import { MethodManager, MissingFunction } from './MethodManager';
 
 export abstract class Service {
     public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
     public readonly headers: { [name: string]: any } = Object.create(null);
+    public timeout: number = 120000;
     public debug: boolean = false;
     public simple: boolean = false;
     public utc: boolean = false;
@@ -37,6 +38,9 @@ export abstract class Service {
     public codec: ServiceCodec = DefaultServiceCodec.instance;
     private handlerManager: HandlerManager = new HandlerManager(this.execute.bind(this), this.process.bind(this));
     private methodManager: MethodManager = new MethodManager(this.methods);
+    constructor() {
+        this.add(new Method(() => { return Object.keys(this.methods); }, '~'));
+    }
     public handle(request: Uint8Array, context: Context): Promise<Uint8Array> {
         return this.handlerManager.ioHandler(request, context);
     }

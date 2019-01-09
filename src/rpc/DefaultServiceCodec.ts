@@ -53,9 +53,9 @@ export class DefaultServiceCodec implements ServiceCodec {
         if (method === undefined) {
             throw new Error('Can\'t find this function ' + fullname + '().');
         }
-        context.debug = (method.debug === undefined) ? service.debug : method.debug;
-        context.simple = (method.simple === undefined) ? service.simple : method.simple;
-        context.utc = (method.utc === undefined) ? service.utc : method.utc;
+        if (method.debug !== undefined) context.debug = method.debug;
+        if (method.simple !== undefined) context.simple = method.simple;
+        if (method.utc !== undefined) context.utc = method.utc;
         context.missing = method.missing;
         context.method = method.method;
         context.obj = method.obj;

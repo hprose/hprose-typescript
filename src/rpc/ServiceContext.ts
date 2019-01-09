@@ -21,22 +21,23 @@ import { Context } from './Context';
 import { Service } from './Service';
 import { copy } from './Utils';
 
-export class ServerContext implements Context {
+export class ServiceContext implements Context {
+    public debug: boolean;
+    public simple: boolean;
+    public utc: boolean;
+    public missing: boolean = false;
+    public method: Function = ()=>{};
+    public obj: any;
     public headers: { [name: string]: any } = Object.create(null);
     [name: string]: any;
-    constructor(public service: Service) {}
-    public clone(): ServerContext {
-        let result: ServerContext = Object.create(ServerContext.prototype);
+    constructor(public service: Service) {
+        this.debug = service.debug;
+        this.simple = service.simple;
+        this.utc = service.utc;
+    }
+    public clone(): ServiceContext {
+        let result: ServiceContext = Object.create(ServiceContext.prototype);
         copy(this, result);
         return result;
     }
-}
-
-export interface ServiceContext extends ServerContext {
-    debug: boolean;
-    simple: boolean;
-    utc: boolean;
-    missing: boolean;
-    method: Function;
-    obj: any;
 }
