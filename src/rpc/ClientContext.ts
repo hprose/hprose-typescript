@@ -22,6 +22,8 @@ import { Client } from './Client';
 import { InvokeSettings } from './InvokeSettings';
 import { copy } from './Utils';
 
+const emptySettings: InvokeSettings = Object.create(null);
+
 export class ClientContext implements Context {
     public headers: { [name: string]: any } = Object.create(null);
     public uri: string;
@@ -37,7 +39,7 @@ export class ClientContext implements Context {
             throw new Error('The service URIs has not been set up yet');
         }
         this.uri = uris[0];
-        const defaultSettings = client.settings[fullname];
+        const defaultSettings = (fullname in client.settings) ? client.settings[fullname] : emptySettings;
         const getValue = (name: keyof InvokeSettings, defaultValue: any): any => {
             return (settings[name] !== undefined)
                 ? settings[name]

@@ -43,7 +43,7 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
     return httpHeaders;
 }
 
-export default class HttpClient extends Client {
+export class HttpClient extends Client {
     private counter: number = 0;
     private requests: { [id: number]: XMLHttpRequest } = Object.create(null);
     public readonly httpHeaders: { [name: string]: string } = Object.create(null);

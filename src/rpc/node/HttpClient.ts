@@ -26,7 +26,7 @@ import * as https from 'https';
 import { getCookie, setCookie } from '../CookieManager';
 import { ByteStream } from '../../hprose.io';
 
-export default class HttpClient extends Client {
+export class HttpClient extends Client {
     private counter: number = 0;
     private requests: { [id: number]: http.ClientRequest } = Object.create(null);
     public keepAlive: boolean = true;
@@ -75,9 +75,10 @@ export default class HttpClient extends Client {
         return new Promise<Uint8Array>((resolve, reject) => {
             const id = this.counter++;
             const req = client.request(options, (res: http.IncomingMessage) => {
-                const bytes = new ByteStream();
-                res.on('data', (chunk) => {
-                    bytes.write(chunk);
+                const size = res.headers['content-length'];
+                const bytes = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
+                res.on('data', function(chunk: Buffer) {
+                    bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
                 });
                 res.on('end', () => {
                     delete this.requests[id];
