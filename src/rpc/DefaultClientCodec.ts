@@ -12,7 +12,7 @@
 |                                                          |
 | Default ClientCodec for TypeScript.                      |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -32,10 +32,12 @@ export class DefaultClientCodec implements ClientCodec {
         if (size > 0) {
             stream.writeByte(Tags.TagHeader);
             writer.write(headers);
+            writer.reset();
         }
         stream.writeByte(Tags.TagCall);
         writer.write(name);
         if (args.length > 0) {
+            writer.reset();
             writer.write(args);
         }
         stream.writeByte(Tags.TagEnd);
@@ -52,6 +54,7 @@ export class DefaultClientCodec implements ClientCodec {
             for (const name in headers) {
                 context.headers[name] = headers[name];
             }
+            reader.reset();
             tag = stream.readByte();
         }
         switch (tag) {
