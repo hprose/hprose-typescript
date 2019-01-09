@@ -28,7 +28,7 @@ export class DefaultServiceCodec implements ServiceCodec {
     public encode(result: any, context: ServiceContext): Uint8Array {
         const stream = new ByteStream();
         const writer = new Writer(stream, context.simple, context.utc);
-        const headers = context.headers;
+        const headers = context.responseHeaders;
         let size = 0;
         for (const _ in headers) { size++; }
         if (size > 0) {
@@ -105,7 +105,7 @@ export class DefaultServiceCodec implements ServiceCodec {
         if (tag === Tags.TagHeader) {
             const headers = reader.deserialize(service.nullType);
             for (const name in headers) {
-                context.headers[name] = headers[name];
+                context.requestHeaders[name] = headers[name];
             }
             reader.reset();
             tag = stream.readByte();

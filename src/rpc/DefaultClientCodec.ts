@@ -26,7 +26,7 @@ export class DefaultClientCodec implements ClientCodec {
     public encode(name: string, args: any[], context: ClientContext): Uint8Array {
         const stream = new ByteStream();
         const writer = new Writer(stream, context.simple, context.utc);
-        const headers = context.headers;
+        const headers = context.requestHeaders;
         let size = 0;
         for (const _ in headers) { size++; }
         if (size > 0) {
@@ -52,7 +52,7 @@ export class DefaultClientCodec implements ClientCodec {
         if (tag === Tags.TagHeader) {
             const headers = reader.deserialize();
             for (const name in headers) {
-                context.headers[name] = headers[name];
+                context.responseHeaders[name] = headers[name];
             }
             reader.reset();
             tag = stream.readByte();

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,21 +25,27 @@ import * as http from 'http';
 import * as https from 'https';
 import { getCookie, setCookie } from '../CookieManager';
 import { ByteStream } from '../../hprose.io';
+import { ClientContext } from '../ClientContext';
+
+export interface HttpClientContext extends ClientContext {
+    httpRequestHeaders?: http.OutgoingHttpHeaders;
+    httpResponseHeaders?: http.IncomingHttpHeaders;
+}
 
 export class HttpClient extends Client {
     private counter: number = 0;
     private requests: { [id: number]: http.ClientRequest } = Object.create(null);
     public keepAlive: boolean = true;
     public readonly options: https.RequestOptions = Object.create(null);
-    public readonly httpHeaders: http.OutgoingHttpHeaders = Object.create(null);
-    private getRequestHeader(httpHeaders?: http.OutgoingHttpHeaders): http.OutgoingHttpHeaders {
+    public readonly httpRequestHeaders: http.OutgoingHttpHeaders = Object.create(null);
+    private getRequestHeader(httpRequestHeaders?: http.OutgoingHttpHeaders): http.OutgoingHttpHeaders {
         const headers: http.OutgoingHttpHeaders = Object.create(null);
-        for (const name in this.httpHeaders) {
-            headers[name] = this.httpHeaders[name];
+        for (const name in this.httpRequestHeaders) {
+            headers[name] = this.httpRequestHeaders[name];
         }
-        if (httpHeaders) {
-            for (const name in httpHeaders) {
-                headers[name] = httpHeaders[name];
+        if (httpRequestHeaders) {
+            for (const name in httpRequestHeaders) {
+                headers[name] = httpRequestHeaders[name];
             }
         }
         return headers;
@@ -66,7 +72,7 @@ export class HttpClient extends Client {
             }
         }
         options.method = 'POST';
-        options.headers = this.getRequestHeader(context.httpHeaders);
+        options.headers = this.getRequestHeader((context as HttpClientContext).httpRequestHeaders);
         options.headers['Content-Length'] = request.length;
         const cookie = getCookie(options.host, options.path, secure);
         if (cookie) {
@@ -84,7 +90,7 @@ export class HttpClient extends Client {
                     delete this.requests[id];
                     if (res.statusCode) {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
-                            context.httpHeaders = res.headers;
+                            (context as HttpClientContext).httpResponseHeaders = res.headers;
                             setCookie(res.headers, options.host);
                             resolve(bytes.takeBytes());
                         } else {

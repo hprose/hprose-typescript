@@ -12,7 +12,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,8 @@ import { copy } from './Utils';
 const emptySettings: InvokeSettings = Object.create(null);
 
 export class ClientContext implements Context {
-    public headers: { [name: string]: any } = Object.create(null);
+    public requestHeaders: { [name: string]: any } = Object.create(null);
+    public responseHeaders: { [name: string]: any } = Object.create(null);
     public uri: string;
     public simple: boolean;
     public utc: boolean;

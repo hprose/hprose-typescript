@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,6 +20,12 @@
 import { Client } from '../Client';
 import { Context } from '../Context';
 import { TimeoutError } from '../TimeoutError';
+import { ClientContext } from '../ClientContext';
+
+export interface HttpClientContext extends ClientContext {
+    httpRequestHeaders?: { [name: string]: string | string[] };
+    httpResponseHeaders?: { [name: string]: string | string[] };
+}
 
 function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | string[] } {
     const httpHeaders: { [name: string]: string | string[] } = Object.create(null);
@@ -28,7 +34,9 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
         for (let i = 0, n = headers.length; i < n; i++) {
             if (headers[i] !== '') {
                 let [name, value] = headers[i].split(': ', 2).map((value) => { return value.trim(); });
-                if (name in httpHeaders) {
+                if (typeof httpHeaders.hasOwnProperty === 'undefined'
+                    && name in httpHeaders
+                    || httpHeaders.hasOwnProperty(name)) {
                     if (Array.isArray(httpHeaders[name])) {
                         (httpHeaders[name] as string[]).push(value);
                     } else {
@@ -46,20 +54,23 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
 export class HttpClient extends Client {
     private counter: number = 0;
     private requests: { [id: number]: XMLHttpRequest } = Object.create(null);
-    public readonly httpHeaders: { [name: string]: string } = Object.create(null);
+    public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
-    private getRequestHeaders(httpHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
+    private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
         const headers: { [name: string]: string } = Object.create(null);
-        for (const name in this.httpHeaders) {
-            headers[name] = this.httpHeaders[name];
+        for (const name in this.httpRequestHeaders) {
+            headers[name] = this.httpRequestHeaders[name];
         }
-        if (httpHeaders) {
-            for (const name in httpHeaders) {
-                const value = httpHeaders[name];
-                if (Array.isArray(value)) {
-                    headers[name] = value.join(', ');
-                } else {
-                    headers[name] = value;
+        if (httpRequestHeaders) {
+            for (const name in httpRequestHeaders) {
+                if (typeof httpRequestHeaders.hasOwnProperty === 'undefined'
+                    || httpRequestHeaders.hasOwnProperty(name)) {
+                    const value = httpRequestHeaders[name];
+                    if (Array.isArray(value)) {
+                        headers[name] = value.join(', ');
+                    } else {
+                        headers[name] = value;
+                    }
                 }
             }
         }
@@ -70,7 +81,7 @@ export class HttpClient extends Client {
         const xhr = new XMLHttpRequest();
         const client = this;
         this.requests[id] = xhr;
-        let httpHeaders = this.getRequestHeaders(context.httpHeaders);
+        let httpRequestHeaders = this.getRequestHeaders((context as HttpClientContext).httpRequestHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
             xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 delete client.requests[id];
@@ -87,8 +98,8 @@ export class HttpClient extends Client {
             xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
                 switch (this.readyState) {
                     case this.OPENED:
-                        for (const name in httpHeaders) {
-                            this.setRequestHeader(name, httpHeaders[name]);
+                        for (const name in httpRequestHeaders) {
+                            this.setRequestHeader(name, httpRequestHeaders[name]);
                         }
                         if (ArrayBuffer.isView) {
                             this.send(request);
@@ -101,7 +112,7 @@ export class HttpClient extends Client {
                         }
                         break;
                     case this.HEADERS_RECEIVED:
-                        context.httpHeaders = getResponseHeaders(this.getAllResponseHeaders());
+                        (context as HttpClientContext).httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
                         break;
                     case this.DONE:
                         delete client.requests[id];

@@ -12,12 +12,13 @@
 |                                                          |
 | hprose Context for TypeScript.                           |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 export interface Context {
-    headers: { [name: string]: any };
+    requestHeaders: { [name: string]: any };
+    responseHeaders: { [name: string]: any };
     [name: string]: any;
 }
