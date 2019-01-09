@@ -12,7 +12,7 @@
 |                                                          |
 | Utils for TypeScript.                                    |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -59,4 +59,46 @@ export function copy(src: { [name: string]: any } | undefined, dist: { [name: st
             }
         }
     }
+}
+
+function getCallback(resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void): Function {
+    return function() {
+        switch(arguments.length) {
+            case 1:
+                const arg = arguments[0];
+                if (arg instanceof Error) {
+                    reject(arg);
+                } else {
+                    resolve(arg);
+                }
+                break;
+            case 2:
+                const arg1 = arguments[0];
+                const arg2 = arguments[1];
+                if (arg1 instanceof Error) {
+                    reject(arg1);
+                } else if (arg2 instanceof Error) {
+                    reject(arg2);
+                } else if (arg1 === undefined) {
+                    resolve(arg2);
+                } else {
+                    resolve(arg1);
+                }
+                break;
+        }
+    };
+}
+
+export function promisify(fn: Function, thisArg?: any): ((...args: any[]) => Promise<any>) {
+    return (...args: any[]): Promise<any> => {
+        return new Promise<any>((resolve, reject) => {
+            args.push(getCallback(resolve, reject));
+            try {
+                fn.apply(thisArg, args);
+            }
+            catch (error) {
+                reject(error);
+            }
+        });
+    };
 }
