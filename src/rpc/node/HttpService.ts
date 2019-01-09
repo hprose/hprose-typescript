@@ -161,7 +161,7 @@ export class HttpService extends Service {
         this._clientAccessPolicyXmlContent = value;
     }
 
-    public httpHandler(request: http.IncomingMessage, response: http.ServerResponse): Promise<undefined> {
+    public httpHandler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<undefined> => {
         const context = new HttpServiceContext(this, request, response);
         request.socket.setTimeout(this.timeout);
         const size = request.headers['content-length'];
@@ -203,6 +203,8 @@ export class HttpService extends Service {
                 this.end(result, response);
                 resolve();
             });
+            request.on('error', reject);
+            request.on('close', reject);
         });
     }
 }

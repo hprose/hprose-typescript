@@ -5,7 +5,7 @@ import { HttpClient } from '../../src/rpc/node/HttpClient';
 test('test boolean serialization', async () => {
     const service = new HttpService();
     service.addFunction((name: string): string => { return 'hello ' + name; }, 'hello', [String]);
-    const server = http.createServer(service.httpHandler.bind(service));
+    const server = http.createServer(service.httpHandler);
     server.listen(8080);
     const client = new HttpClient('http://127.0.0.1:8080/');
     const proxy = await client.useServiceAsync();
