@@ -12,15 +12,14 @@
 |                                                          |
 | Default ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Tags, ByteStream, Writer, Reader } from '../hprose.io';
+import { Tags, ByteStream, Writer, Reader, ValueReader } from '../hprose.io';
 import { ServiceContext } from './ServiceContext';
 import { ServiceCodec } from './ServiceCodec';
-import { readCount } from '../io/ValueReader';
 import { MethodLike } from './Method';
 
 export class DefaultServiceCodec implements ServiceCodec {
@@ -68,7 +67,7 @@ export class DefaultServiceCodec implements ServiceCodec {
         let args: any[] = [];
         if (tag === Tags.TagList) {
             reader.reset();
-            const count = readCount(stream);
+            const count = ValueReader.readCount(stream);
             let paramTypes = method.paramTypes;
             if (paramTypes === undefined) {
                 paramTypes = new Array(count).fill(service.nullType);
