@@ -12,7 +12,7 @@
 |                                                          |
 | hprose DefaultDeserializer for TypeScript.               |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,8 +22,8 @@ import { BaseDeserializer } from './BaseDeserializer';
 import { Deserializer } from './Deserializer';
 import { Reader } from './Reader';
 import { StringDeserializer } from './StringDeserializer';
-import * as ValueReader from './ValueReader';
-import * as ReferenceReader from './ReferenceReader';
+import * as ValueReader from '../ValueReader';
+import * as ReferenceReader from '../ReferenceReader';
 
 export class DefaultDeserializer extends BaseDeserializer implements Deserializer {
     public static instance: Deserializer = new DefaultDeserializer();

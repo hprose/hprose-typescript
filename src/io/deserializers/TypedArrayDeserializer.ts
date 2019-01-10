@@ -12,7 +12,7 @@
 |                                                          |
 | hprose TypedArray deserializer for TypeScript.           |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,8 +24,8 @@ import { IntDeserializer } from './IntDeserializer';
 import { NumberDeserializer } from './NumberDeserializer';
 import { BaseDeserializer } from './BaseDeserializer';
 import { Deserializer } from './Deserializer';
-import { readCount } from './ValueReader';
-import { readBytes, readString } from './ReferenceReader';
+import { readCount } from '../ValueReader';
+import { readBytes, readString } from '../ReferenceReader';
 
 interface TypedArrayConstructor extends Function {
     new(length: number): TypedArray;

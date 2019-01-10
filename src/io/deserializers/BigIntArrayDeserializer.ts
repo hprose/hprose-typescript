@@ -12,7 +12,7 @@
 |                                                          |
 | hprose bigint Array deserializer for TypeScript.         |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,8 +21,8 @@ import { Tags } from '../Tags';
 import { BaseDeserializer } from './BaseDeserializer';
 import { Deserializer } from './Deserializer';
 import { Reader } from './Reader';
-import * as Deserializers from '../Deserializers';
-import * as ValueReader from './ValueReader';
+import { register, getInstance } from '../Deserializer';
+import * as ValueReader from '../ValueReader';
 
 interface BigIntArrayConstructor extends Function {
     new(length: number): BigIntArray;
@@ -38,7 +38,7 @@ function readBigIntArray(reader: Reader, type: BigIntArrayConstructor): BigIntAr
     const count = ValueReader.readCount(stream);
     const a = new type(count);
     reader.addReference(a);
-    const deserializer = Deserializers.getInstance(BigInt);
+    const deserializer = getInstance(BigInt);
     for (let i = 0; i < count; ++i) {
         a[i] = deserializer.deserialize(reader);
     }
@@ -60,7 +60,7 @@ if (typeof BigInt64Array !== 'undefined') {
             }
         }
     }
-    Deserializers.register(BigInt64Array, BigInt64ArrayDeserializer.instance);
+    register(BigInt64Array, BigInt64ArrayDeserializer.instance);
 }
 
 if (typeof BigUint64Array !== 'undefined') {
@@ -77,5 +77,5 @@ if (typeof BigUint64Array !== 'undefined') {
             }
         }
     }
-    Deserializers.register(BigUint64Array, BigUint64ArrayDeserializer.instance);
+    register(BigUint64Array, BigUint64ArrayDeserializer.instance);
 }

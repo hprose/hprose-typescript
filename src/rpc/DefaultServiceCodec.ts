@@ -20,7 +20,7 @@
 import { Tags, ByteStream, Writer, Reader } from '../hprose.io';
 import { ServiceContext } from './ServiceContext';
 import { ServiceCodec } from './ServiceCodec';
-import { readCount } from '../io/deserializers/ValueReader';
+import { readCount } from '../io/ValueReader';
 import { MethodLike } from './Method';
 
 export class DefaultServiceCodec implements ServiceCodec {

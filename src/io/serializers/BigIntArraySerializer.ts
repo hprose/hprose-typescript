@@ -12,7 +12,7 @@
 |                                                          |
 | hprose bigint array serializer for TypeScript.           |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,8 +20,8 @@
 import { Tags } from '../Tags';
 import { ReferenceSerializer } from './ReferenceSerializer';
 import { Writer } from './Writer';
-import { writeBigInt } from './ValueWriter';
-import { register } from '../Serializers';
+import { writeBigInt } from '../ValueWriter';
+import { register } from '../Serializer';
 
 if ((typeof BigInt64Array !== 'undefined') && (typeof BigUint64Array !== 'undefined')) {
     class BigIntArraySerializer extends ReferenceSerializer<ArrayLike<bigint>> {

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose object serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ import { Tags } from '../Tags';
 import { ByteStream } from '../ByteStream';
 import { ReferenceSerializer } from './ReferenceSerializer';
 import { Writer } from './Writer';
-import { writeStringBody } from './ValueWriter';
+import { writeStringBody } from '../ValueWriter';
 
 export class ObjectSerializer<T> extends ReferenceSerializer<T> {
     public readonly type: Function;

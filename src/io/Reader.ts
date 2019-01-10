@@ -12,16 +12,16 @@
 |                                                          |
 | hprose Reader for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { ByteStream } from './ByteStream';
-import { TypeInfo } from './deserializers/TypeInfo';
-import { readInt, readString, readCount } from './deserializers/ValueReader';
+import { TypeInfo } from './TypeInfo';
+import { readInt, readString, readCount } from './ValueReader';
 import * as TypeManager from './TypeManager';
-import * as Deserializers from './Deserializers';
+import * as Deserializer from './Deserializer';
 import './deserializers/BigIntDeserializer';
 import './deserializers/BigIntArrayDeserializer';
 
@@ -53,17 +53,17 @@ export class Reader {
         this.refer = simple ? undefined : new ReaderRefer();
     }
     deserialize(type?: Function | null): any {
-        return Deserializers.getInstance(type).deserialize(this);
+        return Deserializer.getInstance(type).deserialize(this);
     }
     read(tag: number, type?: Function | null): any {
-        return Deserializers.getInstance(type).read(this, tag);
+        return Deserializer.getInstance(type).read(this, tag);
     }
     readClass(): void {
         const stream = this.stream;
         const name = readString(stream);
         const count = readCount(stream);
         const names: string[] = new Array<string>(count);
-        const strDeserialize = Deserializers.getInstance(String);
+        const strDeserialize = Deserializer.getInstance(String);
         for (let i = 0; i < count; ++i) {
             names[i] = strDeserialize.deserialize(this);
         }

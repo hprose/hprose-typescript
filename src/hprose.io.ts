@@ -12,27 +12,31 @@
 |                                                          |
 | hprose io for TypeScript.                                |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { ByteStream } from './io/ByteStream';
-import { Tags } from './io/Tags';
-import { Writer } from './io/Writer';
-import { Reader } from './io/Reader';
+export { ByteStream } from './io/ByteStream';
+export { Tags } from './io/Tags';
+export { Writer } from './io/Writer';
+export { Reader } from './io/Reader';
+export { TypeInfo } from './io/TypeInfo';
+
 import * as TypeManager from './io/TypeManager';
-import * as Serializers from './io/Serializers';
-import * as Deserializers from './io/Deserializers';
+import * as Serializer from './io/Serializer';
+import * as Deserializer from './io/Deserializer';
 import * as Formatter from './io/Formatter';
+import * as ReferenceReader from './io/ReferenceReader';
+import * as ValueReader from './io/ValueReader';
+import * as ValueWriter from './io/ValueWriter';
 
 export {
-    ByteStream,
-    Tags,
-    Writer,
-    Reader,
     TypeManager,
-    Serializers,
-    Deserializers,
-    Formatter
+    Serializer,
+    Deserializer,
+    Formatter,
+    ReferenceReader,
+    ValueReader,
+    ValueWriter
 };

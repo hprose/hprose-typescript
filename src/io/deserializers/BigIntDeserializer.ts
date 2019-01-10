@@ -12,7 +12,7 @@
 |                                                          |
 | hprose bigint deserializer for TypeScript.               |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,8 +21,8 @@ import { Tags } from '../Tags';
 import { BaseDeserializer } from './BaseDeserializer';
 import { Deserializer } from './Deserializer';
 import { Reader } from './Reader';
-import * as Deserializers from '../Deserializers';
-import * as ReferenceReader from './ReferenceReader';
+import { register } from '../Deserializer';
+import * as ReferenceReader from '../ReferenceReader';
 
 if (typeof BigInt !== 'undefined') {
     class BigIntDeserializer extends BaseDeserializer implements Deserializer {
@@ -48,5 +48,5 @@ if (typeof BigInt !== 'undefined') {
             }
         }
     }
-    Deserializers.register(BigInt, BigIntDeserializer.instance);
+    register(BigInt, BigIntDeserializer.instance);
 }

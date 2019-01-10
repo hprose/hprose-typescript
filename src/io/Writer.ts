@@ -12,14 +12,14 @@
 |                                                          |
 | hprose Writer for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { ByteStream } from './ByteStream';
 import { Tags } from './Tags';
-import * as Serializers from './Serializers';
+import * as Serializer from './Serializer';
 import './serializers/BigIntSerializer';
 import './serializers/BigIntArraySerializer';
 
@@ -59,14 +59,14 @@ export class Writer {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            Serializers.getInstance<T>(value).serialize(this, value);
+            Serializer.getInstance<T>(value).serialize(this, value);
         }
     }
     public write<T>(value: T): void {
         if (value === undefined || value === null) {
             this.stream.writeByte(Tags.TagNull);
         } else {
-            Serializers.getInstance<T>(value).write(this, value);
+            Serializer.getInstance<T>(value).write(this, value);
         }
     }
     public writeReference(value: any): boolean {

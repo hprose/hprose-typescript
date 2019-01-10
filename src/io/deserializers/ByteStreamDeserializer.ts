@@ -12,7 +12,7 @@
 |                                                          |
 | hprose ByteStream deserializer for TypeScript.           |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,7 +23,7 @@ import { BaseDeserializer } from './BaseDeserializer';
 import { Deserializer } from './Deserializer';
 import { Reader } from './Reader';
 import { readIntArray } from './TypedArrayDeserializer';
-import { readBytes, readString } from './ReferenceReader';
+import { readBytes, readString } from '../ReferenceReader';
 
 export class ByteStreamDeserializer extends BaseDeserializer implements Deserializer {
     public static instance: Deserializer = new ByteStreamDeserializer();

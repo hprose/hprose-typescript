@@ -12,13 +12,13 @@
 |                                                          |
 | hprose Reader interface for TypeScript.                  |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { ByteStream } from '../ByteStream';
-import { TypeInfo } from './TypeInfo';
+import { TypeInfo } from '../TypeInfo';
 
 export interface Reader {
     readonly stream: ByteStream;
