@@ -51,8 +51,7 @@ export class HttpService extends Service {
             if (request.headers['if-modified-since'] === lastModified &&
                 request.headers['if-none-match'] === etag) {
                 response.statusCode = 304;
-            }
-            else {
+            } else {
                 response.setHeader('Last-Modified', lastModified);
                 response.setHeader('Etag', etag);
                 response.setHeader('Content-Type', 'text/xml');
@@ -70,8 +69,7 @@ export class HttpService extends Service {
             if (request.headers['if-modified-since'] === lastModified &&
                 request.headers['if-none-match'] === etag) {
                 response.statusCode = 304;
-            }
-            else {
+            } else {
                 response.setHeader('Last-Modified', lastModified);
                 response.setHeader('Etag', etag);
                 response.setHeader('Content-Type', 'text/xml');
@@ -100,8 +98,7 @@ export class HttpService extends Service {
                     response.setHeader('Access-Control-Allow-Origin', origin);
                     response.setHeader('Access-Control-Allow-Credentials', 'true');
                 }
-            }
-            else {
+            } else {
                 response.setHeader('Access-Control-Allow-Origin', '*');
             }
         }

@@ -73,7 +73,7 @@ try {
 catch (e) { }
 
 function loadType(name: string): Function | undefined {
-    if (!root) { return undefined; }
+    if (!root) return undefined;
     let obj = root;
     const names = name.split('.');
     for (let i = 0; i < names.length; i++) {
@@ -103,7 +103,7 @@ function findType(alias: string[], positions: number[], i: number, c: string): F
  */
 export function getType(name: string): Function {
     let type: Function | undefined = typeCache[name];
-    if (type) { return type; }
+    if (type) return type;
     type = loadType(name);
     if (type) {
         register(type, name);

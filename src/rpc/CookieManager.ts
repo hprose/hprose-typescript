@@ -12,7 +12,7 @@
 |                                                          |
 | CookieManager for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -35,8 +35,7 @@ export function setCookie(headers: { [header: string]: string | string[] | undef
             if (n > 2 && cookie.PATH.charAt(0) === '"' && cookie.PATH.charAt(n - 1) === '"') {
                 cookie.PATH = cookie.PATH.substr(1, n - 2);
             }
-        }
-        else {
+        } else {
             cookie.PATH = '/';
         }
         if (cookie.EXPIRES) {
@@ -44,8 +43,7 @@ export function setCookie(headers: { [header: string]: string | string[] | undef
         }
         if (cookie.DOMAIN) {
             cookie.DOMAIN = cookie.DOMAIN.toLowerCase();
-        }
-        else {
+        } else {
             cookie.DOMAIN = host;
         }
         cookie.SECURE = (cookie.SECURE !== undefined);
@@ -72,8 +70,7 @@ export function getCookie(host: string = '@', path: string = '/', secure: boolea
                 const cookie = cookieManager[domain][name];
                 if (cookie.EXPIRES && ((new Date()).getTime() > cookie.EXPIRES)) {
                     names.push(name);
-                }
-                else if (path.indexOf(cookie.PATH) === 0) {
+                } else if (path.indexOf(cookie.PATH) === 0) {
                     if (((secure && cookie.SECURE) ||
                         !cookie.SECURE) && (cookie.value !== null)) {
                         cookies.push(cookie.name + '=' + cookie.value);
