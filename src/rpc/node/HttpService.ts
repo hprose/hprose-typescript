@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpService for TypeScript.                       |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,6 +22,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import { ServiceContext } from '../ServiceContext';
 import { ByteStream } from '../../hprose.io';
+import { TimeoutError } from '../TimeoutError';
 
 const lastModified = (new Date()).toUTCString();
 const etag = '"' + Math.floor(Math.random() * 2147483647).toString(16) +
@@ -163,9 +164,11 @@ export class HttpService extends Service {
 
     public httpHandler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<undefined> => {
         const context = new HttpServiceContext(this, request, response);
-        request.socket.setTimeout(this.timeout);
         const size = request.headers['content-length'];
         const bytes = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
+        request.setTimeout(this.timeout, () => {
+            request.destroy(new TimeoutError('timeout'));
+        });
         request.on('data', function (chunk: Buffer) {
             bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
         });
@@ -179,7 +182,7 @@ export class HttpService extends Service {
                     && this.crossDomainXmlHandler(request, response)) {
                     return resolve();
                 }
-                let result: Uint8Array;
+                let result: Uint8Array = empty;
                 switch (request.method) {
                     case 'GET':
                         if (!this.get) {
@@ -191,8 +194,6 @@ export class HttpService extends Service {
                     case 'POST':
                         result = await this.handle(bytes.takeBytes(), context);
                         break;
-                    default:
-                        result = empty;
                 }
                 try {
                     this.sendHeader(request, response);

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -85,15 +85,15 @@ export class HttpClient extends Client {
         let result = new Promise<Uint8Array>((resolve, reject) => {
             xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 delete client.requests[id];
-                reject(new Error('Network error'));
+                reject(new Error('network error'));
             };
             xhr.upload.onabort = xhr.onabort = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 delete client.requests[id];
-                reject(new Error('Transport abort'));
+                reject(new Error('transport abort'));
             };
             xhr.upload.ontimeout = xhr.ontimeout = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 delete client.requests[id];
-                reject(new TimeoutError('Transport timeout'));
+                reject(new TimeoutError('timeout'));
             };
             xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
                 switch (this.readyState) {

@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -109,7 +109,7 @@ export class HttpClient extends Client {
             req.shouldKeepAlive = this.keepAlive;
             req.setTimeout(this.timeout, () => {
                 delete this.requests[id];
-                reject(new TimeoutError('Transport timeout'));
+                reject(new TimeoutError('timeout'));
             });
             req.on('error', (err) => {
                 delete this.requests[id];
@@ -117,7 +117,7 @@ export class HttpClient extends Client {
             });
             req.on('abort', () => {
                 delete this.requests[id];
-                reject(new Error('Transport abort'));
+                reject(new Error('transport abort'));
             });
             req.end(Buffer.from(request.buffer, 0, request.length));
         });

@@ -27,7 +27,7 @@ import { MethodManager, MissingFunction } from './MethodManager';
 
 export abstract class Service {
     public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
-    public timeout: number = 120000;
+    public timeout: number = 300000;
     public debug: boolean = false;
     public simple: boolean = false;
     public utc: boolean = false;
