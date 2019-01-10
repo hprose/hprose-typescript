@@ -53,9 +53,9 @@ export class ClientContext implements Context {
         this.longType = getValue('longType', client.longType);
         this.dictType = getValue('dictType', client.dictType);
         this.type = getValue('type', client.nullType);
-        copy(client.headers, this.headers);
-        copy(defaultSettings.headers, this.headers);
-        copy(settings.headers, this.headers);
+        copy(client.requestHeaders, this.requestHeaders);
+        copy(defaultSettings.requestHeaders, this.requestHeaders);
+        copy(settings.requestHeaders, this.requestHeaders);
         copy(defaultSettings.context, this);
         copy(settings.context, this);
     }

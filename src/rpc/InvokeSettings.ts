@@ -23,6 +23,6 @@ export interface InvokeSettings {
     longType?: 'number' | 'bigint' | 'string';
     dictType?: 'object' | 'map';
     type?: Function | null;
-    headers?: { [name: string]: any };
+    requestHeaders?: { [name: string]: any };
     context?: { [name: string]: any };
 }
