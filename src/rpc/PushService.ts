@@ -25,6 +25,7 @@ import { ServiceContext } from './ServiceContext';
 import { TimeoutError } from './TimeoutError';
 import { Message } from './Message';
 import { NextInvokeHandler } from './HandlerManager';
+import { PushMethodName } from './PushMethodName';
 
 export interface PushServiceContext extends Context {
     clients: {
@@ -42,6 +43,7 @@ export interface PushServiceContext extends Context {
 export class PushService {
     protected messages: { [id: string]: { [topic: string]: Message[] | null } } = Object.create(null);
     protected responders: { [id: string]: Deferred<any> } = Object.create(null);
+    protected timers: { [id: string]: Deferred<void> } = Object.create(null);
     public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     public heartbeat: number = 10000;
@@ -58,34 +60,34 @@ export class PushService {
         idlist: this.idlist.bind(this),
     };
     constructor(public service: Service) {
-        const subscribe = new Method(this.subscribe, '+', this, [String]);
+        const subscribe = new Method(this.subscribe, PushMethodName.subscribe, this, [String]);
         subscribe.passContext = true;
         this.service.add(subscribe);
 
-        const unsubscribe = new Method(this.unsubscribe, '-', this, [String]);
+        const unsubscribe = new Method(this.unsubscribe, PushMethodName.unsubscribe, this, [String]);
         unsubscribe.passContext = true;
         this.service.add(unsubscribe);
 
-        const message = new Method(this.message, '<', this);
+        const message = new Method(this.message, PushMethodName.message, this);
         message.passContext = true;
         this.service.add(message);
 
-        const unicast = new Method(this.unicast, '>', this, [this.service.nullType, String, String]);
+        const unicast = new Method(this.unicast, PushMethodName.unicast, this, [this.service.nullType, String, String]);
         unicast.passContext = true;
         this.service.add(unicast);
 
-        const multicast = new Method(this.multicast, '>?', this, [this.service.nullType, String, Array]);
+        const multicast = new Method(this.multicast, PushMethodName.multicast, this, [this.service.nullType, String, Array]);
         multicast.passContext = true;
         this.service.add(multicast);
 
-        const broadcast = new Method(this.broadcast, '>*', this, [this.service.nullType, String]);
+        const broadcast = new Method(this.broadcast, PushMethodName.broadcast, this, [this.service.nullType, String]);
         broadcast.passContext = true;
         this.service.add(broadcast);
 
-        const exist = new Method(this.exist, '?', this, [String, String]);
+        const exist = new Method(this.exist, PushMethodName.exist, this, [String, String]);
         this.service.add(exist);
 
-        const idlist = new Method(this.idlist, '|', this, [String]);
+        const idlist = new Method(this.idlist, PushMethodName.idlist, this, [String]);
         this.service.add(idlist);
     }
     protected send(id: string, responder: Deferred<any>): boolean {
@@ -112,8 +114,10 @@ export class PushService {
             } else if (count > 0) {
                 responder.resolve(result);
                 if (this.heartbeat > 0) {
-                    responder = defer();
-                    responder.promise.catch((reason) => {
+                    let timer = this.timers[id];
+                    if (timer) timer.resolve();
+                    timer = defer();
+                    timer.promise.catch((reason) => {
                         if (reason instanceof TimeoutError && this.messages[id]) {
                             for (const topic in this.messages[id]) {
                                 const context = new ServiceContext(this.service);
@@ -123,9 +127,9 @@ export class PushService {
                         }
                     });
                     setTimeout(() => {
-                        responder.reject(new TimeoutError('timeout'));
+                        timer.reject(new TimeoutError('timeout'));
                     }, this.heartbeat);
-                    this.responders[id] = responder;
+                    this.timers[id] = timer;
                 }
             } else {
                 return false;
@@ -179,6 +183,11 @@ export class PushService {
             const responder = this.responders[id];
             delete this.responders[id];
             responder.resolve(undefined);
+        }
+        if (this.timers[id]) {
+            const timer = this.timers[id];
+            delete this.timers[id];
+            timer.resolve();
         }
         const responder = defer();
         if (!this.send(id, responder)) {
@@ -250,11 +259,11 @@ export class PushService {
         }
         return result;
     }
-    public push(data: any, topic: string, id?: string | string[]): void {
+    public push(data: any, topic: string, id?: string | string[]): boolean | { [id: string]: boolean }  {
         switch (typeof id) {
-            case 'undefined': this.broadcast(data, topic); break;
-            case 'string': this.unicast(data, topic, id); break;
-            default: this.multicast(data, topic, id); break;
+            case 'undefined': return this.broadcast(data, topic);
+            case 'string': return this.unicast(data, topic, id);
+            default: return this.multicast(data, topic, id);
         }
     }
     public exist(topic: string, id: string): boolean {

@@ -32,15 +32,15 @@ export class DefaultServiceCodec implements ServiceCodec {
         for (const _ in headers) { size++; }
         if (size > 0) {
             stream.writeByte(Tags.TagHeader);
-            writer.write(headers);
+            writer.serialize(headers);
             writer.reset();
         }
         if (result instanceof Error) {
             stream.writeByte(Tags.TagError);
-            writer.write(context.debug ? result.stack ? result.stack : result.message : result.message);
+            writer.serialize(context.debug ? result.stack ? result.stack : result.message : result.message);
         } else {
             stream.writeByte(Tags.TagResult);
-            writer.write(result);
+            writer.serialize(result);
         }
         stream.writeByte(Tags.TagEnd);
         return stream.takeBytes();
