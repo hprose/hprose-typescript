@@ -250,11 +250,11 @@ export class PushService {
         }
         return result;
     }
-    public push(message: any, topic: string, id?: string | string[]): void {
+    public push(data: any, topic: string, id?: string | string[]): void {
         switch (typeof id) {
-            case 'undefined': this.broadcast(message, topic); break;
-            case 'string': this.unicast(message, topic, id); break;
-            default: this.multicast(message, topic, id); break;
+            case 'undefined': this.broadcast(data, topic); break;
+            case 'string': this.unicast(data, topic, id); break;
+            default: this.multicast(data, topic, id); break;
         }
     }
     public exist(topic: string, id: string): boolean {
