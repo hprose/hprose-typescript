@@ -8,11 +8,11 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/rpc/PushClient.ts                                 |
+| hprose/rpc/Message.ts                                    |
 |                                                          |
-| hprose PushClient for TypeScript.                        |
+| hprose Message for TypeScript.                           |
 |                                                          |
-| LastModified: Jan 10, 2019                               |
+| LastModified: Jan 13, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
