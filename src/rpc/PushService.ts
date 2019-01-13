@@ -111,20 +111,22 @@ export class PushService {
                 responder.resolve(undefined);
             } else if (count > 0) {
                 responder.resolve(result);
-                responder = defer();
-                responder.promise.catch((reason) => {
-                    if (reason instanceof TimeoutError && this.messages[id]) {
-                        for (const topic in this.messages[id]) {
-                            const context = new ServiceContext(this.service);
-                            context.requestHeaders['id'] = id;
-                            this.unsubscribe(topic, context);
+                if (this.heartbeat > 0) {
+                    responder = defer();
+                    responder.promise.catch((reason) => {
+                        if (reason instanceof TimeoutError && this.messages[id]) {
+                            for (const topic in this.messages[id]) {
+                                const context = new ServiceContext(this.service);
+                                context.requestHeaders['id'] = id;
+                                this.unsubscribe(topic, context);
+                            }
                         }
-                    }
-                });
-                setTimeout(() => {
-                    responder.reject(new TimeoutError('timeout'));
-                }, this.heartbeat);
-                this.responders[id] = responder;
+                    });
+                    setTimeout(() => {
+                        responder.reject(new TimeoutError('timeout'));
+                    }, this.heartbeat);
+                    this.responders[id] = responder;
+                }
             } else {
                 return false;
             }
@@ -180,9 +182,11 @@ export class PushService {
         }
         const responder = defer();
         if (!this.send(id, responder)) {
-            setTimeout(() => {
-                responder.resolve(Object.create(null));
-            }, this.timeout);
+            if (this.timeout > 0) {
+                setTimeout(() => {
+                    responder.resolve(Object.create(null));
+                }, this.timeout);
+            }
             this.responders[id] = responder;
         }
         return responder.promise;
