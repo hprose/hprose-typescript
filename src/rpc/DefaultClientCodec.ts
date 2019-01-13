@@ -31,14 +31,14 @@ export class DefaultClientCodec implements ClientCodec {
         for (const _ in headers) { size++; }
         if (size > 0) {
             stream.writeByte(Tags.TagHeader);
-            writer.write(headers);
+            writer.serialize(headers);
             writer.reset();
         }
         stream.writeByte(Tags.TagCall);
-        writer.write(name);
+        writer.serialize(name);
         if (args.length > 0) {
             writer.reset();
-            writer.write(args);
+            writer.serialize(args);
         }
         stream.writeByte(Tags.TagEnd);
         return stream.takeBytes();

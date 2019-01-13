@@ -12,7 +12,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 13, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -42,9 +42,9 @@ export class ClientContext implements Context {
         this.uri = uris[0];
         const defaultSettings = (fullname in client.settings) ? client.settings[fullname] : emptySettings;
         const getValue = (name: keyof InvokeSettings, defaultValue: any): any => {
-            return (settings[name] !== undefined)
+            return (name in settings)
                 ? settings[name]
-                : (defaultSettings[name] !== undefined)
+                : (name in defaultSettings)
                     ? defaultSettings[name]
                     : defaultValue;
         };
