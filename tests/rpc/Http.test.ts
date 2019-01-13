@@ -3,7 +3,7 @@ import { HttpService } from '../../src/rpc/node/HttpService';
 import { HttpClient } from '../../src/rpc/node/HttpClient';
 import { Context } from '../../src/rpc/Context';
 import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { PushService } from '../../src/rpc/PushService';
+import { PushService, PushServiceContext } from '../../src/rpc/PushService';
 import { PushClient } from '../../src/rpc/PushClient';
 // import { ByteStream } from '../../src/hprose.io';
 
@@ -87,6 +87,35 @@ test('test push', async() => {
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
             await pushClient1.unsubscribe('test');
+            server.close();
+            resolve();
+        }, 100);
+    });
+});
+
+test('test server push', async() => {
+    function hello(name: string, context: Context): string {
+        const cxt = context as PushServiceContext;
+        cxt.clients.push('hello', 'test');
+        return 'hello ' + name;
+    }
+    const service = new HttpService();
+    service.use(new PushService(service).handler);
+    service.add({method: hello, fullname: 'hello', passContext: true});
+    const server = http.createServer(service.httpHandler);
+    server.listen(8080);
+    const client = new HttpClient('http://127.0.0.1:8080/');
+    const pushClient = new PushClient(client, '1');
+    await pushClient.subscribe('test', (message) => {
+        // console.log(message);
+        expect(message.from).toBe('');
+        expect(message.data).toBe('hello');
+    });
+    const proxy = await client.useServiceAsync();
+    const result = await proxy.hello('world');
+    expect(result).toBe('hello world');
+    await new Promise((resolve, reject) => {
+        setTimeout(async () => {
             server.close();
             resolve();
         }, 100);

@@ -23,8 +23,8 @@ export class Method {
     public utc?: boolean;
     public longType?: 'number' | 'bigint' | 'string';
     public dictType?: 'object' | 'map';
-    public missing: boolean = false;
-    public passContext: boolean = false;
+    public missing?: boolean;
+    public passContext?: boolean;
     [name: string]: any;
     constructor(
         public method: Function,

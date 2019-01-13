@@ -12,7 +12,7 @@
 |                                                          |
 | Default ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Jan 13, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -55,7 +55,7 @@ export class DefaultServiceCodec implements ServiceCodec {
         if (method.debug !== undefined) context.debug = method.debug;
         if (method.simple !== undefined) context.simple = method.simple;
         if (method.utc !== undefined) context.utc = method.utc;
-        context.missing = method.missing;
+        context.missing = !!method.missing;
         context.method = method.method;
         context.obj = method.obj;
         return method;
