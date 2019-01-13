@@ -117,7 +117,13 @@ export class PushService {
                     let timer = this.timers[id];
                     if (timer) timer.resolve();
                     timer = defer();
-                    timer.promise.catch((reason) => {
+                    const timeoutId = setTimeout(() => {
+                        timer.reject(new TimeoutError('timeout'));
+                    }, this.heartbeat);
+                    timer.promise.then(() => {
+                        clearTimeout(timeoutId);
+                    }, (reason) => {
+                        clearTimeout(timeoutId);
                         if (reason instanceof TimeoutError && this.messages[id]) {
                             for (const topic in this.messages[id]) {
                                 const context = new ServiceContext(this.service);
@@ -126,9 +132,6 @@ export class PushService {
                             }
                         }
                     });
-                    setTimeout(() => {
-                        timer.reject(new TimeoutError('timeout'));
-                    }, this.heartbeat);
                     this.timers[id] = timer;
                 }
             } else {
@@ -192,9 +195,12 @@ export class PushService {
         const responder = defer();
         if (!this.send(id, responder)) {
             if (this.timeout > 0) {
-                setTimeout(() => {
+                const timeoutId = setTimeout(() => {
                     responder.resolve(Object.create(null));
                 }, this.timeout);
+                responder.promise.then(() => {
+                    clearTimeout(timeoutId);
+                });
             }
             this.responders[id] = responder;
         }
@@ -227,7 +233,7 @@ export class PushService {
             const messages = this.messages[id][topic];
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
-                    messages.push({from, data});
+                    messages.push({ from, data });
                     result = true;
                 }
             }
@@ -249,7 +255,7 @@ export class PushService {
             const messages = this.messages[id][topic];
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
-                    messages.push({from, data});
+                    messages.push({ from, data });
                     result[id] = true;
                 } else {
                     result[id] = false;
@@ -259,7 +265,7 @@ export class PushService {
         }
         return result;
     }
-    public push(data: any, topic: string, id?: string | string[]): boolean | { [id: string]: boolean }  {
+    public push(data: any, topic: string, id?: string | string[]): boolean | { [id: string]: boolean } {
         switch (typeof id) {
             case 'undefined': return this.broadcast(data, topic);
             case 'string': return this.unicast(data, topic, id);
