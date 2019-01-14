@@ -40,13 +40,13 @@ export class Prosumer {
     private async message(): Promise<void> {
         do {
             try {
-                const result: { [topic: string]: Message[] } | undefined = await this.client.invoke('<', [], { dictType: 'object', type: undefined });
-                if (!result) return;
+                const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<', [], { dictType: 'object', type: undefined });
+                if (!topics) return;
                 setTimeout(() => {
-                    for (const topic in result) {
+                    for (const topic in topics) {
                         const callback = this.callbacks[topic];
                         if (callback) {
-                            const messages = result[topic];
+                            const messages = topics[topic];
                             if (messages) {
                                 for (let i = 0, n = messages.length; i < n; ++i) {
                                     callback(messages[i]);
