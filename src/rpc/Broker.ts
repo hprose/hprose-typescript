@@ -111,7 +111,7 @@ export class Broker implements Producer {
                 }
             }
             if (size === 0) {
-                responder.resolve(undefined);
+                responder.resolve();
             } else if (count > 0) {
                 responder.resolve(result);
                 if (this.heartbeat > 0) {
@@ -139,7 +139,7 @@ export class Broker implements Producer {
                 return false;
             }
         } else {
-            responder.resolve(undefined);
+            responder.resolve();
         }
         return true;
     }
@@ -186,14 +186,14 @@ export class Broker implements Producer {
         if (this.responders[id]) {
             const responder = this.responders[id];
             delete this.responders[id];
-            responder.resolve(undefined);
+            responder.resolve();
         }
         if (this.timers[id]) {
             const timer = this.timers[id];
             delete this.timers[id];
             timer.resolve();
         }
-        const responder = defer();
+        const responder = defer<any>();
         if (!this.send(id, responder)) {
             if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
