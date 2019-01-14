@@ -8,11 +8,11 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/rpc/PushService.ts                                |
+| hprose/rpc/Broker.ts                                     |
 |                                                          |
-| hprose PushService for TypeScript.                       |
+| hprose Broker for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 13, 2019                               |
+| LastModified: Jan 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,22 +25,23 @@ import { ServiceContext } from './ServiceContext';
 import { TimeoutError } from './TimeoutError';
 import { Message } from './Message';
 import { NextInvokeHandler } from './HandlerManager';
-import { PushMethodName } from './PushMethodName';
 
-export interface PushServiceContext extends Context {
-    clients: {
-        id(context: Context): string;
-        deny(id: string, topic?: string): void;
-        unicast(data: any, topic: string, id: string, context?: Context): boolean;
-        multicast(data: any, topic: string, id: string[], context?: Context): { [id: string]: boolean };
-        broadcast(data: any, topic: string, context?: Context): { [id: string]: boolean };
-        push(message: any, topic: string, id?: string | string[]): void;
-        exist(topic: string, id: string): boolean;
-        idlist(topic: string): string[];
-    };
+export interface Producer {
+    id(context: Context): string;
+    deny(id: string, topic?: string): void;
+    unicast(data: any, topic: string, id: string, context?: Context): boolean;
+    multicast(data: any, topic: string, id: string[], context?: Context): { [id: string]: boolean };
+    broadcast(data: any, topic: string, context?: Context): { [id: string]: boolean };
+    push(message: any, topic: string, id?: string | string[]): void;
+    exist(topic: string, id: string): boolean;
+    idlist(topic: string): string[];
 }
 
-export class PushService {
+export interface BrokerContext extends Context {
+    producer: Producer;
+}
+
+export class Broker implements Producer {
     protected messages: { [id: string]: { [topic: string]: Message[] | null } } = Object.create(null);
     protected responders: { [id: string]: Deferred<any> } = Object.create(null);
     protected timers: { [id: string]: Deferred<void> } = Object.create(null);
@@ -49,7 +50,7 @@ export class PushService {
     public heartbeat: number = 10000;
     public onsubscribe?: (id: string, topic: string, context: Context) => void;
     public onunsubscribe?: (id: string, topic: string, messages: any[], context: Context) => void;
-    private clients = {
+    private producer: Producer = {
         id: this.id.bind(this),
         deny: this.deny.bind(this),
         unicast: this.unicast.bind(this),
@@ -60,34 +61,34 @@ export class PushService {
         idlist: this.idlist.bind(this),
     };
     constructor(public service: Service) {
-        const subscribe = new Method(this.subscribe, PushMethodName.subscribe, this, [String]);
+        const subscribe = new Method(this.subscribe, '+', this, [String]);
         subscribe.passContext = true;
         this.service.add(subscribe);
 
-        const unsubscribe = new Method(this.unsubscribe, PushMethodName.unsubscribe, this, [String]);
+        const unsubscribe = new Method(this.unsubscribe, '-', this, [String]);
         unsubscribe.passContext = true;
         this.service.add(unsubscribe);
 
-        const message = new Method(this.message, PushMethodName.message, this);
+        const message = new Method(this.message, '<', this);
         message.passContext = true;
         this.service.add(message);
 
-        const unicast = new Method(this.unicast, PushMethodName.unicast, this, [this.service.nullType, String, String]);
+        const unicast = new Method(this.unicast, '>', this, [this.service.nullType, String, String]);
         unicast.passContext = true;
         this.service.add(unicast);
 
-        const multicast = new Method(this.multicast, PushMethodName.multicast, this, [this.service.nullType, String, Array]);
+        const multicast = new Method(this.multicast, '>?', this, [this.service.nullType, String, Array]);
         multicast.passContext = true;
         this.service.add(multicast);
 
-        const broadcast = new Method(this.broadcast, PushMethodName.broadcast, this, [this.service.nullType, String]);
+        const broadcast = new Method(this.broadcast, '>*', this, [this.service.nullType, String]);
         broadcast.passContext = true;
         this.service.add(broadcast);
 
-        const exist = new Method(this.exist, PushMethodName.exist, this, [String, String]);
+        const exist = new Method(this.exist, '?', this, [String, String]);
         this.service.add(exist);
 
-        const idlist = new Method(this.idlist, PushMethodName.idlist, this, [String]);
+        const idlist = new Method(this.idlist, '|', this, [String]);
         this.service.add(idlist);
     }
     protected send(id: string, responder: Deferred<any>): boolean {
@@ -285,12 +286,12 @@ export class PushService {
         return idlist;
     }
     public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        if (context.clients) {
-            for (const method in this.clients) {
-                context.clients[method] = (this.clients as any)[method];
+        if (context.producer) {
+            for (const method in this.producer) {
+                context.producer[method] = (this.producer as any)[method];
             }
         } else {
-            (context as PushServiceContext).clients = this.clients;
+            (context as BrokerContext).producer = this.producer;
         }
         return next(name, args, context);
     }

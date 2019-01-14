@@ -3,8 +3,8 @@ import { HttpService } from '../../src/rpc/node/HttpService';
 import { HttpClient } from '../../src/rpc/node/HttpClient';
 import { Context } from '../../src/rpc/Context';
 import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { PushService, PushServiceContext } from '../../src/rpc/PushService';
-import { PushClient } from '../../src/rpc/PushClient';
+import { Broker , BrokerContext } from '../../src/rpc/Broker';
+import { Prosumer } from '../../src/rpc/Prosumer';
 // import { ByteStream } from '../../src/hprose.io';
 
 test('test hello world rpc', async () => {
@@ -59,34 +59,34 @@ test('test push', async() => {
     //     return response;
     // };
     const service = new HttpService();
-    service.use(new PushService(service).handler);
+    service.use(new Broker(service).handler);
     // service.use(logHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
     const client1 = new HttpClient('http://127.0.0.1:8080/');
     // client1.use(logHandler);
-    const pushClient1 = new PushClient(client1, '1');
+    const prosumer1 = new Prosumer(client1, '1');
     const client2 = new HttpClient('http://127.0.0.1:8080/');
     // client2.use(logHandler);
-    const pushClient2 = new PushClient(client2, '2');
-    await pushClient1.subscribe('test', (message) => {
+    const prosumer2 = new Prosumer(client2, '2');
+    await prosumer1.subscribe('test', (message) => {
         // console.log(message);
         expect(message.from).toBe('2');
         expect(message.data).toBe('hello');
     });
-    await pushClient1.subscribe('test2', (message) => {
+    await prosumer1.subscribe('test2', (message) => {
         // console.log(message);
         expect(message.from).toBe('2');
         expect(message.data).toBe('world');
     });
-    const r1 = pushClient2.push('hello', 'test', '1');
-    const r2 = pushClient2.push('hello', 'test', '1');
-    const r3 = pushClient2.push('world', 'test2', '1');
-    const r4 = pushClient2.push('world', 'test2', '1');
+    const r1 = prosumer2.push('hello', 'test', '1');
+    const r2 = prosumer2.push('hello', 'test', '1');
+    const r3 = prosumer2.push('world', 'test2', '1');
+    const r4 = prosumer2.push('world', 'test2', '1');
     await Promise.all([r1, r2, r3, r4]);
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
-            await pushClient1.unsubscribe('test');
+            await prosumer1.unsubscribe('test');
             server.close();
             resolve();
         }, 100);
@@ -95,27 +95,27 @@ test('test push', async() => {
 
 test('test server push', async() => {
     function hello(name: string, context: Context): string {
-        const cxt = context as PushServiceContext;
-        cxt.clients.push('hello', 'test');
+        const cxt = context as BrokerContext;
+        cxt.producer.push('hello', 'test');
         return 'hello ' + name;
     }
     const service = new HttpService();
-    const pushService = new PushService(service);
-    service.use(pushService.handler);
+    const broker = new Broker(service);
+    service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
     const client = new HttpClient('http://127.0.0.1:8080/');
-    const pushClient = new PushClient(client, '1');
-    pushClient.onsubscribe = (topic) => {
+    const prosumer = new Prosumer(client, '1');
+    prosumer.onsubscribe = (topic) => {
         // console.log(`${ topic } is subscribe.`);
         expect(topic).toBe('test');
     };
-    pushClient.onunsubscribe = (topic) => {
+    prosumer.onunsubscribe = (topic) => {
         // console.log(`${ topic } is unsubscribe.`);
         expect(topic).toBe('test');
     };
-    await pushClient.subscribe('test', (message) => {
+    await prosumer.subscribe('test', (message) => {
         // console.log(message);
         expect(message.from).toBe('');
         expect(message.data).toBe('hello');
@@ -123,7 +123,7 @@ test('test server push', async() => {
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
-    await pushService.deny('1', 'test');
+    await broker.deny('1', 'test');
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
             server.close();
