@@ -100,12 +100,21 @@ test('test server push', async() => {
         return 'hello ' + name;
     }
     const service = new HttpService();
-    service.use(new PushService(service).handler);
+    const pushService = new PushService(service);
+    service.use(pushService.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
     const client = new HttpClient('http://127.0.0.1:8080/');
     const pushClient = new PushClient(client, '1');
+    pushClient.onsubscribe = (topic) => {
+        // console.log(`${ topic } is subscribe.`);
+        expect(topic).toBe('test');
+    };
+    pushClient.onunsubscribe = (topic) => {
+        // console.log(`${ topic } is unsubscribe.`);
+        expect(topic).toBe('test');
+    };
     await pushClient.subscribe('test', (message) => {
         // console.log(message);
         expect(message.from).toBe('');
@@ -114,6 +123,7 @@ test('test server push', async() => {
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
+    await pushService.deny('1', 'test');
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
             server.close();

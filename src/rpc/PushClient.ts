@@ -24,6 +24,8 @@ import { PushMethodName } from './PushMethodName';
 export class PushClient {
     private callbacks: { [topic: string]: (message: Message) => void | undefined } = Object.create(null);
     public onerror?: (error: Error) => void;
+    public onsubscribe?:(topic: string) => void;
+    public onunsubscribe?:(topic: string) => void;
     constructor(public client: Client, id?: string) {
         if (id) this.id = id;
     }
@@ -46,8 +48,14 @@ export class PushClient {
                         const callback = this.callbacks[topic];
                         if (callback) {
                             const messages = result[topic];
-                            for (let i = 0, n = messages.length; i < n; ++i) {
-                                callback(messages[i]);
+                            if (messages) {
+                                for (let i = 0, n = messages.length; i < n; ++i) {
+                                    callback(messages[i]);
+                                }
+                            } else {
+                                if (this.onunsubscribe) {
+                                    this.onunsubscribe(topic);
+                                }
                             }
                         }
                     }
@@ -64,11 +72,18 @@ export class PushClient {
         this.callbacks[topic] = callback;
         const result: boolean = await this.client.invoke(PushMethodName.subscribe, [topic], { type: Boolean });
         this.message();
+        if (this.onsubscribe) {
+            this.onsubscribe(topic);
+        }
         return result;
     }
-    public unsubscribe(topic: string): Promise<boolean> {
+    public async unsubscribe(topic: string): Promise<boolean> {
+        const result: boolean = await this.client.invoke(PushMethodName.unsubscribe, [topic], { type: Boolean });
         delete this.callbacks[topic];
-        return this.client.invoke(PushMethodName.unsubscribe, [topic], { type: Boolean });
+        if (this.onunsubscribe) {
+            this.onunsubscribe(topic);
+        }
+        return result;
     }
     public unicast(data: any, topic: string, id: string): Promise<boolean> {
         return this.client.invoke(PushMethodName.unicast, [data, topic, id], { type: Boolean });
