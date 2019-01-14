@@ -12,12 +12,12 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 10, 2019                               |
+| LastModified: Jan 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { InvokeSettings } from './InvokeSettings';
+import { Settings } from './Settings';
 import { ClientCodec } from './ClientCodec';
 import { DefaultClientCodec } from './DefaultClientCodec';
 import { Context } from './Context';
@@ -112,7 +112,7 @@ export interface ClientSettings {
 }
 
 export abstract class Client {
-    public readonly settings: { [fullname: string]: InvokeSettings } = Object.create(null);
+    public readonly settings: { [fullname: string]: Settings } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public timeout: number = 30000;
     public simple: boolean = false;
@@ -143,12 +143,12 @@ export abstract class Client {
             this.urilist.sort(() => Math.random() - 0.5);
         }
     }
-    public useService<T extends object>(settings?: { [name in keyof T]: InvokeSettings }): T;
-    public useService<T extends object>(namespace: string, settings?: { [name in keyof T]: InvokeSettings }): T;
+    public useService<T extends object>(settings?: { [name in keyof T]: Settings }): T;
+    public useService<T extends object>(namespace: string, settings?: { [name in keyof T]: Settings }): T;
     public useService(fullnames: string[]): any;
     public useService(...args: any[]): any {
         let namespace: string | undefined;
-        let settings: { [name in keyof any]: InvokeSettings } | undefined;
+        let settings: { [name in keyof any]: Settings } | undefined;
         switch (args.length) {
             case 1:
                 if (Array.isArray(args[0])) {
@@ -196,7 +196,7 @@ export abstract class Client {
         }
         return this;
     }
-    public async invoke<T>(fullname: string, args: any[] = [], settings?: InvokeSettings): Promise<T> {
+    public async invoke<T>(fullname: string, args: any[] = [], settings?: Settings): Promise<T> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }

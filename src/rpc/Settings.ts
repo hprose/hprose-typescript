@@ -8,16 +8,16 @@
 \*________________________________________________________*/
 /*--------------------------------------------------------*\
 |                                                          |
-| hprose/rpc/InvokeSettings.ts                             |
+| hprose/rpc/Settings.ts                                   |
 |                                                          |
-| hprose InvokeSettings for TypeScript.                    |
+| hprose Settings for TypeScript.                          |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export interface InvokeSettings {
+export interface Settings {
     simple?: boolean;
     utc?: boolean;
     longType?: 'number' | 'bigint' | 'string';

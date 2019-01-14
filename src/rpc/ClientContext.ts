@@ -12,17 +12,17 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 13, 2019                               |
+| LastModified: Jan 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { Context } from './Context';
 import { Client } from './Client';
-import { InvokeSettings } from './InvokeSettings';
+import { Settings } from './Settings';
 import { copy } from './Utils';
 
-const emptySettings: InvokeSettings = Object.create(null);
+const emptySettings: Settings = Object.create(null);
 
 export class ClientContext implements Context {
     public requestHeaders: { [name: string]: any } = Object.create(null);
@@ -34,14 +34,14 @@ export class ClientContext implements Context {
     public dictType: 'object' | 'map';
     public type: Function | null;
     [name: string]: any;
-    constructor(public client: Client, fullname: string, settings: InvokeSettings = Object.create(null)) {
+    constructor(public client: Client, fullname: string, settings: Settings = Object.create(null)) {
         const uris = client.uris;
         if (uris.length <= 0) {
             throw new Error('The service URIs has not been set up yet');
         }
         this.uri = uris[0];
         const defaultSettings = (fullname in client.settings) ? client.settings[fullname] : emptySettings;
-        const getValue = (name: keyof InvokeSettings, defaultValue: any): any => {
+        const getValue = (name: keyof Settings, defaultValue: any): any => {
             return (name in settings)
                 ? settings[name]
                 : (name in defaultSettings)
