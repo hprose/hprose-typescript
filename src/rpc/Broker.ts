@@ -146,9 +146,8 @@ export class Broker implements Producer {
     protected response(id: string): void {
         if (this.responders[id]) {
             const responder = this.responders[id];
-            delete this.responders[id];
-            if (!this.send(id, responder)) {
-                this.responders[id] = responder;
+            if (this.send(id, responder)) {
+                delete this.responders[id];
             }
         }
     }
