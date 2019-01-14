@@ -131,3 +131,23 @@ test('test server push', async() => {
         }, 100);
     });
 });
+
+test('test maxRequestLength', async () => {
+    function hello(name: string): string {
+        return 'hello ' + name;
+    }
+    const service = new HttpService();
+    service.maxRequestLength = 10;
+    service.addFunction(hello);
+    const server = http.createServer(service.httpHandler);
+    server.listen(8080);
+    const client = new HttpClient('http://127.0.0.1:8080/');
+    const proxy = await client.useServiceAsync();
+    try {
+        await proxy.hello('world');
+    }
+    catch (e) {
+        expect(e).toEqual(new Error('413:Request Entity Too Large'));
+    }
+    server.close();
+});

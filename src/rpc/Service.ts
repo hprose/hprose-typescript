@@ -35,6 +35,7 @@ export abstract class Service {
     public dictType: 'object' | 'map' = 'object';
     public nullType: undefined | null = undefined;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
+    public maxRequestLength: number = 0x7FFFFFFF;
     private handlerManager: HandlerManager = new HandlerManager(this.execute.bind(this), this.process.bind(this));
     private methodManager: MethodManager = new MethodManager(this.methods);
     constructor() {

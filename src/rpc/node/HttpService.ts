@@ -159,17 +159,31 @@ export class HttpService extends Service {
         this._clientAccessPolicyXmlContent = value;
     }
 
-    public httpHandler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<undefined> => {
+    public httpHandler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
         const context = new HttpServiceContext(this, request, response);
-        const size = request.headers['content-length'];
-        const bytes = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
+        const size = Number(request.headers['content-length']);
+        if (size > this.maxRequestLength) {
+            response.statusCode = 413;
+            response.statusMessage = 'Request Entity Too Large';
+            response.end();
+            return Promise.resolve();
+        }
         request.setTimeout(this.timeout, () => {
             request.destroy(new TimeoutError('timeout'));
         });
-        request.on('data', function (chunk: Buffer) {
-            bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
-        });
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
+            const bytes = size ? new ByteStream(size) : new ByteStream();
+            const ondata = function (chunk: Buffer) {
+                if (bytes.length + chunk.length > size) {
+                    request.off('data', ondata);
+                    response.statusCode = 413;
+                    response.statusMessage = 'Request Entity Too Large';
+                    response.end();
+                    return resolve();
+                }
+                bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
+            };
+            request.on('data', ondata);
             request.on('end', async () => {
                 if (this._clientAccessPolicyXmlContent.length > 0
                     && this.clientAccessPolicyXmlHandler(request, response)) {
