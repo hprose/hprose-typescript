@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 10, 2019                               |
+| LastModified: Jan 15, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -82,9 +82,9 @@ export class HttpClient extends Client {
             const id = this.counter++;
             const req = client.request(options, (res: http.IncomingMessage) => {
                 const size = res.headers['content-length'];
-                const bytes = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
+                const instream = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
                 res.on('data', function(chunk: Buffer) {
-                    bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
+                    instream.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
                 });
                 res.on('end', () => {
                     delete this.requests[id];
@@ -92,12 +92,12 @@ export class HttpClient extends Client {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
                             (context as HttpClientContext).httpResponseHeaders = res.headers;
                             setCookie(res.headers, options.host);
-                            resolve(bytes.takeBytes());
+                            resolve(instream.takeBytes());
                         } else {
                             reject(new Error(res.statusCode + ':' + res.statusMessage));
                         }
                     } else {
-                        reject(new Error(bytes.toString()));
+                        reject(new Error(instream.toString()));
                     }
                 });
                 res.on('error', (err) => {

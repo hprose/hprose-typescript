@@ -12,7 +12,7 @@
 |                                                          |
 | hprose HttpService for TypeScript.                       |
 |                                                          |
-| LastModified: Jan 10, 2019                               |
+| LastModified: Jan 15, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -45,7 +45,8 @@ export class HttpService extends Service {
     private _crossDomainXmlContent: Buffer = new Buffer(0);
     private _clientAccessPolicyXmlFile: string = '';
     private _clientAccessPolicyXmlContent: Buffer = new Buffer(0);
-
+    public onclose?: () => void;
+    public onerror?: (error?: Error) => void;
     protected crossDomainXmlHandler(request: http.IncomingMessage, response: http.ServerResponse): boolean {
         if (request.url && request.url.toLowerCase() === '/crossdomain.xml') {
             if (request.headers['if-modified-since'] === lastModified &&
@@ -172,16 +173,16 @@ export class HttpService extends Service {
             request.destroy(new TimeoutError('timeout'));
         });
         return new Promise<void>((resolve, reject) => {
-            const bytes = size ? new ByteStream(size) : new ByteStream();
+            const instream = size ? new ByteStream(size) : new ByteStream();
             const ondata = function (chunk: Buffer) {
-                if (bytes.length + chunk.length > size) {
+                if (instream.length + chunk.length > size) {
                     request.off('data', ondata);
                     response.statusCode = 413;
                     response.statusMessage = 'Request Entity Too Large';
                     response.end();
                     return resolve();
                 }
-                bytes.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
+                instream.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
             };
             request.on('data', ondata);
             request.on('end', async () => {
@@ -203,7 +204,7 @@ export class HttpService extends Service {
                         }
                     // tslint:disable-next-line:no-switch-case-fall-through
                     case 'POST':
-                        result = await this.handle(bytes.takeBytes(), context);
+                        result = await this.handle(instream.takeBytes(), context);
                         break;
                 }
                 try {
@@ -215,8 +216,14 @@ export class HttpService extends Service {
                 this.end(result, response);
                 resolve();
             });
-            request.on('error', reject);
-            request.on('close', reject);
+            request.on('error', (error: Error) => {
+                if (this.onerror) this.onerror(error);
+                reject(error);
+            });
+            request.on('close', () => {
+                if (this.onclose) this.onclose();
+                reject();
+            });
         });
     }
 }
