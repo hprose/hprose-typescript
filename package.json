@@ -44,6 +44,10 @@
     "tslint": "^5.12.0",
     "typescript": "^3.2.2"
   },
+  "optionalDependencies": {
+    "@types/ws": ">=6.0.1",
+    "ws": ">=6.1.2"
+  },
   "dependencies": {
     "guid-typescript": "^1.0.9"
   },
