@@ -46,7 +46,7 @@ export class HttpService extends Service {
     private _clientAccessPolicyXmlFile: string = '';
     private _clientAccessPolicyXmlContent: Buffer = new Buffer(0);
     public onclose?: () => void;
-    public onerror?: (error?: Error) => void;
+    public onerror?: (error: Error) => void;
     protected crossDomainXmlHandler(request: http.IncomingMessage, response: http.ServerResponse): boolean {
         if (request.url && request.url.toLowerCase() === '/crossdomain.xml') {
             if (request.headers['if-modified-since'] === lastModified &&

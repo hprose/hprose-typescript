@@ -18,7 +18,7 @@
 \*________________________________________________________*/
 
 import { Service } from '../Service';
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
 import * as http from 'http';
 import { ServiceContext } from '../ServiceContext';
 import { ByteStream } from '../../hprose.io';
@@ -32,7 +32,7 @@ export class WebSocketServiceContext extends ServiceContext {
 
 export class WebSocketService extends HttpService {
     onaccept?: () => void;
-    public wsHandler = async (websocket: WebSocket, request: http.IncomingMessage): Promise<void> => {
+    public wsHandler = (websocket: WebSocket, request: http.IncomingMessage): void => {
         try {
             websocket.binaryType = 'arraybuffer';
             if (this.onaccept) this.onaccept();
@@ -47,21 +47,21 @@ export class WebSocketService extends HttpService {
         websocket.on('error', (error) => {
             if (this.onerror) this.onerror(error);
         });
-        websocket.on('message', (data: ArrayBuffer) => {
+        websocket.on('message', async (data: ArrayBuffer) => {
             const instream = new ByteStream(data);
-            const id = instream.readInt32BE();
-            process.nextTick(async () => {
-                const context = new WebSocketServiceContext(this, websocket, request);
-                const result = await this.handle(instream.remains, context);
-                const outstream = new ByteStream(4 + result.length);
-                outstream.writeInt32BE(id);
-                outstream.write(result);
-                websocket.send(outstream.toBytes(), {
-                    binary: true,
-                    compress: false
-                }, (error) => {
+            const index = instream.readInt32BE();
+            const context = new WebSocketServiceContext(this, websocket, request);
+            const result = await this.handle(instream.remains, context);
+            const outstream = new ByteStream(4 + result.length);
+            outstream.writeInt32BE(index);
+            outstream.write(result);
+            websocket.send(outstream.toBytes(), {
+                binary: true,
+                compress: false
+            }, (error) => {
+                if (error) {
                     if (this.onerror) this.onerror(error);
-                });
+                }
             });
         });
     }
