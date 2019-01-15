@@ -119,7 +119,7 @@ test('test server push', async() => {
     };
     await prosumer.subscribe('test', (message) => {
         // console.log(message);
-        expect(message.from).toBe('');
+        expect(message.from).toBe('1');
         expect(message.data).toBe('hello');
     });
     const proxy = await client.useServiceAsync();

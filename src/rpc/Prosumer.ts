@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Prosumer for TypeScript.                          |
 |                                                          |
-| LastModified: Jan 14, 2019                               |
+| LastModified: Jan 15, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -68,21 +68,27 @@ export class Prosumer {
         } while(true);
     }
     public async subscribe(topic: string, callback: (message: Message) => void): Promise<boolean> {
-        this.callbacks[topic] = callback;
-        const result: boolean = await this.client.invoke('+', [topic], { type: Boolean });
-        this.message();
-        if (this.onsubscribe) {
-            this.onsubscribe(topic);
+        if (this.id) {
+            this.callbacks[topic] = callback;
+            const result: boolean = await this.client.invoke('+', [topic], { type: Boolean });
+            this.message();
+            if (this.onsubscribe) {
+                this.onsubscribe(topic);
+            }
+            return result;
         }
-        return result;
+        return false;
     }
     public async unsubscribe(topic: string): Promise<boolean> {
-        const result: boolean = await this.client.invoke('-', [topic], { type: Boolean });
-        delete this.callbacks[topic];
-        if (this.onunsubscribe) {
-            this.onunsubscribe(topic);
+        if (this.id) {
+            const result: boolean = await this.client.invoke('-', [topic], { type: Boolean });
+            delete this.callbacks[topic];
+            if (this.onunsubscribe) {
+                this.onunsubscribe(topic);
+            }
+            return result;
         }
-        return result;
+        return false;
     }
     public unicast(data: any, topic: string, id: string): Promise<boolean> {
         return this.client.invoke('>', [data, topic, id], { type: Boolean });
@@ -100,7 +106,7 @@ export class Prosumer {
             default: return this.multicast(data, topic, id);
         }
     }
-    public exist(topic: string, id: string): Promise<boolean> {
+    public exist(topic: string, id: string = this.id): Promise<boolean> {
         return this.client.invoke('?', [topic, id], { type: Boolean });
     }
     public idlist(topic: string): Promise<string[]> {
