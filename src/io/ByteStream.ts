@@ -12,7 +12,7 @@
 |                                                          |
 | hprose ByteStream for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 15, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -183,18 +183,16 @@ export class ByteStream {
     }
 
     protected grow(n: number): void {
-        n = pow2roundup(this.size + n);
         const capacity = this.capacity;
+        n = this.size + n;
         if (capacity > 0) {
-            n *= 2;
             if (n > capacity) {
-                const buf = new Uint8Array(n);
+                const buf = new Uint8Array(pow2roundup(n));
                 buf.set(this.buffer);
                 this.buffer = buf;
             }
         } else {
-            n = Math.max(n, INIT_SIZE);
-            this.buffer = new Uint8Array(n);
+            this.buffer = new Uint8Array(Math.max(pow2roundup(n), INIT_SIZE));
         }
     }
     /**
