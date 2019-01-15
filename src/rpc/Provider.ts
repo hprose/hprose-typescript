@@ -12,7 +12,7 @@
 |                                                          |
 | hprose Provider for TypeScript.                          |
 |                                                          |
-| LastModified: Jan 14, 2019                               |
+| LastModified: Jan 15, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -73,35 +73,44 @@ export class Provider {
             }
         } while (true);
     }
-    public add(method: MethodLike) {
+    public add(method: MethodLike): this {
         this.methodManager.add(method);
+        return this;
     }
-    public remove(fullname: string) {
+    public remove(fullname: string): this {
         delete this.methods[fullname];
+        return this;
     }
-    public addFunction(f: Function, fullname?: string): void {
+    public addFunction(f: Function, fullname?: string): this {
         this.methodManager.addFunction(f, fullname);
+        return this;
     }
-    public addMethod(method: Function, obj: any, fullname?: string): void;
-    public addMethod(fullname: string, obj: any): void;
-    public addMethod(...args: any[]): void {
+    public addMethod(method: Function, obj: any, fullname?: string): this;
+    public addMethod(fullname: string, obj: any): this;
+    public addMethod(...args: any[]): this {
         this.methodManager.addMethod(args[0], args[1], ...args.slice(2));
+        return this;
     }
-    public addMissingFunction(f: MissingFunction): void {
+    public addMissingFunction(f: MissingFunction): this {
         this.methodManager.addMissingFunction(f);
+        return this;
     }
-    public addMissingMethod(f: MissingFunction, obj: any): void {
+    public addMissingMethod(f: MissingFunction, obj: any): this {
         this.methodManager.addMissingMethod(f, obj);
+        return this;
     }
-    public addFunctions(functions: Function[], fullnames?: string[]): void {
+    public addFunctions(functions: Function[], fullnames?: string[]): this {
         this.methodManager.addFunctions(functions, fullnames);
+        return this;
     }
-    public addMethods(methods: Function[], obj: any, fullnames?: string[]): void;
-    public addMethods(fullnames: string[], obj: any): void;
-    public addMethods(...args: any[]): void {
+    public addMethods(methods: Function[], obj: any, fullnames?: string[]): this;
+    public addMethods(fullnames: string[], obj: any): this;
+    public addMethods(...args: any[]): this {
         this.methodManager.addMethods(args[0], args[1], ...args.slice(2));
+        return this;
     }
-    public addInstanceMethods(obj: any, prefix?: string) {
+    public addInstanceMethods(obj: any, prefix?: string): this {
         this.methodManager.addInstanceMethods(obj, prefix);
+        return this;
     }
 }
