@@ -22,6 +22,62 @@ import { Deferred, defer } from './Deferred';
 import { Context } from './Context';
 import { NextInvokeHandler } from './HandlerManager';
 import { Method } from './Method';
+import { normalize } from './Utils';
+
+function makeInvoke(caller: Caller, id: string, fullname: string): () => Promise<any> {
+    return function (): Promise<any> {
+        return caller.invoke(id, fullname, Array.prototype.slice.call(arguments));
+    };
+}
+
+function setMethods(caller: Caller, id: string, service: any, namespace: string, name: string, methods: any) {
+    if (service[name] !== undefined) { return; }
+    service[name] = Object.create(null);
+    if (!Array.isArray(methods)) {
+        methods = [methods];
+    }
+    namespace = namespace + name + '_';
+    for (let i = 0; i < methods.length; i++) {
+        const node = methods[i];
+        if (typeof node === 'string') {
+            service[name][node] = makeInvoke(caller, id, namespace + node);
+        } else {
+            for (const n in node) {
+                setMethods(caller, id, service[name], namespace, n, node[n]);
+            }
+        }
+    }
+}
+
+function useService(caller: Caller, id: string, functions: string[]): any {
+    let root: any[] = normalize(functions);
+    const service: any = Object.create(null);
+    for (let i = 0; i < root.length; i++) {
+        const node = root[i];
+        if (typeof node === 'string') {
+            if (service[node] === undefined) {
+                service[node] = makeInvoke(caller, id, node);
+            }
+        } else {
+            for (const name in node) {
+                setMethods(caller, id, service, '', name, node[name]);
+            }
+        }
+    }
+    return service;
+}
+
+class ServiceProxyHandler implements ProxyHandler<any> {
+    constructor(private client: Caller, private id: string, private namespace?: string) { }
+    public get(target: any, p: PropertyKey, receiver: any): any {
+        if (typeof p === 'symbol') { return undefined; }
+        if (p === 'then') { return undefined; }
+        if (!(p in target) || target.hasOwnProperty && !target.hasOwnProperty(p)) {
+            target[p] = makeInvoke(this.client, this.id, this.namespace ? this.namespace + '_' + p : '' + p);
+        }
+        return target[p];
+    }
+}
 
 export interface CallerContext extends Context {
     invoke<T>(fullname: string, args?: any[]): Promise<T>;
@@ -140,6 +196,21 @@ export class Caller {
         this.results[id][index] = result;
         this.response(id);
         return result.promise;
+    }
+    public useService<T extends object>(id: string, namespace?: string): T;
+    public useService(id: string, fullnames: string[]): any;
+    public useService(id: string, arg?: string | string[]): any {
+        let namespace: string | undefined;
+        if (Array.isArray(arg)) {
+            return useService(this, id, arg);
+        } else {
+            namespace = arg;
+        }
+        return new Proxy(Object.create(null), new ServiceProxyHandler(this, id, namespace));
+    }
+    public async useServiceAsync(id: string): Promise<any> {
+        const fullnames: string[] = await this.invoke(id, '~');
+        return useService(this, id, fullnames);
     }
     public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         (context as CallerContext).invoke = <T>(fullname: string, args: any[] = []): Promise<T> => {

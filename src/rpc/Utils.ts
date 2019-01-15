@@ -61,6 +61,27 @@ export function copy(src: { [name: string]: any } | undefined, dist: { [name: st
     }
 }
 
+export function normalize(functions: string[]): any[] {
+    const root = [Object.create(null)];
+    for (let i = 0, n = functions.length; i < n; ++i) {
+        const func = functions[i].split('_');
+        const n = func.length - 1;
+        if (n > 0) {
+            let node = root;
+            for (let j = 0; j < n; j++) {
+                const f = func[j];
+                if (node[0][f] === undefined) {
+                    node[0][f] = [Object.create(null)];
+                }
+                node = node[0][f];
+            }
+            node.push(func[n]);
+        }
+        root.push(functions[i]);
+    }
+    return root;
+}
+
 function getCallback(resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void): Function {
     return function() {
         switch(arguments.length) {

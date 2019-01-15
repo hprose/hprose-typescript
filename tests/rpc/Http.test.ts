@@ -176,9 +176,13 @@ test('test reverse RPC', async () => {
     provider.addFunction(hello);
     provider.boot();
 
-    const result1 = caller.invoke('1', 'hello', ['world1']);
-    const result2 = caller.invoke('1', 'hello', ['world2']);
-    const result3 = caller.invoke('1', 'hello', ['world3']);
+    interface Hello {
+        hello(name: string): Promise<string>;
+    }
+    const proxy = caller.useService<Hello>('1');
+    const result1 = proxy.hello('world1');
+    const result2 = proxy.hello('world2');
+    const result3 = proxy.hello('world3');
 
     const [r1, r2, r3] = await Promise.all([result1, result2, result3]);
     expect(r1).toEqual('hello world1');
