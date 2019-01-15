@@ -23,32 +23,12 @@ import { DefaultClientCodec } from './DefaultClientCodec';
 import { Context } from './Context';
 import { ClientContext } from './ClientContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
+import { normalize } from './Utils';
 
 function makeInvoke(client: Client, fullname: string): () => Promise<any> {
     return function (): Promise<any> {
         return client.invoke(fullname, Array.prototype.slice.call(arguments));
     };
-}
-
-function normalize(functions: string[]): any[] {
-    const root = [Object.create(null)];
-    for (let i = 0, n = functions.length; i < n; ++i) {
-        const func = functions[i].split('_');
-        const n = func.length - 1;
-        if (n > 0) {
-            let node = root;
-            for (let j = 0; j < n; j++) {
-                const f = func[j];
-                if (node[0][f] === undefined) {
-                    node[0][f] = [Object.create(null)];
-                }
-                node = node[0][f];
-            }
-            node.push(func[n]);
-        }
-        root.push(functions[i]);
-    }
-    return root;
 }
 
 function setMethods(client: Client, service: any, namespace: string, name: string, methods: any) {
@@ -93,7 +73,7 @@ class ServiceProxyHandler implements ProxyHandler<any> {
     public get(target: any, p: PropertyKey, receiver: any): any {
         if (typeof p === 'symbol') { return undefined; }
         if (p === 'then') { return undefined; }
-        if (!target.hasOwnProperty(p)) {
+        if (!(p in target) || target.hasOwnProperty && !target.hasOwnProperty(p)) {
             target[p] = makeInvoke(this.client, this.namespace ? this.namespace + '_' + p : '' + p);
         }
         return target[p];
