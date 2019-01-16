@@ -17,11 +17,11 @@
 |                                                          |
 \*________________________________________________________*/
 
+import WebSocket from 'ws';
 import { Client, ClientSettings } from '../Client';
 import { Context } from '../Context';
 import { ByteStream } from '../../hprose.io';
 import { defer, Deferred } from '../Deferred';
-import WebSocket from 'ws';
 
 export class WebSocketClient extends Client {
     private counter: number = 0;

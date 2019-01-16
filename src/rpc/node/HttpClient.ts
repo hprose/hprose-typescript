@@ -17,15 +17,15 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Client } from '../Client';
-import { Context } from '../Context';
-import { TimeoutError } from '../TimeoutError';
 import { parse } from 'url';
 import * as http from 'http';
 import * as https from 'https';
+import { Client } from '../Client';
+import { Context } from '../Context';
+import { ClientContext } from '../ClientContext';
+import { TimeoutError } from '../TimeoutError';
 import { getCookie, setCookie } from '../CookieManager';
 import { ByteStream } from '../../hprose.io';
-import { ClientContext } from '../ClientContext';
 
 export interface HttpClientContext extends ClientContext {
     httpRequestHeaders?: http.OutgoingHttpHeaders;

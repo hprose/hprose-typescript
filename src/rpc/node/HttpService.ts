@@ -17,9 +17,9 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Service } from '../Service';
 import * as http from 'http';
 import * as fs from 'fs';
+import { Service } from '../Service';
 import { ServiceContext } from '../ServiceContext';
 import { ByteStream } from '../../hprose.io';
 import { TimeoutError } from '../TimeoutError';

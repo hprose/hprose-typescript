@@ -17,9 +17,9 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Service } from '../Service';
 import WebSocket from 'ws';
 import * as http from 'http';
+import { Service } from '../Service';
 import { ServiceContext } from '../ServiceContext';
 import { ByteStream } from '../../hprose.io';
 import { HttpService } from './HttpService';
@@ -31,7 +31,7 @@ export class WebSocketServiceContext extends ServiceContext {
 }
 
 export class WebSocketService extends HttpService {
-    onaccept?: () => void;
+    public onaccept?: () => void;
     public wsHandler = (websocket: WebSocket, request: http.IncomingMessage): void => {
         try {
             websocket.binaryType = 'arraybuffer';
