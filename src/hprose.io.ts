@@ -12,12 +12,12 @@
 |                                                          |
 | hprose io for TypeScript.                                |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Jan 16, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export { ByteStream } from './io/ByteStream';
+export { ByteStream, writeInt32BE, writeInt32LE } from './io/ByteStream';
 export { Tags } from './io/Tags';
 export { Writer } from './io/Writer';
 export { Reader } from './io/Reader';

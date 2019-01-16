@@ -20,7 +20,7 @@
 const EMPTY_BYTES = new Uint8Array(0);
 const INIT_SIZE = 1024;
 
-function writeInt32BE(bytes: Uint8Array, offset: number, value: number): number {
+export function writeInt32BE(bytes: Uint8Array, offset: number, value: number): number {
     bytes[offset++] = value >>> 24 & 0xFF;
     bytes[offset++] = value >>> 16 & 0xFF;
     bytes[offset++] = value >>> 8 & 0xFF;
@@ -28,7 +28,7 @@ function writeInt32BE(bytes: Uint8Array, offset: number, value: number): number 
     return offset;
 }
 
-function writeInt32LE(bytes: Uint8Array, offset: number, value: number): number {
+export function writeInt32LE(bytes: Uint8Array, offset: number, value: number): number {
     bytes[offset++] = value & 0xFF;
     bytes[offset++] = value >>> 8 & 0xFF;
     bytes[offset++] = value >>> 16 & 0xFF;
