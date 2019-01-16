@@ -1,7 +1,7 @@
 {
   "name": "hprose",
   "version": "3.0.0",
-  "homepage": "https://github.com/hprose/hprose-ts",
+  "homepage": "https://github.com/hprose/hprose-typescript",
   "description": "hprose for TypeScript",
   "keywords": [
     "hprose",
@@ -22,10 +22,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hprose/hprose-ts"
+    "url": "https://github.com/hprose/hprose-typescript"
   },
   "bugs": {
-    "url": "https://github.com/hprose/hprose-ts/issues",
+    "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
   },
   "license": "MIT",
