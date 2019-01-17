@@ -64,7 +64,7 @@ export class HttpClient extends Client {
                 secure = true;
                 break;
             default:
-                throw new Error('Unsupported ' + options.protocol + 'protocol');
+                throw new Error('unsupported ' + options.protocol + 'protocol');
         }
         for (const key in this.options) {
             if (this.options.hasOwnProperty && this.options.hasOwnProperty(key)) {

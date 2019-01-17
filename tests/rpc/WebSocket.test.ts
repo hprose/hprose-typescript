@@ -21,13 +21,8 @@ test('test hello world rpc on websocket', async () => {
     service.addFunction(hello);
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
     const client = new WebSocketClient('ws://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -57,13 +52,8 @@ test('test headers', async () => {
     service.use(serviceHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false, maxPayload: service.maxRequestLength + 4
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
     const client = new WebSocketClient('http://127.0.0.1:8089');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
@@ -84,13 +74,8 @@ test('test push', async() => {
     // service.use(logHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false, maxPayload: service.maxRequestLength + 4
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
     const client1 = new WebSocketClient('http://127.0.0.1:8089');
     // client1.use(logHandler);
     const prosumer1 = new Prosumer(client1, '1');
@@ -133,13 +118,8 @@ test('test server push', async() => {
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false, maxPayload: service.maxRequestLength + 4
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
     const client = new WebSocketClient('http://127.0.0.1:8089');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
@@ -176,13 +156,8 @@ test('test maxRequestLength', async () => {
     service.addFunction(hello);
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false, maxPayload: service.maxRequestLength + 4
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
     const client = new WebSocketClient('http://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     try {
@@ -210,13 +185,8 @@ test('test reverse RPC', async () => {
     // service.use(logHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({
-        server, perMessageDeflate: false, maxPayload: service.maxRequestLength + 4
-    });
-    wsserver.on('connection', service.wsHandler);
-    if (service.onerror) {
-        wsserver.on('error', service.onerror);
-    }
+    const wsserver = new WebSocket.Server({server});
+    service.websocketHandler(wsserver);
 
     const client = new WebSocketClient('http://127.0.0.1:8089');
     const provider = new Provider(client, '1');

@@ -32,37 +32,44 @@ export class WebSocketServiceContext extends ServiceContext {
 
 export class WebSocketService extends HttpService {
     public onaccept?: () => void;
-    public wsHandler = (websocket: WebSocket, request: http.IncomingMessage): void => {
-        try {
-            websocket.binaryType = 'arraybuffer';
-            if (this.onaccept) this.onaccept();
-        }
-        catch {
-            websocket.close();
-            return;
-        }
-        websocket.on('close', () => {
-            if (this.onclose) this.onclose();
-        });
-        websocket.on('error', (error) => {
-            if (this.onerror) this.onerror(error);
-        });
-        websocket.on('message', async (data: ArrayBuffer) => {
-            const instream = new ByteStream(data);
-            const index = instream.readInt32BE();
-            const context = new WebSocketServiceContext(this, websocket, request);
-            const result = await this.handle(instream.remains, context);
-            const outstream = new ByteStream(4 + result.length);
-            outstream.writeInt32BE(index);
-            outstream.write(result);
-            websocket.send(outstream.toBytes(), {
-                binary: true,
-                compress: false
-            }, (error) => {
-                if (error) {
-                    if (this.onerror) this.onerror(error);
-                }
+    public websocketHandler(server: WebSocket.Server) {
+        server.options.perMessageDeflate = false;
+        server.options.maxPayload = this.maxRequestLength + 4;
+        server.on('connection', (websocket: WebSocket, request: http.IncomingMessage): void => {
+            try {
+                websocket.binaryType = 'arraybuffer';
+                if (this.onaccept) this.onaccept();
+            }
+            catch {
+                websocket.close();
+                return;
+            }
+            websocket.on('close', () => {
+                if (this.onclose) this.onclose();
             });
+            websocket.on('error', (error) => {
+                if (this.onerror) this.onerror(error);
+            });
+            websocket.on('message', async (data: ArrayBuffer) => {
+                const instream = new ByteStream(data);
+                const index = instream.readInt32BE();
+                const context = new WebSocketServiceContext(this, websocket, request);
+                const result = await this.handle(instream.remains, context);
+                const outstream = new ByteStream(4 + result.length);
+                outstream.writeInt32BE(index);
+                outstream.write(result);
+                websocket.send(outstream.toBytes(), {
+                    binary: true,
+                    compress: false
+                }, (error) => {
+                    if (error) {
+                        if (this.onerror) this.onerror(error);
+                    }
+                });
+            });
+        });
+        server.on('error', (error: Error) => {
+            if (this.onerror) this.onerror(error);
         });
     }
 }

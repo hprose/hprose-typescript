@@ -33,46 +33,45 @@ export class WebSocketClient extends Client {
         this.options.perMessageDeflate = false;
     }
     private async connect(uri: string): Promise<WebSocket> {
-        const ws = defer<WebSocket>();
         let websocket = await this.websockets[uri];
-        if (websocket === undefined
-            || websocket.readyState === WebSocket.CLOSING
-            || websocket.readyState === WebSocket.CLOSED) {
-            websocket = new WebSocket(uri, this.options);
-            websocket.binaryType = 'arraybuffer';
-            websocket.on('open', () => ws.resolve(websocket));
-            websocket.on('message', async (data: ArrayBuffer) => {
-                const instream = new ByteStream(data);
-                const index = instream.readInt32BE();
-                const result = this.results[uri][index];
-                delete this.results[uri][index];
-                if (result) {
-                    result.resolve(instream.remains);
-                }
-            });
-            const onerror = (error?: Error) => {
-                const results = this.results[uri];
-                if (results) {
-                    for (const index in results) {
-                        const result = results[index];
-                        result.reject(error);
-                        delete results[index];
-                    }
-                }
-                delete this.websockets[uri];
-            };
-            websocket.on('error', onerror);
-            websocket.on('close', (code, reason) => {
-                if (reason) {
-                    onerror(new Error(`${ code }:${ reason }`));
-                } else {
-                    onerror(new Error(`${ code }`));
-                }
-            });
-            this.websockets[uri] = ws.promise;
-        } else {
-            ws.resolve(websocket);
+        if (websocket !== undefined
+            && websocket.readyState !== WebSocket.CLOSING
+            && websocket.readyState !== WebSocket.CLOSED) {
+            return websocket;
         }
+        const ws = defer<WebSocket>();
+        websocket = new WebSocket(uri, this.options);
+        websocket.binaryType = 'arraybuffer';
+        websocket.on('open', () => ws.resolve(websocket));
+        websocket.on('message', async (data: ArrayBuffer) => {
+            const instream = new ByteStream(data);
+            const index = instream.readInt32BE();
+            const result = this.results[uri][index];
+            delete this.results[uri][index];
+            if (result) {
+                result.resolve(instream.remains);
+            }
+        });
+        const onerror = (error?: Error) => {
+            const results = this.results[uri];
+            if (results) {
+                for (const index in results) {
+                    const result = results[index];
+                    result.reject(error);
+                    delete results[index];
+                }
+            }
+            delete this.websockets[uri];
+        };
+        websocket.on('error', onerror);
+        websocket.on('close', (code, reason) => {
+            if (reason) {
+                onerror(new Error(`${code}:${reason}`));
+            } else {
+                onerror(new Error(`${code}`));
+            }
+        });
+        this.websockets[uri] = ws.promise;
         return ws.promise;
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
