@@ -12,7 +12,7 @@
 |                                                          |
 | hprose WebSocketClient for TypeScript.                   |
 |                                                          |
-| LastModified: Jan 16, 2019                               |
+| LastModified: Jan 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -94,5 +94,13 @@ export class WebSocketClient extends Client {
             }
         });
         return result.promise;
+    }
+    public async abort(): Promise<void> {
+        for (const uri in this.websockets) {
+            if (this.websockets[uri]) {
+                (await this.websockets[uri]).close(1000);
+            }
+            delete this.websockets[uri];
+        }
     }
 }
