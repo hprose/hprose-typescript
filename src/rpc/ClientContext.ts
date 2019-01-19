@@ -2,11 +2,7 @@
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
-|                                                          |
-\*________________________________________________________*/
-/*--------------------------------------------------------*\
+| Official WebSite: https://hprose.com                     |
 |                                                          |
 | hprose/rpc/ClientContext.ts                              |
 |                                                          |
