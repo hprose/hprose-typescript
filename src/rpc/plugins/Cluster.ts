@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Cluster.ts                                    |
+| hprose/rpc/plugins/Cluster.ts                            |
 |                                                          |
 | hprose Cluster for TypeScript.                           |
 |                                                          |
@@ -13,9 +13,9 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context } from './Context';
-import { ClientContext } from './ClientContext';
-import { IOHandler, NextIOHandler, NextInvokeHandler } from './HandlerManager';
+import { Context } from '../Context';
+import { ClientContext } from '../ClientContext';
+import { IOHandler, NextIOHandler, NextInvokeHandler } from '../HandlerManager';
 
 export interface ClusterSettings {
     retry?: number;

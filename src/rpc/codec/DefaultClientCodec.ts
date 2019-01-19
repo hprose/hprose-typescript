@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/DefaultClientCodec.ts                         |
+| hprose/rpc/codec/DefaultClientCodec.ts                   |
 |                                                          |
 | Default ClientCodec for TypeScript.                      |
 |                                                          |
@@ -13,9 +13,9 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Tags, ByteStream, Writer, Reader } from '../hprose.io';
-import { ClientContext } from './ClientContext';
-import { ClientCodec } from './ClientCodec';
+import { Tags, ByteStream, Writer, Reader } from '../../hprose.io';
+import { ClientContext } from '../ClientContext';
+import { ClientCodec } from '../ClientCodec';
 
 export class DefaultClientCodec implements ClientCodec {
     public static instance: ClientCodec = new DefaultClientCodec();

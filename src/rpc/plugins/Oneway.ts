@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Oneway.ts                                     |
+| hprose/rpc/plugins/Oneway.ts                             |
 |                                                          |
 | hprose Oneway Handler for TypeScript.                    |
 |                                                          |
@@ -13,8 +13,8 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context } from './Context';
-import { NextInvokeHandler } from './HandlerManager';
+import { Context } from '../Context';
+import { NextInvokeHandler } from '../HandlerManager';
 
 export async function onewayHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
     const result = next(name, args, context);

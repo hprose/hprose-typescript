@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Caller.ts                                     |
+| hprose/rpc/plugins/Caller.ts                             |
 |                                                          |
 | hprose Caller for TypeScript.                            |
 |                                                          |
@@ -13,12 +13,12 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Service } from './Service';
-import { Deferred, defer } from './Deferred';
-import { Context } from './Context';
-import { NextInvokeHandler } from './HandlerManager';
-import { Method } from './Method';
-import { normalize } from './Utils';
+import { Service } from '../Service';
+import { Deferred, defer } from '../Deferred';
+import { Context } from '../Context';
+import { NextInvokeHandler } from '../HandlerManager';
+import { Method } from '../Method';
+import { normalize } from '../Utils';
 
 function makeInvoke(caller: Caller, id: string, fullname: string): () => Promise<any> {
     return function (): Promise<any> {

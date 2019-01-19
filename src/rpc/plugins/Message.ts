@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Message.ts                                    |
+| hprose/rpc/plugins/Message.ts                            |
 |                                                          |
 | hprose Message for TypeScript.                           |
 |                                                          |

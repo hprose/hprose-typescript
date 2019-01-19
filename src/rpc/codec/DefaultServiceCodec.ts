@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/DefaultServiceCodec.ts                        |
+| hprose/rpc/codec/DefaultServiceCodec.ts                  |
 |                                                          |
 | Default ServiceCodec for TypeScript.                     |
 |                                                          |
@@ -13,10 +13,10 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Tags, ByteStream, Writer, Reader, ValueReader } from '../hprose.io';
-import { ServiceContext } from './ServiceContext';
-import { ServiceCodec } from './ServiceCodec';
-import { MethodLike } from './Method';
+import { Tags, ByteStream, Writer, Reader, ValueReader } from '../../hprose.io';
+import { ServiceContext } from '../ServiceContext';
+import { ServiceCodec } from '../ServiceCodec';
+import { MethodLike } from '../Method';
 
 export class DefaultServiceCodec implements ServiceCodec {
     public static instance: ServiceCodec = new DefaultServiceCodec();

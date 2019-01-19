@@ -15,7 +15,7 @@
 
 import { Settings } from './Settings';
 import { ClientCodec } from './ClientCodec';
-import { DefaultClientCodec } from './DefaultClientCodec';
+import { DefaultClientCodec } from './codec/DefaultClientCodec';
 import { Context } from './Context';
 import { ClientContext } from './ClientContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';

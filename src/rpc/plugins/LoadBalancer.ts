@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/LoadBalance.ts                                |
+| hprose/rpc/plugins/LoadBalance.ts                        |
 |                                                          |
 | hprose LoadBalance for TypeScript.                       |
 |                                                          |
@@ -13,8 +13,8 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context } from './Context';
-import { NextIOHandler, IOHandler } from './HandlerManager';
+import { Context } from '../Context';
+import { NextIOHandler, IOHandler } from '../HandlerManager';
 
 export interface WeightedURIList {
     [uri: string]: number

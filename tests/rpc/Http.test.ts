@@ -3,10 +3,10 @@ import { HttpService } from '../../src/rpc/node/HttpService';
 import { HttpClient } from '../../src/rpc/node/HttpClient';
 import { Context } from '../../src/rpc/Context';
 import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { Broker , BrokerContext } from '../../src/rpc/Broker';
-import { Prosumer } from '../../src/rpc/Prosumer';
-import { Caller } from '../../src/rpc/Caller';
-import { Provider } from '../../src/rpc/Provider';
+import { Broker , BrokerContext } from '../../src/rpc/plugins/Broker';
+import { Prosumer } from '../../src/rpc/plugins/Prosumer';
+import { Caller } from '../../src/rpc/plugins/Caller';
+import { Provider } from '../../src/rpc/plugins/Provider';
 // import { ByteStream } from '../../src/hprose.io';
 
 test('test hello world rpc', async () => {

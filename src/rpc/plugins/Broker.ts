@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Broker.ts                                     |
+| hprose/rpc/plugins/Broker.ts                             |
 |                                                          |
 | hprose Broker for TypeScript.                            |
 |                                                          |
@@ -13,14 +13,14 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Service } from './Service';
-import { Deferred, defer } from './Deferred';
-import { Context } from './Context';
-import { Method } from './Method';
-import { ServiceContext } from './ServiceContext';
-import { TimeoutError } from './TimeoutError';
+import { Service } from '../Service';
+import { Deferred, defer } from '../Deferred';
+import { Context } from '../Context';
+import { Method } from '../Method';
+import { ServiceContext } from '../ServiceContext';
+import { TimeoutError } from '../TimeoutError';
 import { Message } from './Message';
-import { NextInvokeHandler } from './HandlerManager';
+import { NextInvokeHandler } from '../HandlerManager';
 
 export interface Producer {
     unicast(data: any, topic: string, id: string): boolean;

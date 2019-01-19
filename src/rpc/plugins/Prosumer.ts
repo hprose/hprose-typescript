@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Prosumer.ts                                   |
+| hprose/rpc/plugins/Prosumer.ts                           |
 |                                                          |
 | hprose Prosumer for TypeScript.                          |
 |                                                          |
@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Client } from './Client';
+import { Client } from '../Client';
 import { Message } from './Message';
 
 export class Prosumer {

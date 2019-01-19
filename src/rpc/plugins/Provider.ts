@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/Provider.ts                                   |
+| hprose/rpc/plugins/Provider.ts                           |
 |                                                          |
 | hprose Provider for TypeScript.                          |
 |                                                          |
@@ -13,9 +13,9 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { MethodLike } from './Method';
-import { MethodManager, MissingFunction } from './MethodManager';
-import { Client } from './Client';
+import { MethodLike } from '../Method';
+import { MethodManager, MissingFunction } from '../MethodManager';
+import { Client } from '../Client';
 
 export class Provider {
     public debug: boolean = false;

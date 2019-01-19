@@ -14,7 +14,7 @@
 \*________________________________________________________*/
 
 import { ServiceCodec } from './ServiceCodec';
-import { DefaultServiceCodec } from './DefaultServiceCodec';
+import { DefaultServiceCodec } from './codec/DefaultServiceCodec';
 import { Context } from './Context';
 import { ServiceContext } from './ServiceContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
