@@ -1,12 +1,5 @@
 import * as net from 'net';
-import { SocketService } from '../../src/rpc/node/SocketService';
-import { SocketClient } from '../../src/rpc/node/SocketClient';
-import { Context } from '../../src/rpc/Context';
-import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { Broker , BrokerContext } from '../../src/rpc/plugins/Broker';
-import { Prosumer } from '../../src/rpc/plugins/Prosumer';
-import { Caller } from '../../src/rpc/plugins/Caller';
-import { Provider } from '../../src/rpc/plugins/Provider';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, SocketService, SocketClient } from '../../src/hprose.node';
 // import { ByteStream } from '../../src/hprose.io';
 
 test('test hello world rpc', async () => {

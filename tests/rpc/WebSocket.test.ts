@@ -1,14 +1,6 @@
 import * as http from 'http';
-import { WebSocketService } from '../../src/rpc/node/WebSocketService';
-import { WebSocketClient } from '../../src/rpc/node/WebSocketClient';
-import { Context } from '../../src/rpc/Context';
-import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { Broker, BrokerContext } from '../../src/rpc/plugins/Broker';
-import { Prosumer } from '../../src/rpc/plugins/Prosumer';
-import { Caller } from '../../src/rpc/plugins/Caller';
-import { Provider } from '../../src/rpc/plugins/Provider';
-// import { ByteStream } from '../../src/hprose.io';
 import WebSocket from 'ws';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, WebSocketService, WebSocketClient } from '../../src/hprose.node';
 
 test('test hello world rpc on websocket', async () => {
     function hello(name: string): string {

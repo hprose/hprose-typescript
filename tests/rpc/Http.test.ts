@@ -1,13 +1,5 @@
 import * as http from 'http';
-import { HttpService } from '../../src/rpc/node/HttpService';
-import { HttpClient } from '../../src/rpc/node/HttpClient';
-import { Context } from '../../src/rpc/Context';
-import { NextInvokeHandler } from '../../src/rpc/HandlerManager';
-import { Broker , BrokerContext } from '../../src/rpc/plugins/Broker';
-import { Prosumer } from '../../src/rpc/plugins/Prosumer';
-import { Caller } from '../../src/rpc/plugins/Caller';
-import { Provider } from '../../src/rpc/plugins/Provider';
-// import { ByteStream } from '../../src/hprose.io';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, HttpService, HttpClient } from '../../src/hprose.node';
 
 test('test hello world rpc', async () => {
     function hello(name: string): string {

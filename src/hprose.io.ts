@@ -6,9 +6,9 @@
 |                                                          |
 | hprose.io.ts                                             |
 |                                                          |
-| hprose io for TypeScript.                                |
+| hprose IO for TypeScript.                                |
 |                                                          |
-| LastModified: Jan 16, 2019                               |
+| LastModified: Jan 19, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
