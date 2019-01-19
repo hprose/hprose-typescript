@@ -61,7 +61,7 @@ export class DefaultClientCodec implements ClientCodec {
             case Tags.TagEnd:
                 return context.type === null ? null : undefined;
             default:
-                throw new Error('Wrong Response:\r\n' + stream.toString());
+                throw new Error('Invalid response:\r\n' + stream.toString());
         }
     }
 }

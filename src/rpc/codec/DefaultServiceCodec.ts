@@ -113,7 +113,7 @@ export class DefaultServiceCodec implements ServiceCodec {
             case Tags.TagEnd:
                 return ['~', this.decodeMethod('~', context).passContext ? [context] : []];
             default:
-                throw new Error('Wrong Response:\r\n' + stream.toString());
+                throw new Error('Invalid request:\r\n' + stream.toString());
         }
     }
 }
