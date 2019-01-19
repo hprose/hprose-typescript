@@ -41,3 +41,4 @@ import * as Oneway from './rpc/plugins/Oneway';
 export { Cluster, LoadBalancer, Oneway };
 
 export { HttpClient, HttpClientContext } from './rpc/browser/HttpClient';
+export { WebSocketClient } from './rpc/node/WebSocketClient';
