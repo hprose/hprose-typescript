@@ -18,7 +18,7 @@
 \*________________________________________________________*/
 
 export interface Context {
-    requestHeaders: { [name: string]: any };
-    responseHeaders: { [name: string]: any };
+    readonly requestHeaders: { [name: string]: any };
+    readonly responseHeaders: { [name: string]: any };
     [name: string]: any;
 }

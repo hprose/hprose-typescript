@@ -25,8 +25,8 @@ import { copy } from './Utils';
 const emptySettings: Settings = Object.create(null);
 
 export class ClientContext implements Context {
-    public requestHeaders: { [name: string]: any } = Object.create(null);
-    public responseHeaders: { [name: string]: any } = Object.create(null);
+    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
+    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     public uri: string;
     public simple: boolean;
     public utc: boolean;

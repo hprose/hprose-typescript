@@ -22,14 +22,14 @@ import { Service } from './Service';
 import { copy } from './Utils';
 
 export class ServiceContext implements Context {
+    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
+    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     public debug: boolean;
     public simple: boolean;
     public utc: boolean;
     public missing: boolean = false;
     public method: Function = ()=>{};
     public obj: any;
-    public requestHeaders: { [name: string]: any } = Object.create(null);
-    public responseHeaders: { [name: string]: any } = Object.create(null);
     [name: string]: any;
     constructor(public service: Service) {
         this.debug = service.debug;
