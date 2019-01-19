@@ -31,7 +31,7 @@ export class ServiceContext implements Context {
     public method: Function = ()=>{};
     public obj: any;
     [name: string]: any;
-    constructor(public service: Service) {
+    constructor(public readonly service: Service) {
         this.debug = service.debug;
         this.simple = service.simple;
         this.utc = service.utc;
