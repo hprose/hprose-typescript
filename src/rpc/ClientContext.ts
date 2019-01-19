@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 14, 2019                               |
+| LastModified: Jan 20, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -32,10 +32,7 @@ export class ClientContext implements Context {
     [name: string]: any;
     constructor(public readonly client: Client, fullname: string, settings: Settings = Object.create(null)) {
         const uris = client.uris;
-        if (uris.length <= 0) {
-            throw new Error('The service URIs has not been set up yet');
-        }
-        this.uri = uris[0];
+        this.uri = (uris.length > 0) ? uris[0] : '';
         const defaultSettings = (fullname in client.settings) ? client.settings[fullname] : emptySettings;
         const getValue = (name: keyof Settings, defaultValue: any): any => {
             return (name in settings)
