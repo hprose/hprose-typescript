@@ -34,7 +34,7 @@ export class ClientContext implements Context {
     public dictType: 'object' | 'map';
     public type: Function | null;
     [name: string]: any;
-    constructor(public client: Client, fullname: string, settings: Settings = Object.create(null)) {
+    constructor(public readonly client: Client, fullname: string, settings: Settings = Object.create(null)) {
         const uris = client.uris;
         if (uris.length <= 0) {
             throw new Error('The service URIs has not been set up yet');
