@@ -98,11 +98,14 @@ export abstract class Client {
     public nullType: undefined | null = undefined;
     public codec: ClientCodec = DefaultClientCodec.instance;
     private urilist: string[] = [];
-    private handlerManager: HandlerManager = new HandlerManager(this.call.bind(this), this.transport.bind(this));
+    private readonly handlerManager: HandlerManager = new HandlerManager(this.call.bind(this), this.transport.bind(this));
     constructor(uri?: string | string[], settings?: ClientSettings) {
         if (uri) {
-            if (typeof uri === 'string') uri = [uri];
-            this.uris = uri;
+            if (typeof uri === 'string') {
+                this.urilist.push(uri);
+            } else {
+                this.urilist.push(...uri);
+            }
         }
         if (settings) {
             for (const key in settings) {
