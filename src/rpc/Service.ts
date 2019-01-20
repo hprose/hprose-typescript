@@ -60,12 +60,12 @@ export abstract class Service {
         }
         return cxt.method.apply(cxt.obj, args);
     }
-    public use(...handler: InvokeHandler[] | IOHandler[]): this {
-        this.handlerManager.use(...handler);
+    public use(...handlers: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.use(...handlers);
         return this;
     }
-    public unuse(...handler: InvokeHandler[] | IOHandler[]): this {
-        this.handlerManager.unuse(...handler);
+    public unuse(...handlers: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.unuse(...handlers);
         return this;
     }
     public add(method: MethodLike): this {

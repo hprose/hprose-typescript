@@ -156,12 +156,12 @@ export abstract class Client {
         const fullnames: string[] = await this.invoke('~');
         return useService(this, fullnames);
     }
-    public use(...handler: InvokeHandler[] | IOHandler[]): this {
-        this.handlerManager.use(...handler);
+    public use(...handlers: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.use(...handlers);
         return this;
     }
-    public unuse(...handler: InvokeHandler[] | IOHandler[]): this {
-        this.handlerManager.unuse(...handler);
+    public unuse(...handlers: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.unuse(...handlers);
         return this;
     }
     public async invoke<T>(fullname: string, args: any[] = [], settings?: Settings): Promise<T> {

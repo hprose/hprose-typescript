@@ -58,18 +58,18 @@ export class HandlerManager {
     public get ioHandler(): NextIOHandler {
         return this.firstIOHandler;
     }
-    private addInvokeHandlers(...handler: InvokeHandler[]): void {
-        this.invokeHandlers.push(...handler);
+    private addInvokeHandlers(...handlers: InvokeHandler[]): void {
+        this.invokeHandlers.push(...handlers);
         this.rebuildInvokeHandler();
     }
-    private addIOHandlers(...handler: IOHandler[]): void {
-        this.ioHandlers.push(...handler);
+    private addIOHandlers(...handlers: IOHandler[]): void {
+        this.ioHandlers.push(...handlers);
         this.rebuildIOHandler();
     }
-    private removeInvokeHandlers(...handler: InvokeHandler[]): void {
+    private removeInvokeHandlers(...handlers: InvokeHandler[]): void {
         let rebuild = false;
-        for (let i = 0, n = handler.length; i < n; ++i) {
-            const index = this.invokeHandlers.indexOf(handler[i]);
+        for (let i = 0, n = handlers.length; i < n; ++i) {
+            const index = this.invokeHandlers.indexOf(handlers[i]);
             if (index >= 0) {
                 this.invokeHandlers.splice(index, 1);
                 rebuild = true;
@@ -77,10 +77,10 @@ export class HandlerManager {
         }
         if (rebuild) this.rebuildInvokeHandler();
     }
-    private removeIOHandlers(...handler: IOHandler[]): void {
+    private removeIOHandlers(...handlers: IOHandler[]): void {
         let rebuild = false;
-        for (let i = 0, n = handler.length; i < n; ++i) {
-            const index = this.ioHandlers.indexOf(handler[i]);
+        for (let i = 0, n = handlers.length; i < n; ++i) {
+            const index = this.ioHandlers.indexOf(handlers[i]);
             if (index >= 0) {
                 this.ioHandlers.splice(index, 1);
                 rebuild = true;
@@ -88,19 +88,19 @@ export class HandlerManager {
         }
         if (rebuild) this.rebuildIOHandler();
     }
-    public use(...handler: InvokeHandler[] | IOHandler[]): void {
-        if (handler.length <= 0) return;
-        switch (handler[0].length) {
-            case 4: this.addInvokeHandlers(...handler as InvokeHandler[]); break;
-            case 3: this.addIOHandlers(...handler as IOHandler[]); break;
+    public use(...handlers: InvokeHandler[] | IOHandler[]): void {
+        if (handlers.length <= 0) return;
+        switch (handlers[0].length) {
+            case 4: this.addInvokeHandlers(...handlers as InvokeHandler[]); break;
+            case 3: this.addIOHandlers(...handlers as IOHandler[]); break;
             default: throw new TypeError('Invalid parameter type');
         }
     }
-    public unuse(...handler: InvokeHandler[] | IOHandler[]): void {
-        if (handler.length <= 0) return;
-        switch (handler[0].length) {
-            case 4: this.removeInvokeHandlers(...handler as InvokeHandler[]); break;
-            case 3: this.removeIOHandlers(...handler as IOHandler[]); break;
+    public unuse(...handlers: InvokeHandler[] | IOHandler[]): void {
+        if (handlers.length <= 0) return;
+        switch (handlers[0].length) {
+            case 4: this.removeInvokeHandlers(...handlers as InvokeHandler[]); break;
+            case 3: this.removeIOHandlers(...handlers as IOHandler[]); break;
             default: throw new TypeError('Invalid parameter type');
         }
     }
