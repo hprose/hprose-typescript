@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 15, 2019                               |
+| LastModified: Jan 20, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -60,20 +60,12 @@ export abstract class Service {
         }
         return cxt.method.apply(cxt.obj, args);
     }
-    public use(handler: InvokeHandler | IOHandler): this {
-        switch (handler.length) {
-            case 4: this.handlerManager.addInvokeHandler(handler as InvokeHandler); break;
-            case 3: this.handlerManager.addIOHandler(handler as IOHandler); break;
-            default: throw new TypeError('Invalid parameter type');
-        }
+    public use(...handler: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.use(...handler);
         return this;
     }
-    public unuse(handler: InvokeHandler | IOHandler): this {
-        switch (handler.length) {
-            case 4: this.handlerManager.removeInvokeHandler(handler as InvokeHandler); break;
-            case 3: this.handlerManager.removeIOHandler(handler as IOHandler); break;
-            default: throw new TypeError('Invalid parameter type');
-        }
+    public unuse(...handler: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.unuse(...handler);
         return this;
     }
     public add(method: MethodLike): this {

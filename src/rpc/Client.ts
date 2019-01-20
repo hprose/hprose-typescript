@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 14, 2019                               |
+| LastModified: Jan 20, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -156,20 +156,12 @@ export abstract class Client {
         const fullnames: string[] = await this.invoke('~');
         return useService(this, fullnames);
     }
-    public use(handler: InvokeHandler | IOHandler): this {
-        switch (handler.length) {
-            case 4: this.handlerManager.addInvokeHandler(handler as InvokeHandler); break;
-            case 3: this.handlerManager.addIOHandler(handler as IOHandler); break;
-            default: throw new TypeError('Invalid parameter type');
-        }
+    public use(...handler: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.use(...handler);
         return this;
     }
-    public unuse(handler: InvokeHandler | IOHandler): this {
-        switch (handler.length) {
-            case 4: this.handlerManager.removeInvokeHandler(handler as InvokeHandler); break;
-            case 3: this.handlerManager.removeIOHandler(handler as IOHandler); break;
-            default: throw new TypeError('Invalid parameter type');
-        }
+    public unuse(...handler: InvokeHandler[] | IOHandler[]): this {
+        this.handlerManager.unuse(...handler);
         return this;
     }
     public async invoke<T>(fullname: string, args: any[] = [], settings?: Settings): Promise<T> {

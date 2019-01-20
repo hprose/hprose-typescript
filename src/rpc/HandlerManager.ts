@@ -8,7 +8,7 @@
 |                                                          |
 | hprose HandlerManager for TypeScript.                    |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Jan 20, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ export class HandlerManager {
     private ioHandlers: IOHandler[] = [];
     private firstInvokeHandler: NextInvokeHandler;
     private firstIOHandler: NextIOHandler;
-    constructor(public defaultInvokeHandler: NextInvokeHandler, public defaultIOHandler: NextIOHandler) {
+    constructor(private readonly defaultInvokeHandler: NextInvokeHandler, private readonly defaultIOHandler: NextIOHandler) {
         this.firstInvokeHandler = defaultInvokeHandler;
         this.firstIOHandler = defaultIOHandler;
     }
@@ -58,26 +58,50 @@ export class HandlerManager {
     public get ioHandler(): NextIOHandler {
         return this.firstIOHandler;
     }
-    public addInvokeHandler(handler: InvokeHandler): void {
-        this.invokeHandlers.push(handler);
+    private addInvokeHandlers(...handler: InvokeHandler[]): void {
+        this.invokeHandlers.push(...handler);
         this.rebuildInvokeHandler();
     }
-    public addIOHandler(handler: IOHandler): void {
-        this.ioHandlers.push(handler);
+    private addIOHandlers(...handler: IOHandler[]): void {
+        this.ioHandlers.push(...handler);
         this.rebuildIOHandler();
     }
-    public removeInvokeHandler(handler: InvokeHandler): void {
-        const index = this.invokeHandlers.indexOf(handler);
-        if (index >= 0) {
-            this.invokeHandlers.splice(index, 1);
-            this.rebuildInvokeHandler();
+    private removeInvokeHandlers(...handler: InvokeHandler[]): void {
+        let rebuild = false;
+        for (let i = 0, n = handler.length; i < n; ++i) {
+            const index = this.invokeHandlers.indexOf(handler[i]);
+            if (index >= 0) {
+                this.invokeHandlers.splice(index, 1);
+                rebuild = true;
+            }
+        }
+        if (rebuild) this.rebuildInvokeHandler();
+    }
+    private removeIOHandlers(...handler: IOHandler[]): void {
+        let rebuild = false;
+        for (let i = 0, n = handler.length; i < n; ++i) {
+            const index = this.ioHandlers.indexOf(handler[i]);
+            if (index >= 0) {
+                this.ioHandlers.splice(index, 1);
+                rebuild = true;
+            }
+        }
+        if (rebuild) this.rebuildIOHandler();
+    }
+    public use(...handler: InvokeHandler[] | IOHandler[]): void {
+        if (handler.length <= 0) return;
+        switch (handler[0].length) {
+            case 4: this.addInvokeHandlers(...handler as InvokeHandler[]); break;
+            case 3: this.addIOHandlers(...handler as IOHandler[]); break;
+            default: throw new TypeError('Invalid parameter type');
         }
     }
-    public removeIOHandler(handler: IOHandler): void {
-        const index = this.ioHandlers.indexOf(handler);
-        if (index >= 0) {
-            this.ioHandlers.splice(index, 1);
-            this.rebuildIOHandler();
+    public unuse(...handler: InvokeHandler[] | IOHandler[]): void {
+        if (handler.length <= 0) return;
+        switch (handler[0].length) {
+            case 4: this.removeInvokeHandlers(...handler as InvokeHandler[]); break;
+            case 3: this.removeIOHandlers(...handler as IOHandler[]); break;
+            default: throw new TypeError('Invalid parameter type');
         }
     }
 }
