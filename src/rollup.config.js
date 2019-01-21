@@ -14,10 +14,10 @@ export default [
         ]
     },
     {
-        input: "./hprose.browser.ts",
+        input: "./hprose.html5.ts",
         output: {
             format: "es",
-            file: '../dist/hprose.browser.js',
+            file: '../dist/hprose.html5.js',
             sourcemap: true,
             banner: "/* eslint-disable */",
         },
