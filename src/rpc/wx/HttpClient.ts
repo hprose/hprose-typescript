@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/browser/HttpClient.ts                         |
+| hprose/rpc/wx/HttpClient.ts                              |
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |

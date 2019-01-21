@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/browser/WebSocketClient.ts                    |
+| hprose/rpc/html5/WebSocketClient.ts                      |
 |                                                          |
 | hprose WebSocketClient for TypeScript.                   |
 |                                                          |

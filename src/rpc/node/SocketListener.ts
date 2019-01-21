@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/node/SocketService.ts                         |
+| hprose/rpc/node/SocketListener.ts                        |
 |                                                          |
-| hprose SocketService for TypeScript.                     |
+| hprose SocketListener for TypeScript.                    |
 |                                                          |
 | LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |

@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/node/HttpService.ts                           |
+| hprose/rpc/node/HttpListener.ts                          |
 |                                                          |
-| hprose HttpService for TypeScript.                       |
+| hprose HttpListener for TypeScript.                      |
 |                                                          |
 | LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
