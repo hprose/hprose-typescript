@@ -68,7 +68,7 @@ class ServiceProxyHandler implements ProxyHandler<any> {
     public get(target: any, p: PropertyKey, receiver: any): any {
         if (typeof p === 'symbol') { return undefined; }
         if (p === 'then') { return undefined; }
-        if (!(p in target) || target.hasOwnProperty && !target.hasOwnProperty(p)) {
+        if (!(p in target)) {
             target[p] = makeInvoke(this.client, this.id, this.namespace ? this.namespace + '_' + p : '' + p);
         }
         return target[p];

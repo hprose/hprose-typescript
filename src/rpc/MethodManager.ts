@@ -156,7 +156,7 @@ export class MethodManager {
     }
     public addInstanceMethods(obj: any, prefix?: string) {
         for (const name in obj) {
-            if (obj.hasOwnProperty && obj.hasOwnProperty(name) && typeof obj[name] === 'function') {
+            if ((!obj.hasOwnProperty || obj.hasOwnProperty(name)) && typeof obj[name] === 'function') {
                 const fullname = prefix ? prefix + '_' + name : name;
                 this.add(new Method(obj[name], obj, fullname));
             }

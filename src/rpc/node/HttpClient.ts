@@ -64,7 +64,7 @@ export class HttpTransport implements Transport {
                 throw new Error('unsupported ' + options.protocol + 'protocol');
         }
         for (const key in this.options) {
-            if (this.options.hasOwnProperty && this.options.hasOwnProperty(key)) {
+            if (!this.options.hasOwnProperty || this.options.hasOwnProperty(key)) {
                 (options as any)[key] = (this.options as any)[key];
             }
         }

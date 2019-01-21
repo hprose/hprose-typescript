@@ -43,15 +43,9 @@ export function parseURI(uri: string): URI {
 
 export function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
     if (src) {
-        if (src.hasOwnProperty === undefined) {
-            for (let name in src) {
+        for (let name in src) {
+            if (!src.hasOwnProperty || src.hasOwnProperty(name)) {
                 dist[name] = src[name];
-            }
-        } else {
-            for (let name in src) {
-                if (src.hasOwnProperty(name)) {
-                    dist[name] = src[name];
-                }
             }
         }
     }

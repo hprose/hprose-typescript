@@ -70,7 +70,7 @@ export class SocketTransport implements Transport {
                     default: {
                         const tlsOptions: tls.ConnectionOptions = options;
                         for (const key in this.options) {
-                            if (this.options.hasOwnProperty && this.options.hasOwnProperty(key)) {
+                            if (!this.options.hasOwnProperty || this.options.hasOwnProperty(key)) {
                                 (tlsOptions as any)[key] = (this.options as any)[key];
                             }
                         }

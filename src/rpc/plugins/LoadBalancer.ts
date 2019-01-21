@@ -25,7 +25,7 @@ function parseWeightedURIList(urilist?: WeightedURIList): [string[], number[]] {
     const weights: number[] = [];
     if (urilist) {
         for (const uri in urilist) {
-            if (urilist.hasOwnProperty && urilist.hasOwnProperty(uri)) {
+            if (!urilist.hasOwnProperty || urilist.hasOwnProperty(uri)) {
                 uris.push(uri);
                 const weight = urilist[uri] | 0;
                 if (weight <= 0) {

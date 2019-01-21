@@ -31,9 +31,7 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
         for (let i = 0, n = headers.length; i < n; i++) {
             if (headers[i] !== '') {
                 let [name, value] = headers[i].split(': ', 2).map((value) => { return value.trim(); });
-                if (typeof httpHeaders.hasOwnProperty === 'undefined'
-                    && name in httpHeaders
-                    || httpHeaders.hasOwnProperty(name)) {
+                if (httpHeaders.hasOwnProperty ? httpHeaders.hasOwnProperty(name) : name in httpHeaders) {
                     if (Array.isArray(httpHeaders[name])) {
                         (httpHeaders[name] as string[]).push(value);
                     } else {
@@ -60,8 +58,7 @@ export class HttpTransport implements Transport {
         }
         if (httpRequestHeaders) {
             for (const name in httpRequestHeaders) {
-                if (typeof httpRequestHeaders.hasOwnProperty === 'undefined'
-                    || httpRequestHeaders.hasOwnProperty(name)) {
+                if (!httpRequestHeaders.hasOwnProperty || httpRequestHeaders.hasOwnProperty(name)) {
                     const value = httpRequestHeaders[name];
                     if (Array.isArray(value)) {
                         headers[name] = value.join(', ');
