@@ -14,6 +14,7 @@
 \*________________________________________________________*/
 
 import * as http from 'http';
+import * as https from 'https';
 import * as fs from 'fs';
 import { Service } from '../Service';
 import { ServiceContext } from '../ServiceContext';
@@ -31,7 +32,7 @@ export class HttpServiceContext extends ServiceContext {
     }
 }
 
-export class HttpService extends Service {
+export class HttpListener {
     public p3p: boolean = true;
     public get: boolean = true;
     public crossDomain: boolean = true;
@@ -43,6 +44,14 @@ export class HttpService extends Service {
     private _clientAccessPolicyXmlContent: Buffer = new Buffer(0);
     public onclose?: () => void;
     public onerror?: (error: Error) => void;
+    constructor(public readonly service: Service, server?: http.Server | https.Server) {
+        if (server) {
+            server.on('request', this.listener);
+            server.on('error', (error: Error) => {
+                if (this.onerror) this.onerror(error);
+            });
+        }
+    }
     protected crossDomainXmlHandler(request: http.IncomingMessage, response: http.ServerResponse): boolean {
         if (request.url && request.url.toLowerCase() === '/crossdomain.xml') {
             if (request.headers['if-modified-since'] === lastModified &&
@@ -156,16 +165,16 @@ export class HttpService extends Service {
         this._clientAccessPolicyXmlContent = value;
     }
 
-    public httpHandler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
-        const context = new HttpServiceContext(this, request, response);
+    public listener = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
+        const context = new HttpServiceContext(this.service, request, response);
         const size = Number(request.headers['content-length']);
-        if (size > this.maxRequestLength) {
+        if (size > this.service.maxRequestLength) {
             response.statusCode = 413;
             response.statusMessage = 'Request Entity Too Large';
             response.end();
             return Promise.resolve();
         }
-        request.setTimeout(this.timeout, () => {
+        request.setTimeout(this.service.timeout, () => {
             request.destroy(new TimeoutError());
         });
         return new Promise<void>((resolve, reject) => {
@@ -200,7 +209,7 @@ export class HttpService extends Service {
                         }
                     // tslint:disable-next-line:no-switch-case-fall-through
                     case 'POST':
-                        result = await this.handle(instream.takeBytes(), context);
+                        result = await this.service.handle(instream.takeBytes(), context);
                         break;
                 }
                 try {

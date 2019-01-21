@@ -1,25 +1,20 @@
 import * as http from 'http';
-import WebSocket from 'ws';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, WebSocketService, Client } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, Client, Service, WebSocketListener } from '../../src/hprose.node';
 
 test('test hello world rpc on websocket', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new WebSocketService();
-    service.onerror = (error) => {
-        console.log(error);
-    };
+    const service = new Service();
     service.addFunction(hello);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
     const client = new Client('ws://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
-    wsserver.close();
     server.close();
 });
 
@@ -39,13 +34,13 @@ test('test headers', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new WebSocketService();
+    const service = new Service();
     service.addFunction(hello);
     service.use(serviceHandler);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
     const client = new Client('ws://127.0.0.1:8089');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
@@ -61,13 +56,13 @@ test('test push', async() => {
     //     console.log(ByteStream.toString(response));
     //     return response;
     // };
-    const service = new WebSocketService();
+    const service = new Service();
     service.use(new Broker(service).handler);
     // service.use(logHandler);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
     const client1 = new Client('ws://127.0.0.1:8089');
     // client1.use(logHandler);
     const prosumer1 = new Prosumer(client1, '1');
@@ -104,14 +99,14 @@ test('test server push', async() => {
         cxt.producer.push('hello', 'test');
         return 'hello ' + name;
     }
-    const service = new WebSocketService();
+    const service = new Service();
     const broker = new Broker(service);
     service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
     const client = new Client('ws://127.0.0.1:8089');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
@@ -143,13 +138,13 @@ test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new WebSocketService();
+    const service = new Service();
     service.maxRequestLength = 10;
     service.addFunction(hello);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
     const client = new Client('ws://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     try {
@@ -171,14 +166,14 @@ test('test reverse RPC', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new WebSocketService();
+    const service = new Service();
+    const server = http.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new WebSocketListener(service, server);
+    // service.use(logHandler);
     const caller = new Caller(service);
     service.use(caller.handler);
-    // service.use(logHandler);
-    const server = http.createServer(service.httpHandler);
     server.listen(8089);
-    const wsserver = new WebSocket.Server({server});
-    service.websocketHandler(wsserver);
 
     const client = new Client('ws://127.0.0.1:8089');
     const provider = new Provider(client, '1');

@@ -1,14 +1,16 @@
 import * as net from 'net';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, SocketService, Client } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, SocketListener, Service, Client } from '../../src/hprose.node';
 // import { ByteStream } from '../../src/hprose.io';
 
 test('test hello world rpc', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new SocketService();
+    const service = new Service();
     service.addFunction(hello);
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
     const client = new Client('tcp://127.0.0.1');
     const proxy = await client.useServiceAsync();
@@ -33,10 +35,12 @@ test('test headers', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new SocketService();
+    const service = new Service();
     service.addFunction(hello);
     service.use(serviceHandler);
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
     const client = new Client('tcp://127.0.0.1');
     client.use(clientHandler);
@@ -53,10 +57,12 @@ test('test push', async() => {
     //     console.log(ByteStream.toString(response));
     //     return response;
     // };
-    const service = new SocketService();
+    const service = new Service();
     service.use(new Broker(service).handler);
     // service.use(logHandler);
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
     const client1 = new Client('tcp://127.0.0.1');
     // client1.use(logHandler);
@@ -94,11 +100,13 @@ test('test server push', async() => {
         cxt.producer.push('hello', 'test');
         return 'hello ' + name;
     }
-    const service = new SocketService();
+    const service = new Service();
     const broker = new Broker(service);
     service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
     const client = new Client('tcp://127.0.0.1');
     const prosumer = new Prosumer(client, '1');
@@ -131,10 +139,12 @@ test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new SocketService();
+    const service = new Service();
     service.maxRequestLength = 10;
     service.addFunction(hello);
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
     const client = new Client('tcp://127.0.0.1');
     const proxy = await client.useServiceAsync();
@@ -157,11 +167,13 @@ test('test reverse RPC', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new SocketService();
+    const service = new Service();
     const caller = new Caller(service);
     service.use(caller.handler);
     // service.use(logHandler);
-    const server = net.createServer(service.socketHandler);
+    const server = net.createServer();
+    // tslint:disable-next-line:no-unused-expression
+    new SocketListener(service, server);
     server.listen(8412);
 
     const client = new Client('tcp://127.0.0.1');

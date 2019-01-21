@@ -47,9 +47,9 @@ import * as Oneway from './rpc/plugins/Oneway';
 
 export { Cluster, LoadBalancer, Oneway };
 
-export { HttpClient, HttpClientContext } from './rpc/node/HttpClient';
-export { WebSocketClient } from './rpc/node/WebSocketClient';
-export { SocketClient } from './rpc/node/SocketClient';
-export { HttpService, HttpServiceContext } from './rpc/node/HttpService';
-export { WebSocketService, WebSocketServiceContext } from './rpc/node/WebSocketService';
-export { SocketService, SocketServiceContext } from './rpc/node/SocketService';
+export { HttpTransport, HttpClient, HttpClientContext } from './rpc/node/HttpClient';
+export { WebSocketTransport, WebSocketClient } from './rpc/node/WebSocketClient';
+export { SocketTransport, SocketClient } from './rpc/node/SocketClient';
+export { HttpListener, HttpServiceContext } from './rpc/node/HttpListener';
+export { WebSocketListener, WebSocketServiceContext } from './rpc/node/WebSocketListener';
+export { SocketListener, SocketServiceContext } from './rpc/node/SocketListener';

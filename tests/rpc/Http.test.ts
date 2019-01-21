@@ -1,13 +1,15 @@
 import * as http from 'http';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, HttpService, Client } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, HttpListener, Service, Client } from '../../src/hprose.node';
 
 test('test hello world rpc', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new HttpService();
+    const service = new Service();
     service.addFunction(hello);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
     const client = new Client('http://127.0.0.1:8080/');
     const proxy = await client.useServiceAsync();
@@ -32,10 +34,12 @@ test('test headers', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new HttpService();
+    const service = new Service();
     service.addFunction(hello);
     service.use(serviceHandler);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
     const client = new Client('http://127.0.0.1:8080/');
     client.use(clientHandler);
@@ -52,10 +56,12 @@ test('test push', async() => {
     //     console.log(ByteStream.toString(response));
     //     return response;
     // };
-    const service = new HttpService();
+    const service = new Service();
     service.use(new Broker(service).handler);
     // service.use(logHandler);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
     const client1 = new Client('http://127.0.0.1:8080/');
     // client1.use(logHandler);
@@ -93,11 +99,14 @@ test('test server push', async() => {
         cxt.producer.push('hello', 'test');
         return 'hello ' + name;
     }
-    const service = new HttpService();
+    const service = new Service();
+    // service.use(logHandler);
     const broker = new Broker(service);
     service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
     const client = new Client('http://127.0.0.1:8080/');
     const prosumer = new Prosumer(client, '1');
@@ -130,10 +139,12 @@ test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new HttpService();
+    const service = new Service();
     service.maxRequestLength = 10;
     service.addFunction(hello);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
     const client = new Client('http://127.0.0.1:8080/');
     const proxy = await client.useServiceAsync();
@@ -156,11 +167,13 @@ test('test reverse RPC', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
     }
-    const service = new HttpService();
+    const service = new Service();
     const caller = new Caller(service);
     service.use(caller.handler);
     // service.use(logHandler);
-    const server = http.createServer(service.httpHandler);
+    const server = http.createServer();
+    const listener = new HttpListener(service, server);
+    listener.crossDomain = true;
     server.listen(8080);
 
     const client = new Client('http://127.0.0.1:8080/');

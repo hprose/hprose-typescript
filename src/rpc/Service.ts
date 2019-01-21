@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 20, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
 import { MethodLike, Method } from './Method';
 import { MethodManager, MissingFunction } from './MethodManager';
 
-export abstract class Service {
+export class Service {
     public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
     public timeout: number = 300000;
     public debug: boolean = false;

@@ -8,28 +8,36 @@
 |                                                          |
 | hprose SocketService for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 16, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Socket } from 'net';
+import * as net from 'net';
 import { Service } from '../Service';
 import { ServiceContext } from '../ServiceContext';
 import { crc32 } from '../Utils';
 import { writeInt32BE, ByteStream } from '../../hprose.io';
 
 export class SocketServiceContext extends ServiceContext {
-    constructor(service: Service, public socket: Socket) {
+    constructor(service: Service, public socket: net.Socket) {
         super(service);
     }
 }
 
-export class SocketService extends Service {
+export class SocketListener {
     public onaccept?: () => void;
     public onclose?: () => void;
     public onerror?: (error: Error) => void;
-    private send(socket: Socket, response: Uint8Array, index: number): void {
+    constructor(public readonly service: Service, server?: net.Server) {
+        if (server) {
+            server.on('connection', this.listener);
+            server.on('error', (error: Error) => {
+                if (this.onerror) this.onerror(error);
+            });
+        }
+    }
+    private send(socket: net.Socket, response: Uint8Array, index: number): void {
         const n = response.length;
         const header = new Uint8Array(8);
         writeInt32BE(header, 0, n | 0x80000000);
@@ -42,12 +50,12 @@ export class SocketService extends Service {
         response = outstream.takeBytes();
         socket.write(Buffer.from(response.buffer, response.byteOffset, response.length));
     }
-    private async run(socket: Socket, request: Uint8Array, index: number): Promise<void> {
-        const context = new SocketServiceContext(this, socket);
-        const response = await this.handle(request, context);
+    private async run(socket: net.Socket, request: Uint8Array, index: number): Promise<void> {
+        const context = new SocketServiceContext(this.service, socket);
+        const response = await this.service.handle(request, context);
         this.send(socket, response, index);
     }
-    private receive(socket: Socket): void {
+    private receive(socket: net.Socket): void {
         const instream = new ByteStream();
         const headerLength = 12;
         let bodyLength = -1;
@@ -67,7 +75,7 @@ export class SocketService extends Service {
                     }
                     instream.reset();
                     bodyLength = instream.readInt32BE() & 0x7FFFFFFF;
-                    if (bodyLength > this.maxRequestLength) {
+                    if (bodyLength > this.service.maxRequestLength) {
                         socket.removeListener('data', ondata);
                         socket.destroy(new Error('request too large'));
                         return;
@@ -86,7 +94,7 @@ export class SocketService extends Service {
         };
         socket.on('data', ondata);
     }
-    public socketHandler = (socket: Socket): void => {
+    public listener = (socket: net.Socket): void => {
         try {
             if (this.onaccept) this.onaccept();
         }
@@ -100,7 +108,6 @@ export class SocketService extends Service {
         socket.on('error', (error) => {
             if (this.onerror) this.onerror(error);
         });
-        socket.setTimeout(this.timeout);
         this.receive(socket);
     }
 }
