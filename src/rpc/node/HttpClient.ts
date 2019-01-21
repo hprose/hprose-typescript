@@ -8,7 +8,7 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 15, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,6 +17,7 @@ import { parse } from 'url';
 import * as http from 'http';
 import * as https from 'https';
 import { Client } from '../Client';
+import { Transport } from '../Transport';
 import { Context } from '../Context';
 import { ClientContext } from '../ClientContext';
 import { TimeoutError } from '../TimeoutError';
@@ -28,11 +29,11 @@ export interface HttpClientContext extends ClientContext {
     httpResponseHeaders?: http.IncomingHttpHeaders;
 }
 
-export class HttpClient extends Client {
+export class HttpTransport implements Transport {
     private counter: number = 0;
-    private requests: { [id: number]: http.ClientRequest } = Object.create(null);
+    private requests: { [index: number]: http.ClientRequest } = Object.create(null);
     public keepAlive: boolean = true;
-    public readonly options: https.RequestOptions = Object.create(null);
+    public options: https.RequestOptions = Object.create(null);
     public readonly httpRequestHeaders: http.OutgoingHttpHeaders = Object.create(null);
     private getRequestHeader(httpRequestHeaders?: http.OutgoingHttpHeaders): http.OutgoingHttpHeaders {
         const headers: http.OutgoingHttpHeaders = Object.create(null);
@@ -75,7 +76,7 @@ export class HttpClient extends Client {
             options.headers['Cookie'] = cookie;
         }
         return new Promise<Uint8Array>((resolve, reject) => {
-            const id = this.counter++;
+            const index = this.counter++;
             const req = client.request(options, (res: http.IncomingMessage) => {
                 const size = res.headers['content-length'];
                 const instream = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
@@ -83,7 +84,7 @@ export class HttpClient extends Client {
                     instream.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
                 });
                 res.on('end', () => {
-                    delete this.requests[id];
+                    delete this.requests[index];
                     if (res.statusCode) {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
                             (context as HttpClientContext).httpResponseHeaders = res.headers;
@@ -97,33 +98,41 @@ export class HttpClient extends Client {
                     }
                 });
                 res.on('error', (err) => {
-                    delete this.requests[id];
+                    delete this.requests[index];
                     reject(err);
                 });
             });
-            this.requests[id] = req;
+            this.requests[index] = req;
             req.shouldKeepAlive = this.keepAlive;
-            req.setTimeout(this.timeout, () => {
-                delete this.requests[id];
-                reject(new TimeoutError('timeout'));
+            req.setTimeout(context.timeout, () => {
+                delete this.requests[index];
+                reject(new TimeoutError());
             });
             req.on('error', (err) => {
-                delete this.requests[id];
+                delete this.requests[index];
                 reject(err);
             });
             req.on('abort', () => {
-                delete this.requests[id];
+                delete this.requests[index];
                 reject(new Error('transport abort'));
             });
             req.end(Buffer.from(request.buffer, 0, request.length));
         });
     }
-    public abort(): void {
-        for (const id in this.requests) {
-            if (this.requests[id]) {
-                this.requests[id].abort();
+    public async abort(): Promise<void> {
+        for (const index in this.requests) {
+            const request = this.requests[index];
+            delete this.requests[index];
+            if (request) {
+                request.abort();
             }
-            delete this.requests[id];
         }
     }
+}
+
+
+Client.register('http', HttpTransport, ['http:', 'https:']);
+
+export interface HttpClient extends Client {
+    http: HttpTransport;
 }

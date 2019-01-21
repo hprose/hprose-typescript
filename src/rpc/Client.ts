@@ -19,7 +19,8 @@ import { DefaultClientCodec } from './codec/DefaultClientCodec';
 import { Context } from './Context';
 import { ClientContext } from './ClientContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
-import { normalize } from './Utils';
+import { Transport, TransportConstructor } from './Transport';
+import { normalize, parseURI } from './Utils';
 
 function makeInvoke(client: Client, fullname: string): () => Promise<any> {
     return function (): Promise<any> {
@@ -87,7 +88,13 @@ export interface ClientSettings {
     codec?: ClientCodec;
 }
 
-export abstract class Client {
+export class Client {
+    private static transports: { name: string, ctor: TransportConstructor }[] = [];
+    private static protocols: { [protocol: string]: string } = Object.create(null);
+    public static register(name: string, ctor: TransportConstructor, protocols: string[]): void {
+        Client.transports.push({ name, ctor });
+        protocols.forEach((protocol) => Client.protocols[protocol] = name);
+    }
     public readonly settings: { [fullname: string]: Settings } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public timeout: number = 30000;
@@ -98,8 +105,22 @@ export abstract class Client {
     public nullType: undefined | null = undefined;
     public codec: ClientCodec = DefaultClientCodec.instance;
     private urilist: string[] = [];
+    private readonly transports: { [name: string]: Transport } = Object.create(null);
     private readonly handlerManager: HandlerManager = new HandlerManager(this.call.bind(this), this.transport.bind(this));
     constructor(uri?: string | string[], settings?: ClientSettings) {
+        Client.transports.forEach(({ name, ctor }) => {
+            let transport = new ctor();
+            this.transports[name] = transport;
+            Object.defineProperty(this, name, {
+                get: () => transport,
+                set: (value) => {
+                    transport = value;
+                    this.transports[name] = value;
+                },
+                enumerable: false,
+                configurable: false
+            });
+        });
         if (uri) {
             if (typeof uri === 'string') {
                 this.urilist.push(uri);
@@ -182,5 +203,19 @@ export abstract class Client {
         const response = await ioHandler(request, context);
         return codec.decode(response, context as ClientContext);
     }
-    public abstract async transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+    public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
+        const uri = parseURI(context.uri);
+        const name = Client.protocols[uri.protocol];
+        if (name !== undefined) {
+            return this.transports[name].transport(request, context);
+        }
+        throw new Error(`The protocol "${uri.protocol}" is not supported.`);
+    }
+    public async abort(): Promise<void> {
+        const results = [];
+        for (const name in this.transports) {
+            results.push(this.transports[name].abort());
+        }
+        await Promise.all(results);
+    }
 }

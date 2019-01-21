@@ -14,6 +14,7 @@
 \*________________________________________________________*/
 
 export interface Settings {
+    timeout?: number;
     simple?: boolean;
     utc?: boolean;
     longType?: 'number' | 'bigint' | 'string';

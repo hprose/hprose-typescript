@@ -8,15 +8,16 @@
 |                                                          |
 | hprose HttpClient for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 10, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Client } from '../Client';
+import { Transport } from '../Transport';
 import { Context } from '../Context';
 import { TimeoutError } from '../TimeoutError';
 import { ClientContext } from '../ClientContext';
+import { Client } from '../Client';
 
 export interface HttpClientContext extends ClientContext {
     httpRequestHeaders?: { [name: string]: string | string[] };
@@ -47,9 +48,9 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
     return httpHeaders;
 }
 
-export class HttpClient extends Client {
+export class HttpTransport implements Transport {
     private counter: number = 0;
-    private requests: { [id: number]: XMLHttpRequest } = Object.create(null);
+    private requests: { [index: number]: XMLHttpRequest } = Object.create(null);
     public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
     private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
@@ -73,23 +74,24 @@ export class HttpClient extends Client {
         return headers;
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
-        const id = this.counter++;
+        const index = this.counter++;
         const xhr = new XMLHttpRequest();
-        const client = this;
-        this.requests[id] = xhr;
+        const self = this;
+        this.requests[index] = xhr;
         let httpRequestHeaders = this.getRequestHeaders((context as HttpClientContext).httpRequestHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
+            xhr.upload.onprogress = xhr.onprogress = this.onprogress;
             xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
-                delete client.requests[id];
+                delete self.requests[index];
                 reject(new Error('network error'));
             };
             xhr.upload.onabort = xhr.onabort = function (this: XMLHttpRequest, ev: ProgressEvent): any {
-                delete client.requests[id];
+                delete self.requests[index];
                 reject(new Error('transport abort'));
             };
             xhr.upload.ontimeout = xhr.ontimeout = function (this: XMLHttpRequest, ev: ProgressEvent): any {
-                delete client.requests[id];
-                reject(new TimeoutError('timeout'));
+                delete self.requests[index];
+                reject(new TimeoutError());
             };
             xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
                 switch (this.readyState) {
@@ -111,7 +113,7 @@ export class HttpClient extends Client {
                         (context as HttpClientContext).httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
                         break;
                     case this.DONE:
-                        delete client.requests[id];
+                        delete self.requests[index];
                         if (this.status >= 200 && this.status < 300) {
                             resolve(new Uint8Array(this.response));
                         } else {
@@ -124,17 +126,22 @@ export class HttpClient extends Client {
         xhr.open('POST', context.uri, true);
         xhr.withCredentials = true;
         xhr.responseType = 'arraybuffer';
-        xhr.timeout = this.timeout;
-        xhr.upload.onprogress = xhr.onprogress = this.onprogress;
+        xhr.timeout = context.timeout;
         return result;
     }
-    public abort(): void {
-        for (const id in this.requests) {
-            if (this.requests[id]) {
-                this.requests[id].abort();
+    public async abort(): Promise<void> {
+        for (const index in this.requests) {
+            const request = this.requests[index];
+            delete this.requests[index];
+            if (request) {
+                request.abort();
             }
-            delete this.requests[id];
         }
     }
+}
 
+Client.register('http', HttpTransport, ['', 'http:', 'https:']);
+
+export interface HttpClient extends Client {
+    http: HttpTransport;
 }

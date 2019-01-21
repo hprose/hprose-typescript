@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Broker for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 15, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -101,7 +101,7 @@ export class Broker {
                     if (timer) timer.resolve();
                     timer = defer();
                     const timeoutId = setTimeout(() => {
-                        timer.reject(new TimeoutError('timeout'));
+                        timer.reject(new TimeoutError());
                     }, this.heartbeat);
                     timer.promise.then(() => {
                         clearTimeout(timeoutId);

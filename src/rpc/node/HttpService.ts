@@ -8,7 +8,7 @@
 |                                                          |
 | hprose HttpService for TypeScript.                       |
 |                                                          |
-| LastModified: Jan 15, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -166,7 +166,7 @@ export class HttpService extends Service {
             return Promise.resolve();
         }
         request.setTimeout(this.timeout, () => {
-            request.destroy(new TimeoutError('timeout'));
+            request.destroy(new TimeoutError());
         });
         return new Promise<void>((resolve, reject) => {
             const instream = size ? new ByteStream(size) : new ByteStream();

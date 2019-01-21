@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, SocketService, SocketClient } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, SocketService, Client } from '../../src/hprose.node';
 // import { ByteStream } from '../../src/hprose.io';
 
 test('test hello world rpc', async () => {
@@ -10,7 +10,7 @@ test('test hello world rpc', async () => {
     service.addFunction(hello);
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
-    const client = new SocketClient('tcp://127.0.0.1');
+    const client = new Client('tcp://127.0.0.1');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
@@ -38,7 +38,7 @@ test('test headers', async () => {
     service.use(serviceHandler);
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
-    const client = new SocketClient('tcp://127.0.0.1');
+    const client = new Client('tcp://127.0.0.1');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -58,10 +58,10 @@ test('test push', async() => {
     // service.use(logHandler);
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
-    const client1 = new SocketClient('tcp://127.0.0.1');
+    const client1 = new Client('tcp://127.0.0.1');
     // client1.use(logHandler);
     const prosumer1 = new Prosumer(client1, '1');
-    const client2 = new SocketClient('tcp://127.0.0.1');
+    const client2 = new Client('tcp://127.0.0.1');
     // client2.use(logHandler);
     const prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) => {
@@ -100,7 +100,7 @@ test('test server push', async() => {
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
-    const client = new SocketClient('tcp://127.0.0.1');
+    const client = new Client('tcp://127.0.0.1');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
         // console.log(`${ topic } is subscribe.`);
@@ -136,7 +136,7 @@ test('test maxRequestLength', async () => {
     service.addFunction(hello);
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
-    const client = new SocketClient('tcp://127.0.0.1');
+    const client = new Client('tcp://127.0.0.1');
     const proxy = await client.useServiceAsync();
     try {
         await proxy.hello('world');
@@ -164,7 +164,7 @@ test('test reverse RPC', async () => {
     const server = net.createServer(service.socketHandler);
     server.listen(8412);
 
-    const client = new SocketClient('tcp://127.0.0.1');
+    const client = new Client('tcp://127.0.0.1');
     const provider = new Provider(client, '1');
     provider.addFunction(hello);
     provider.boot();

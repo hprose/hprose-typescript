@@ -4,15 +4,22 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/TimeoutError.ts                               |
+| hprose/rpc/Transport.ts                                  |
 |                                                          |
-| TimeoutError for TypeScript.                             |
+| Transport for TypeScript.                                |
 |                                                          |
-| LastModified: Dec 26, 2018                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export class TimeoutError extends Error {
-    constructor(message: string = 'timeout') { super(message); }
+import { Context } from './Context';
+
+export interface Transport {
+    transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+    abort(): Promise<void>;
+}
+
+export interface TransportConstructor {
+    new(): Transport
 }

@@ -24,6 +24,7 @@ export class ClientContext implements Context {
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     public uri: string;
+    public timeout: number;
     public simple: boolean;
     public utc: boolean;
     public longType: 'number' | 'bigint' | 'string';
@@ -41,6 +42,7 @@ export class ClientContext implements Context {
                     ? defaultSettings[name]
                     : defaultValue;
         };
+        this.timeout = getValue('timeout', client.timeout);
         this.simple = getValue('simple', client.simple);
         this.utc = getValue('utc', client.utc);
         this.longType = getValue('longType', client.longType);

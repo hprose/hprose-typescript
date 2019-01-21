@@ -4,11 +4,11 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose.browser.ts                                        |
+| hprose.html5.ts                                          |
 |                                                          |
-| hprose on browser for TypeScript.                        |
+| hprose on html5 browser or application for TypeScript.   |
 |                                                          |
-| LastModified: Jan 19, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -40,5 +40,5 @@ import * as Oneway from './rpc/plugins/Oneway';
 
 export { Cluster, LoadBalancer, Oneway };
 
-export { HttpClient, HttpClientContext } from './rpc/browser/HttpClient';
-export { WebSocketClient } from './rpc/node/WebSocketClient';
+export { HttpTransport, HttpClient, HttpClientContext } from './rpc/html5/HttpClient';
+export { WebSocketTransport, WebSocketClient } from './rpc/html5/WebSocketClient';

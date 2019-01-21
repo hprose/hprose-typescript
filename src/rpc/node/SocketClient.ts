@@ -8,7 +8,7 @@
 |                                                          |
 | hprose SocketClient for TypeScript.                      |
 |                                                          |
-| LastModified: Jan 17, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -18,18 +18,19 @@ import * as tls from 'tls';
 import { ByteStream, writeInt32BE } from '../../hprose.io';
 import { parse } from 'url';
 import { Client } from '../Client';
+import { Transport } from '../Transport';
 import { Context } from '../Context';
 import { defer, Deferred } from '../Deferred';
 import { crc32 } from '../Utils';
 import { TimeoutError } from '../TimeoutError';
 
-export class SocketClient extends Client {
+export class SocketTransport implements Transport {
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private sockets: { [uri: string]: Promise<net.Socket> } = Object.create(null);
     public noDelay: boolean = true;
     public keepAlive: boolean = true;
-    public readonly options: tls.SecureContextOptions = Object.create(null);
+    public options: tls.SecureContextOptions = Object.create(null);
     private connect(uri: string): net.Socket {
         const parser = parse(uri);
         const protocol = parser.protocol;
@@ -44,7 +45,6 @@ export class SocketClient extends Client {
             case 'ssl4:':
             case 'ssl6:': {
                 const options: net.TcpNetConnectOpts = Object.create(null);
-                options.timeout = this.timeout;
                 options.host = parser.hostname;
                 options.port = parser.port ? parseInt(parser.port, 10) : 8412;
                 switch (protocol) {
@@ -70,15 +70,16 @@ export class SocketClient extends Client {
                     default: {
                         const tlsOptions: tls.ConnectionOptions = options;
                         for (const key in this.options) {
-                            (tlsOptions as any)[key] = (this.options as any)[key];
+                            if (this.options.hasOwnProperty && this.options.hasOwnProperty(key)) {
+                                (tlsOptions as any)[key] = (this.options as any)[key];
+                            }
                         }
-                        return tls.connect(options);
+                        return tls.connect(tlsOptions);
                     }
                 }
             }
             case 'unix': {
                 const options: net.IpcNetConnectOpts = Object.create(null);
-                options.timeout = this.timeout;
                 if (parser.path) {
                     options.path = parser.path;
                 } else {
@@ -154,9 +155,6 @@ export class SocketClient extends Client {
             delete this.sockets[uri];
         };
         socket.on('error', onerror);
-        socket.on('timeout', () => {
-            onerror(new TimeoutError('timeout'));
-        });
         socket.on('close', (had_error: boolean) => {
             if (had_error) return;
             onerror(new Error('connection closed'));
@@ -166,13 +164,24 @@ export class SocketClient extends Client {
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const uri: string = context.uri;
-        const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
-        const result = defer<Uint8Array>();
-        const socket: net.Socket = await this.getSocket(uri);
         if (this.results[uri] === undefined) {
             this.results[uri] = Object.create(null);
         }
+        const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
+        const result = defer<Uint8Array>();
         this.results[uri][index] = result;
+        if (context.timeout > 0) {
+            const timeoutId = setTimeout(() => {
+                delete this.results[uri][index];
+                result.reject(new TimeoutError());
+            }, context.timeout);
+            result.promise.then(() => {
+                clearTimeout(timeoutId);
+            }, () => {
+                clearTimeout(timeoutId);
+            });
+        }
+        const socket: net.Socket = await this.getSocket(uri);
         const n = request.length;
         const header = new Uint8Array(8);
         writeInt32BE(header, 0, n | 0x80000000);
@@ -188,10 +197,17 @@ export class SocketClient extends Client {
     }
     public async abort(): Promise<void> {
         for (const uri in this.sockets) {
-            if (this.sockets[uri]) {
-                (await this.sockets[uri]).end();
-            }
+            const sockets = this.sockets[uri];
             delete this.sockets[uri];
+            if (sockets) {
+                (await sockets).end();
+            }
         }
     }
+}
+
+Client.register('socket', SocketTransport, ['tcp:', 'tcp4:', 'tcp6:', 'tls:', 'tls4:', 'tls6:', 'ssl:', 'ssl4:', 'ssl6:', 'unix:']);
+
+export interface SocketClient extends Client {
+    socket: SocketTransport;
 }

@@ -8,17 +8,19 @@
 |                                                          |
 | hprose WebSocketClient for TypeScript.                   |
 |                                                          |
-| LastModified: Jan 19, 2019                               |
+| LastModified: Jan 21, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { Client } from '../Client';
+import { Transport } from '../Transport';
 import { Context } from '../Context';
 import { ByteStream } from '../../hprose.io';
 import { defer, Deferred } from '../Deferred';
+import { TimeoutError } from '../TimeoutError';
 
-export class WebSocketClient extends Client {
+export class WebSocketTransport implements Transport {
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private websockets: { [uri: string]: Promise<WebSocket> } = Object.create(null);
@@ -47,8 +49,8 @@ export class WebSocketClient extends Client {
             if (results) {
                 for (const index in results) {
                     const result = results[index];
-                    result.reject(error);
                     delete results[index];
+                    result.reject(error);
                 }
             }
             delete this.websockets[uri];
@@ -73,6 +75,17 @@ export class WebSocketClient extends Client {
             this.results[uri] = Object.create(null);
         }
         this.results[uri][index] = result;
+        if (context.timeout > 0) {
+            const timeoutId = setTimeout(() => {
+                delete this.results[uri][index];
+                result.reject(new TimeoutError());
+            }, context.timeout);
+            result.promise.then(() => {
+                clearTimeout(timeoutId);
+            }, () => {
+                clearTimeout(timeoutId);
+            });
+        }
         const outstream = new ByteStream(4 + request.length);
         outstream.writeInt32BE(index);
         outstream.write(request);
@@ -88,10 +101,17 @@ export class WebSocketClient extends Client {
     }
     public async abort(): Promise<void> {
         for (const uri in this.websockets) {
-            if (this.websockets[uri]) {
-                (await this.websockets[uri]).close(1000);
-            }
+            const websocket = this.websockets[uri];
             delete this.websockets[uri];
+            if (websocket) {
+                (await websocket).close(1000);
+            }
         }
     }
+}
+
+Client.register('websocket', WebSocketTransport, ['ws:', 'wss:']);
+
+export interface WebSocketClient extends Client {
+    websocket: WebSocketTransport;
 }

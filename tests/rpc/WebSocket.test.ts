@@ -1,6 +1,6 @@
 import * as http from 'http';
 import WebSocket from 'ws';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, WebSocketService, WebSocketClient } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, WebSocketService, Client } from '../../src/hprose.node';
 
 test('test hello world rpc on websocket', async () => {
     function hello(name: string): string {
@@ -15,7 +15,7 @@ test('test hello world rpc on websocket', async () => {
     server.listen(8089);
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
-    const client = new WebSocketClient('ws://127.0.0.1:8089');
+    const client = new Client('ws://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
@@ -46,7 +46,7 @@ test('test headers', async () => {
     server.listen(8089);
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
-    const client = new WebSocketClient('http://127.0.0.1:8089');
+    const client = new Client('ws://127.0.0.1:8089');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -68,10 +68,10 @@ test('test push', async() => {
     server.listen(8089);
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
-    const client1 = new WebSocketClient('http://127.0.0.1:8089');
+    const client1 = new Client('ws://127.0.0.1:8089');
     // client1.use(logHandler);
     const prosumer1 = new Prosumer(client1, '1');
-    const client2 = new WebSocketClient('http://127.0.0.1:8089');
+    const client2 = new Client('ws://127.0.0.1:8089');
     // client2.use(logHandler);
     const prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) => {
@@ -112,7 +112,7 @@ test('test server push', async() => {
     server.listen(8089);
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
-    const client = new WebSocketClient('http://127.0.0.1:8089');
+    const client = new Client('ws://127.0.0.1:8089');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
         // console.log(`${ topic } is subscribe.`);
@@ -150,7 +150,7 @@ test('test maxRequestLength', async () => {
     server.listen(8089);
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
-    const client = new WebSocketClient('http://127.0.0.1:8089');
+    const client = new Client('ws://127.0.0.1:8089');
     const proxy = await client.useServiceAsync();
     try {
         await proxy.hello('world');
@@ -180,7 +180,7 @@ test('test reverse RPC', async () => {
     const wsserver = new WebSocket.Server({server});
     service.websocketHandler(wsserver);
 
-    const client = new WebSocketClient('http://127.0.0.1:8089');
+    const client = new Client('ws://127.0.0.1:8089');
     const provider = new Provider(client, '1');
     provider.addFunction(hello);
     provider.boot();

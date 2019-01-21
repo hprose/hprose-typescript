@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, HttpService, HttpClient } from '../../src/hprose.node';
+import { Context, NextInvokeHandler, Broker, Prosumer, BrokerContext, Caller, Provider, HttpService, Client } from '../../src/hprose.node';
 
 test('test hello world rpc', async () => {
     function hello(name: string): string {
@@ -9,7 +9,7 @@ test('test hello world rpc', async () => {
     service.addFunction(hello);
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
-    const client = new HttpClient('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8080/');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
@@ -37,7 +37,7 @@ test('test headers', async () => {
     service.use(serviceHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
-    const client = new HttpClient('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8080/');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -57,10 +57,10 @@ test('test push', async() => {
     // service.use(logHandler);
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
-    const client1 = new HttpClient('http://127.0.0.1:8080/');
+    const client1 = new Client('http://127.0.0.1:8080/');
     // client1.use(logHandler);
     const prosumer1 = new Prosumer(client1, '1');
-    const client2 = new HttpClient('http://127.0.0.1:8080/');
+    const client2 = new Client('http://127.0.0.1:8080/');
     // client2.use(logHandler);
     const prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) => {
@@ -99,7 +99,7 @@ test('test server push', async() => {
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
-    const client = new HttpClient('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8080/');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
         // console.log(`${ topic } is subscribe.`);
@@ -135,7 +135,7 @@ test('test maxRequestLength', async () => {
     service.addFunction(hello);
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
-    const client = new HttpClient('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8080/');
     const proxy = await client.useServiceAsync();
     try {
         await proxy.hello('world');
@@ -163,7 +163,7 @@ test('test reverse RPC', async () => {
     const server = http.createServer(service.httpHandler);
     server.listen(8080);
 
-    const client = new HttpClient('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8080/');
     const provider = new Provider(client, '1');
     provider.addFunction(hello);
     provider.boot();
