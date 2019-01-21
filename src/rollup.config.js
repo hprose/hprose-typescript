@@ -26,6 +26,18 @@ export default [
         ]
     },
     {
+        input: "./hprose.wx.ts",
+        output: {
+            format: "es",
+            file: '../dist/hprose.wx.js',
+            sourcemap: true,
+            banner: "/* eslint-disable */",
+        },
+        plugins: [
+            typescript(),
+        ]
+    },
+    {
         input: "./hprose.node.ts",
         output: {
             format: "es",

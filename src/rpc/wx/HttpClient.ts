@@ -13,11 +13,11 @@
 |                                                          |
 \*________________________________________________________*/
 
+import { ByteStream } from '../../hprose.io';
+import { Client } from '../Client';
 import { Transport } from '../Transport';
 import { Context } from '../Context';
 import { ClientContext } from '../ClientContext';
-import { Client } from '../Client';
-import { ByteStream } from '../../hprose.io';
 import { TimeoutError } from '../TimeoutError';
 
 export interface HttpClientContext extends ClientContext {
