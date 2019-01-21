@@ -92,10 +92,8 @@ export class WebSocketTransport implements Transport {
         const message = outstream.takeBytes();
         if (ArrayBuffer.isView) {
             websocket.send(message);
-        } else if (message.buffer.slice) {
-            websocket.send(message.buffer.slice(0, message.length));
         } else {
-            websocket.send(message);
+            websocket.send(message.buffer);
         }
         return result.promise;
     }

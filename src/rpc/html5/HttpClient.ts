@@ -99,7 +99,7 @@ export class HttpTransport implements Transport {
                         if (ArrayBuffer.isView) {
                             this.send(request);
                         } else if (request.buffer.slice) {
-                            this.send(request.buffer.slice(0, request.length));
+                            this.send(request.buffer.slice(request.byteOffset, request.length));
                         } else {
                             const bytes = new Uint8Array(request.length);
                             bytes.set(request);
