@@ -22,8 +22,8 @@ export class JsonRpcClientCodec implements ClientCodec {
     private counter: number = 0;
     public encode(name: string, args: any[], context: ClientContext): Uint8Array {
         const request: any = {
-            id: this.counter++,
             jsonrpc: '2.0',
+            id: this.counter++,
             method: name
         };
         if (args.length > 0) {

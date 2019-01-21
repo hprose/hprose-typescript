@@ -63,6 +63,7 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         if (call.jsonrpc !== '2.0' || !('method' in call) || !('id' in call)) {
             throw new Error('Invalid Request');
         }
+        context['jsonrpc.id'] = call.id;
         const fullname = call.method;
         const method = this.decodeMethod(fullname, context);
         const args = call.params ? call.params : [];
