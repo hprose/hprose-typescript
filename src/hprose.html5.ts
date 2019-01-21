@@ -29,6 +29,7 @@ export { TimeoutError } from './rpc/TimeoutError';
 export { URI, parseURI, copy, promisify, normalize, crc32 } from './rpc/Utils';
 
 export { DefaultClientCodec } from './rpc/codec/DefaultClientCodec';
+export { JsonRpcClientCodec } from './rpc/codec/JsonRpcClientCodec';
 
 export { Message } from './rpc/plugins/Message';
 export { Prosumer } from './rpc/plugins/Prosumer';

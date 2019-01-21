@@ -34,6 +34,8 @@ export { ServiceContext } from './rpc/ServiceContext';
 
 export { DefaultClientCodec } from './rpc/codec/DefaultClientCodec';
 export { DefaultServiceCodec } from './rpc/codec/DefaultServiceCodec';
+export { JsonRpcClientCodec } from './rpc/codec/JsonRpcClientCodec';
+export { JsonRpcServiceCodec } from './rpc/codec/JsonRpcServiceCodec';
 
 export { Message } from './rpc/plugins/Message';
 export { Prosumer } from './rpc/plugins/Prosumer';

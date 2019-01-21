@@ -92,7 +92,8 @@ export class DefaultServiceCodec implements ServiceCodec {
         const stream = new ByteStream(request);
         const reader = new Reader(stream, false);
         if (request.length === 0) {
-            return ['~', this.decodeMethod('~', context).passContext ? [context] : []];
+            this.decodeMethod('~', context);
+            return ['~', []];
         }
         reader.longType = service.longType;
         reader.dictType = service.dictType;
@@ -111,7 +112,8 @@ export class DefaultServiceCodec implements ServiceCodec {
                 const args = this.decodeArguments(this.decodeMethod(fullname, context), reader, context);
                 return [fullname, args];
             case Tags.TagEnd:
-                return ['~', this.decodeMethod('~', context).passContext ? [context] : []];
+                this.decodeMethod('~', context);
+                return ['~', []];
             default:
                 throw new Error('Invalid request:\r\n' + stream.toString());
         }

@@ -42,10 +42,10 @@ export class Service {
     }
     public async process(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const codec = this.codec;
-        const [ fullname, args ] = codec.decode(request, context as ServiceContext);
-        const invokeHandler = this.handlerManager.invokeHandler;
         let result: any;
         try {
+            const [ fullname, args ] = codec.decode(request, context as ServiceContext);
+            const invokeHandler = this.handlerManager.invokeHandler;
             result = await invokeHandler(fullname, args, context);
         }
         catch(e) {
