@@ -1,7 +1,7 @@
 {
-  "name": "@hprose/rpc-plugin-push",
+  "name": "@hprose/rpc-plugin-reverse",
   "version": "3.0.0",
-  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-push",
+  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-reverse",
   "description": "hprose for TypeScript",
   "author": {
     "name": "Ma Bingyao",
@@ -10,7 +10,7 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-push",
+  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-reverse",
   "bugs": {
     "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
