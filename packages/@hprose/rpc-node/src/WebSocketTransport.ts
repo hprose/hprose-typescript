@@ -22,6 +22,7 @@ export class WebSocketTransport implements Transport {
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private websockets: { [uri: string]: Promise<WebSocket> } = Object.create(null);
     public options: WebSocket.ClientOptions = Object.create(null);
+    public compress: boolean = false;
     private async connect(uri: string): Promise<WebSocket> {
         let websocket = await this.websockets[uri];
         if (websocket !== undefined
@@ -88,7 +89,10 @@ export class WebSocketTransport implements Transport {
         const outstream = new ByteStream(4 + request.length);
         outstream.writeInt32BE(index);
         outstream.write(request);
-        websocket.send(outstream.takeBytes(), { binary: true }, (error?: Error) => {
+        websocket.send(outstream.takeBytes(), {
+            binary: true,
+            compress: this.compress
+        }, (error?: Error) => {
             if (error) {
                 result.reject(error);
                 delete this.results[uri][index];

@@ -25,6 +25,7 @@ export class WebSocketServiceContext extends ServiceContext {
 }
 
 export class WebSocketHandler {
+    public compress: boolean = false;
     public onaccept?: () => void;
     public onclose?: () => void;
     public onerror?: (error: Error) => void;
@@ -62,7 +63,7 @@ export class WebSocketHandler {
             outstream.write(result);
             websocket.send(outstream.toBytes(), {
                 binary: true,
-                compress: false
+                compress: this.compress,
             }, (error) => {
                 if (error) {
                     if (this.onerror) this.onerror(error);

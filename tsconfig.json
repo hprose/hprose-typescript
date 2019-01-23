@@ -6,7 +6,7 @@
 				"./*/src/"
 			]
 		},
-        "target": "es2015",
+        "target": "es5",
         "module": "commonjs",
         "lib": [
             "dom",
