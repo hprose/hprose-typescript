@@ -1,7 +1,7 @@
 {
   "name": "@hprose/rpc-node",
   "version": "3.0.0",
-  "homepage": "https://github.com/hprose/hprose-typescript",
+  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-node",
   "description": "hprose for TypeScript",
   "author": {
     "name": "Ma Bingyao",
@@ -10,10 +10,7 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hprose/hprose-typescript"
-  },
+  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-node",
   "bugs": {
     "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
