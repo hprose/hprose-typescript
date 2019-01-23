@@ -1,6 +1,6 @@
 {
-  "name": "hprose",
-  "private": true,
+  "name": "@hprose/rpc-wx",
+  "version": "3.0.0",
   "homepage": "https://github.com/hprose/hprose-typescript",
   "description": "hprose for TypeScript",
   "author": {
@@ -8,6 +8,8 @@
     "email": "mabingyao@gmail.com",
     "url": "http://hprose.com/"
   },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/hprose/hprose-typescript"
@@ -16,17 +18,24 @@
     "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
   },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "compile": "tsc -b tsconfig.json",
+    "prepublish": "npm run compile"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "tslint": "^5.12.0",
-    "typescript": "^3.2.2",
-    "lerna": "^3.10.6"
+    "typescript": "^3.2.2"
   },
-  "workspaces": [
-    "packages/@hprose/*"
+  "dependencies": {
+    "@hprose/io": "^3.0.0",
+    "@hprose/rpc-core": "^3.0.0"
+  },
+  "files": [
+    "./lib/"
   ]
 }
