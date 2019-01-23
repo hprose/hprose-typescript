@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/node/SocketHandler.ts                         |
+| SocketHandler.ts                                         |
 |                                                          |
-| hprose SocketHandler for TypeScript.                     |
+| SocketHandler for TypeScript.                            |
 |                                                          |
 | LastModified: Jan 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |

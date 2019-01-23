@@ -6,9 +6,9 @@
 |                                                          |
 | WebSocketTransport.ts                                    |
 |                                                          |
-| hprose WebSocketTransport for TypeScript.                |
+| WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Jan 21, 2019                               |
+| LastModified: Jan 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

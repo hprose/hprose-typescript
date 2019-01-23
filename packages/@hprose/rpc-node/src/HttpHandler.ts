@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/node/HttpHandler.ts                           |
+| HttpHandler.ts                                           |
 |                                                          |
-| hprose HttpHandler for TypeScript.                       |
+| HttpHandler for TypeScript.                              |
 |                                                          |
 | LastModified: Jan 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |

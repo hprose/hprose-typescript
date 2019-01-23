@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/node/WebSocketHandler.ts                      |
+| WebSocketHandler.ts                                      |
 |                                                          |
-| hprose WebSocketHandler for TypeScript.                  |
+| WebSocketHandler for TypeScript.                         |
 |                                                          |
 | LastModified: Jan 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |

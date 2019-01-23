@@ -4,11 +4,11 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| hprose/rpc/codec/JsonRpcServiceCodec.ts                  |
+| JsonRpcServiceCodec.ts                                   |
 |                                                          |
 | JsonRpc ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 21, 2019                               |
+| LastModified: Jan 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
