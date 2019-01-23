@@ -12,8 +12,8 @@ test('test hello world rpc', async () => {
     const server = http.createServer();
     const wsserver = new WebSocket.Server({server});
     service.bind(wsserver);
-    server.listen(8089);
-    const client = new Client('ws://127.0.0.1:8089/');
+    server.listen(8087);
+    const client = new Client('ws://127.0.0.1:8087/');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
@@ -42,8 +42,8 @@ test('test headers', async () => {
     const server = http.createServer();
     const wsserver = new WebSocket.Server({server});
     service.bind(wsserver);
-    server.listen(8089);
-    const client = new Client('ws://127.0.0.1:8089/');
+    server.listen(8088);
+    const client = new Client('ws://127.0.0.1:8088/');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');

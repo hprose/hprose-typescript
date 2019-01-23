@@ -11,7 +11,7 @@ test('test hello world rpc', async () => {
     const server = net.createServer();
     service.bind(server);
     server.listen(8412);
-    const client = new Client('tcp://127.0.0.1:8412');
+    const client = new Client('tcp://127.0.0.1');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
@@ -39,8 +39,8 @@ test('test headers', async () => {
     service.use(serviceHandler);
     const server = net.createServer();
     service.bind(server);
-    server.listen(8412);
-    const client = new Client('tcp://127.0.0.1');
+    server.listen(8413);
+    const client = new Client('tcp://127.0.0.1:8413');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -57,8 +57,8 @@ test('test maxRequestLength', async () => {
     service.addFunction(hello);
     const server = net.createServer();
     service.bind(server);
-    server.listen(8412);
-    const client = new Client('tcp://127.0.0.1');
+    server.listen(8414);
+    const client = new Client('tcp://127.0.0.1:8414');
     const proxy = await client.useServiceAsync();
     try {
         await proxy.hello('world');

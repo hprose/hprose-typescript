@@ -33,7 +33,7 @@ export class Provider {
     public set id(value: string) {
         this.client.requestHeaders['id'] = value;
     }
-    public async boot(): Promise<void> {
+    public async listen(): Promise<void> {
         do {
             try {
                 const calls: [number, string, any[]][] = await this.client.invoke('!', [], { type: Array });
@@ -57,7 +57,14 @@ export class Provider {
                             results[i] = [id, undefined, debug ? e.stack ? e.stack : e.message : e.message];
                         }
                     }
-                    this.client.invoke('=', results.map((value) => Promise.all(value)));
+                    try {
+                        await this.client.invoke('=', results.map((value) => Promise.all(value)));
+                    }
+                    catch (e) {
+                        if (this.onerror) {
+                            this.onerror(e);
+                        }
+                    }
                 }, 0);
             }
             catch (e) {
@@ -66,6 +73,9 @@ export class Provider {
                 }
             }
         } while (true);
+    }
+    public async close(): Promise<void> {
+        await this.client.invoke('!!');
     }
     public add(method: MethodLike): this {
         this.methodManager.add(method);

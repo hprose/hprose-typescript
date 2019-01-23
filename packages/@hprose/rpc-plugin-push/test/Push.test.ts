@@ -1,26 +1,21 @@
 import * as http from 'http';
 import { Context, Service, Client } from '@hprose/rpc-core';
 import '@hprose/rpc-node';
+// import { logIOHandler, logInvokeHandler } from '@hprose/rpc-plugin-log';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
-    // const logHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
-    //     console.log(ByteStream.toString(request));
-    //     const response = await next(request, context);
-    //     console.log(ByteStream.toString(response));
-    //     return response;
-    // };
     const service = new Service();
     service.use(new Broker(service).handler);
-    // service.use(logHandler);
+    // service.use(logIOHandler);
     const server = http.createServer();
     service.bind(server);
     server.listen(8081);
     const client1 = new Client('http://127.0.0.1:8081/');
-    // client1.use(logHandler);
+    // client1.use(logInvokeHandler);
     const prosumer1 = new Prosumer(client1, '1');
     const client2 = new Client('http://127.0.0.1:8081/');
-    // client2.use(logHandler);
+    // client2.use(logInvokeHandler);
     const prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) => {
         // console.log(message);
@@ -40,6 +35,9 @@ test('test push', async() => {
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
             await prosumer1.unsubscribe('test');
+            await prosumer2.unsubscribe('test');
+            await prosumer1.unsubscribe('test2');
+            await prosumer2.unsubscribe('test2');
             server.close();
             resolve();
         }, 100);
@@ -53,14 +51,14 @@ test('test server push', async() => {
         return 'hello ' + name;
     }
     const service = new Service();
-    // service.use(logHandler);
+    // service.use(logIOHandler);
     const broker = new Broker(service);
     service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer();
     service.bind(server);
-    server.listen(8081);
-    const client = new Client('http://127.0.0.1:8081/');
+    server.listen(8082);
+    const client = new Client('http://127.0.0.1:8082/');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {
         // console.log(`${ topic } is subscribe.`);

@@ -83,13 +83,17 @@ export class Caller {
     public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     constructor(public service: Service) {
-        const invokeBegin = new Method(this.invokeBegin, '!', this);
-        invokeBegin.passContext = true;
-        this.service.add(invokeBegin);
+        const close = new Method(this.close, '!!', this);
+        close.passContext = true;
+        this.service.add(close);
 
-        const invokeEnd = new Method(this.invokeEnd, '=', this);
-        invokeEnd.passContext = true;
-        this.service.add(invokeEnd);
+        const begin = new Method(this.begin, '!', this);
+        begin.passContext = true;
+        this.service.add(begin);
+
+        const end = new Method(this.end, '=', this);
+        end.passContext = true;
+        this.service.add(end);
     }
     protected id(context: Context): string {
         if (context.requestHeaders['id']) {
@@ -118,13 +122,17 @@ export class Caller {
             }
         }
     }
-    protected async invokeBegin(context: Context): Promise<[number, string, any[]][]> {
+    protected close(context: Context): string {
         const id = this.id(context);
         if (this.responders[id]) {
             const responder = this.responders[id];
             delete this.responders[id];
             responder.resolve();
         }
+        return id;
+    }
+    protected async begin(context: Context): Promise<[number, string, any[]][]> {
+        const id = this.close(context);
         const responder = defer<[number, string, any[]][]>();
         if (!this.send(id, responder)) {
             if (this.timeout > 0) {
@@ -139,7 +147,7 @@ export class Caller {
         }
         return responder.promise;
     }
-    protected invokeEnd(...args: any[]): void {
+    protected end(...args: any[]): void {
         const results: ([number, any] | [number, undefined, string])[] = args.slice(0, -1);
         const context: Context = args[args.length - 1];
         setTimeout(() => {

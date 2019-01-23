@@ -1,30 +1,26 @@
 import * as http from 'http';
 import { Service, Client } from '@hprose/rpc-core';
 import '@hprose/rpc-node';
+// import { logIOHandler, logInvokeHandler } from '@hprose/rpc-plugin-log';
 import { Caller, Provider } from '../src/index';
 
 test('test reverse RPC', async () => {
-    // const logHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
-    //     console.log(ByteStream.toString(request));
-    //     const response = await next(request, context);
-    //     console.log(ByteStream.toString(response));
-    //     return response;
-    // };
     function hello(name: string): string {
         return 'hello ' + name;
     }
     const service = new Service();
     const caller = new Caller(service);
     service.use(caller.handler);
-    // service.use(logHandler);
+    // service.use(logIOHandler);
     const server = http.createServer();
     service.bind(server);
-    server.listen(8080);
+    server.listen(8083);
 
-    const client = new Client('http://127.0.0.1:8080/');
+    const client = new Client('http://127.0.0.1:8083/');
+    // client.use(logInvokeHandler);
     const provider = new Provider(client, '1');
     provider.addFunction(hello);
-    provider.boot();
+    provider.listen();
 
     interface Hello {
         hello(name: string): Promise<string>;
@@ -38,6 +34,6 @@ test('test reverse RPC', async () => {
     expect(r1).toEqual('hello world1');
     expect(r2).toEqual('hello world2');
     expect(r3).toEqual('hello world3');
+    await provider.close();
     server.close();
-
 });

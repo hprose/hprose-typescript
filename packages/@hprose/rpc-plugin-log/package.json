@@ -1,7 +1,7 @@
 {
-  "name": "@hprose/rpc-plugin-reverse",
+  "name": "@hprose/rpc-plugin-log",
   "version": "3.0.0",
-  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-reverse",
+  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-log",
   "description": "hprose for TypeScript",
   "author": {
     "name": "Ma Bingyao",
@@ -10,14 +10,13 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-reverse",
+  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-log",
   "bugs": {
     "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
   },
   "scripts": {
     "clean": "rm -rf lib",
-    "test": "jest --detectOpenHandles",
     "compile": "tsc -b tsconfig.json",
     "prepublish": "npm run compile"
   },
@@ -27,11 +26,10 @@
     "@types/node": "^10.12.18",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.2.2",
-    "@hprose/rpc-node": "^3.0.0",
-    "@hprose/rpc-plugin-log": "^3.0.0"
+    "typescript": "^3.2.2"
   },
   "dependencies": {
+    "@hprose/io": "^3.0.0",
     "@hprose/rpc-core": "^3.0.0"
   },
   "files": [
