@@ -16,6 +16,10 @@
     "url": "https://github.com/hprose/hprose-typescript/issues",
     "email": "andot@hprose.com"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://hprose.com/"
+  },
   "scripts": {
     "clean": "rm -rf lib",
     "compile": "tsc -b tsconfig.json",
