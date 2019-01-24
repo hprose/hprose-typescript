@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-reverse",
-  "version": "3.0.0",
+  "version": "3.0.0-beta",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-reverse",
   "description": "hprose for TypeScript",
   "author": {
@@ -23,16 +23,16 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@hprose/rpc-node": "^3.0.0-beta",
+    "@hprose/rpc-plugin-log": "^3.0.0-beta",
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
-    "typescript": "^3.2.2",
-    "@hprose/rpc-node": "^3.0.0",
-    "@hprose/rpc-plugin-log": "^3.0.0"
+    "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@hprose/rpc-core": "^3.0.0"
+    "@hprose/rpc-core": "^3.0.0-beta"
   },
   "files": [
     "./lib/"
