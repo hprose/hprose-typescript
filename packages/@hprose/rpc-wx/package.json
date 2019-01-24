@@ -17,8 +17,7 @@
     "email": "andot@hprose.com"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://hprose.com/"
+    "access": "public"
   },
   "scripts": {
     "clean": "rm -rf lib",
