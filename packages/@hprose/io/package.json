@@ -10,6 +10,7 @@
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "typings": "lib/index.d.ts",
   "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/io",
   "bugs": {
     "url": "https://github.com/hprose/hprose-typescript/issues",
