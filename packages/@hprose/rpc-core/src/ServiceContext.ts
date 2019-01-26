@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceContext for TypeScript.                           |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,7 @@ export class ServiceContext implements Context {
     public utc: boolean;
     public missing: boolean = false;
     public method: Function = ()=>{};
-    public obj: any;
+    public target: any;
     [name: string]: any;
     constructor(public readonly service: Service) {
         this.debug = service.debug;

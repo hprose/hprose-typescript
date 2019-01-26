@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -93,9 +93,9 @@ export class Service {
     public async execute(fullname: string, args: any[], context: Context): Promise<any> {
         const cxt = context as ServiceContext;
         if (cxt.missing) {
-            return cxt.method.call(cxt.obj, fullname, args);
+            return cxt.method.call(cxt.target, fullname, args);
         }
-        return cxt.method.apply(cxt.obj, args);
+        return cxt.method.apply(cxt.target, args);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         this.handlerManager.use(...handlers);
@@ -116,25 +116,25 @@ export class Service {
         this.methodManager.remove(fullname);
         return this;
     }
-    public addFunction(f: Function, fullname?: string, paramTypes?: Function[]): this;
-    public addFunction(f: Function, paramTypes: Function[]): this;
-    public addFunction(f: Function, ...args: any[]): this {
-        this.methodManager.addFunction(f, ...args);
+    public addFunction(fn: Function, fullname?: string, paramTypes?: Function[]): this;
+    public addFunction(fn: Function, paramTypes: Function[]): this;
+    public addFunction(fn: Function, ...args: any[]): this {
+        this.methodManager.addFunction(fn, ...args);
         return this;
     }
-    public addMethod(method: Function, obj: any, fullname?: string, paramTypes?: Function[]): this;
-    public addMethod(method: Function, obj: any, paramTypes: Function[]): this;
-    public addMethod(fullname: string, obj: any, paramTypes?: Function[]): this;
+    public addMethod(method: Function, target: any, fullname?: string, paramTypes?: Function[]): this;
+    public addMethod(method: Function, target: any, paramTypes: Function[]): this;
+    public addMethod(fullname: string, target: any, paramTypes?: Function[]): this;
     public addMethod(...args: any[]): this {
         this.methodManager.addMethod(args[0], args[1], ...args.slice(2));
         return this;
     }
-    public addMissingFunction(f: MissingFunction): this {
-        this.methodManager.addMissingFunction(f);
+    public addMissingFunction(fn: MissingFunction): this {
+        this.methodManager.addMissingFunction(fn);
         return this;
     }
-    public addMissingMethod(f: MissingFunction, obj: any): this {
-        this.methodManager.addMissingMethod(f, obj);
+    public addMissingMethod(fn: MissingFunction, target: any): this {
+        this.methodManager.addMissingMethod(fn, target);
         return this;
     }
     public addFunctions(functions: Function[], fullnames?: string[], paramTypes?: Function[]): this;
@@ -143,15 +143,15 @@ export class Service {
         this.methodManager.addFunctions(functions, ...args);
         return this;
     }
-    public addMethods(methods: Function[], obj: any, fullnames?: string[], paramTypes?: Function[]): this;
-    public addMethods(methods: Function[], obj: any, paramTypes: Function[]): this;
-    public addMethods(fullnames: string[], obj: any, paramTypes?: Function[]): this;
+    public addMethods(methods: Function[], target: any, fullnames?: string[], paramTypes?: Function[]): this;
+    public addMethods(methods: Function[], target: any, paramTypes: Function[]): this;
+    public addMethods(fullnames: string[], target: any, paramTypes?: Function[]): this;
     public addMethods(...args: any[]): this {
         this.methodManager.addMethods(args[0], args[1], ...args.slice(2));
         return this;
     }
-    public addInstanceMethods(obj: any, prefix?: string): this {
-        this.methodManager.addInstanceMethods(obj, prefix);
+    public addInstanceMethods(target: any, prefix?: string): this {
+        this.methodManager.addInstanceMethods(target, prefix);
         return this;
     }
 }

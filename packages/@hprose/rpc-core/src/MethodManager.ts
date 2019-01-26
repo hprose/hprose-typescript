@@ -54,9 +54,9 @@ export class MethodManager {
                 break;
         }
     }
-    public addMethod(method: Function, obj: any, fullname?: string, paramTypes?: Function[]): void;
-    public addMethod(method: Function, obj: any, paramTypes: Function[]): void;
-    public addMethod(fullname: string, obj: any, paramTypes?: Function[]): void;
+    public addMethod(method: Function, target: any, fullname?: string, paramTypes?: Function[]): void;
+    public addMethod(method: Function, target: any, paramTypes: Function[]): void;
+    public addMethod(fullname: string, target: any, paramTypes?: Function[]): void;
     public addMethod(...args: any[]): void {
         if (typeof args[0] === 'string') {
             const method = args[1][args[0]];
@@ -87,8 +87,8 @@ export class MethodManager {
         method.missing = true;
         this.add(method);
     }
-    public addMissingMethod(fn: MissingFunction, obj: any): void {
-        const method = new Method(fn, '*', obj);
+    public addMissingMethod(fn: MissingFunction, target: any): void {
+        const method = new Method(fn, '*', target);
         method.missing = true;
         this.add(method);
     }
@@ -118,23 +118,23 @@ export class MethodManager {
             this.add(new Method(functions[i], fullnames ? fullnames[i] : undefined, undefined, paramTypes));
         }
     }
-    public addMethods(methods: Function[], obj: any, fullnames?: string[], paramTypes?: Function[]): void;
-    public addMethods(methods: Function[], obj: any, paramTypes: Function[]): void;
-    public addMethods(fullnames: string[], obj: any, paramTypes?: Function[]): void;
+    public addMethods(methods: Function[], target: any, fullnames?: string[], paramTypes?: Function[]): void;
+    public addMethods(methods: Function[], target: any, paramTypes: Function[]): void;
+    public addMethods(fullnames: string[], target: any, paramTypes?: Function[]): void;
     public addMethods(...args: any[]): void {
         const n: number = args[0].length;
         if (n === 0) return;
         let methods: Function[];
-        let obj: any = args[1];
+        let target: any = args[1];
         let fullnames: string[] | undefined;
         let paramTypes: Function[] | undefined;
         if (typeof args[0][0] === 'string') {
             fullnames = args[0] as string[];
             paramTypes = args[2];
             for (let i = 0; i < n; ++i) {
-                const method = obj[fullnames[i]];
+                const method = target[fullnames[i]];
                 if (typeof method === 'function') {
-                    this.add(new Method(method, fullnames[i], obj, paramTypes));
+                    this.add(new Method(method, fullnames[i], target, paramTypes));
                 } else {
                     throw new Error('obj[fullname] must be a function');
                 }
@@ -160,14 +160,14 @@ export class MethodManager {
             throw new Error('fullnames.length must be equal to functions.length');
         }
         for (let i = 0; i < n; ++i) {
-            this.add(new Method(methods[i], fullnames ? fullnames[i] : undefined, obj, paramTypes));
+            this.add(new Method(methods[i], fullnames ? fullnames[i] : undefined, target, paramTypes));
         }
     }
-    public addInstanceMethods(obj: any, namespace?: string) {
-        for (const name in obj) {
-            if ((!obj.hasOwnProperty || obj.hasOwnProperty(name)) && typeof obj[name] === 'function') {
+    public addInstanceMethods(target: any, namespace?: string) {
+        for (const name in target) {
+            if ((!target.hasOwnProperty || target.hasOwnProperty(name)) && typeof target[name] === 'function') {
                 const fullname = namespace ? namespace + '_' + name : name;
-                this.add(new Method(obj[name], obj, fullname));
+                this.add(new Method(target[name], target, fullname));
             }
         }
     }

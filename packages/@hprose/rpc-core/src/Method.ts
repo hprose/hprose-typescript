@@ -8,7 +8,7 @@
 |                                                          |
 | Method for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 7, 2019                                |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,7 @@ export class Method {
     constructor(
         public method: Function,
         public fullname: string = method.name,
-        public obj?: any,
+        public target?: any,
         public paramTypes?: (Function | undefined | null)[],
     ) {
         if (fullname === '') {

@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceCodec for TypeScript.                             |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -56,7 +56,7 @@ export class DefaultServiceCodec {
         if (method.utc !== undefined) context.utc = method.utc;
         context.missing = !!method.missing;
         context.method = method.method;
-        context.obj = method.obj;
+        context.target = method.target;
         return method;
     }
     private decodeArguments(method: MethodLike, reader: Reader, context: ServiceContext): any[] {
