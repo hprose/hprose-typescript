@@ -8,7 +8,7 @@
 |                                                          |
 | MethodManager for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 8, 2019                                |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -163,10 +163,10 @@ export class MethodManager {
             this.add(new Method(methods[i], fullnames ? fullnames[i] : undefined, obj, paramTypes));
         }
     }
-    public addInstanceMethods(obj: any, prefix?: string) {
+    public addInstanceMethods(obj: any, namespace?: string) {
         for (const name in obj) {
             if ((!obj.hasOwnProperty || obj.hasOwnProperty(name)) && typeof obj[name] === 'function') {
-                const fullname = prefix ? prefix + '_' + name : name;
+                const fullname = namespace ? namespace + '_' + name : name;
                 this.add(new Method(obj[name], obj, fullname));
             }
         }
