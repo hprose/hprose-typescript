@@ -30,6 +30,7 @@ interface RequestTask {
 export class HttpTransport implements Transport {
     private counter: number = 0;
     private requests: { [index: number]: RequestTask } = Object.create(null);
+    public timeout: number = 30000;
     public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
     private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
         const headers: { [name: string]: string } = Object.create(null);
@@ -81,10 +82,10 @@ export class HttpTransport implements Transport {
                     }
                 }
             });
-            if (context.timeout > 0) {
+            if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
                     reject(new TimeoutError());
-                }, context.timeout);
+                }, this.timeout);
                 result.then(() => {
                     clearTimeout(timeoutId);
                 }, () => {

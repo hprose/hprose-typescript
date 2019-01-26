@@ -8,7 +8,7 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 20, 2019                               |
+| LastModified: Jan 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -77,7 +77,6 @@ class ServiceProxyHandler implements ProxyHandler<any> {
 
 export interface ClientSettings {
     requestHeaders?: { [name: string]: any }
-    timeout?: number;
     simple?: boolean;
     utc?: boolean;
     longType?: 'number' | 'bigint' | 'string';
@@ -104,7 +103,6 @@ export class Client {
     }
     public readonly settings: { [fullname: string]: Settings } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
-    public timeout: number = 30000;
     public simple: boolean = false;
     public utc: boolean = false;
     public longType: 'number' | 'bigint' | 'string' = 'number';

@@ -25,6 +25,7 @@ export class SocketTransport implements Transport {
     private sockets: { [uri: string]: Promise<net.Socket> } = Object.create(null);
     public noDelay: boolean = true;
     public keepAlive: boolean = true;
+    public timeout: number = 30000;
     public options: tls.SecureContextOptions = Object.create(null);
     private connect(uri: string): net.Socket {
         const parser = parse(uri);
@@ -165,11 +166,11 @@ export class SocketTransport implements Transport {
         const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
         const result = defer<Uint8Array>();
         this.results[uri][index] = result;
-        if (context.timeout > 0) {
+        if (this.timeout > 0) {
             const timeoutId = setTimeout(() => {
                 delete this.results[uri][index];
                 result.reject(new TimeoutError());
-            }, context.timeout);
+            }, this.timeout);
             result.promise.then(() => {
                 clearTimeout(timeoutId);
             }, () => {
