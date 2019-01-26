@@ -13,16 +13,15 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { MethodManager, MissingFunction, MethodLike, Client } from '@hprose/rpc-core';
+import { MethodManager, MissingFunction, Method, MethodLike, Client } from '@hprose/rpc-core';
 
 export class Provider {
     public debug: boolean = false;
-    public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
     public onerror?: (error: Error) => void;
-    private methodManager: MethodManager = new MethodManager(this.methods);
+    private methodManager: MethodManager = new MethodManager();
     constructor(public client: Client, id?: string) {
         if (id) this.id = id;
-        this.addFunction(() => { return Object.keys(this.methods); }, '~');
+        this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
     }
     public get id(): string {
         if (this.client.requestHeaders['id']) {
@@ -40,10 +39,9 @@ export class Provider {
                 if (!calls) return;
                 setTimeout(async() => {
                     const results: any[][] = [];
-                    const methods = this.methods;
                     for (let i = 0, n = calls.length; i < n; ++i) {
                         const [id, fullname, args] = calls[i];
-                        const method: MethodLike | undefined = (fullname in methods) ? methods[fullname] : methods['*'];
+                        const method: MethodLike | undefined = this.get(fullname);
                         try {
                             if (method === undefined) {
                                 throw new Error('Can\'t find this function ' + fullname + '().');
@@ -77,12 +75,15 @@ export class Provider {
     public async close(): Promise<void> {
         await this.client.invoke('!!');
     }
+    public get(fullname: string): MethodLike | undefined {
+        return this.methodManager.get(fullname);
+    }
     public add(method: MethodLike): this {
         this.methodManager.add(method);
         return this;
     }
     public remove(fullname: string): this {
-        delete this.methods[fullname];
+        this.methodManager.remove(fullname);
         return this;
     }
     public addFunction(f: Function, fullname?: string): this {

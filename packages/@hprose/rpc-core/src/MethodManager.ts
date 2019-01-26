@@ -18,7 +18,16 @@ import { MethodLike, Method } from './Method';
 export type MissingFunction = (fullname: string, args: any[]) => any;
 
 export class MethodManager {
-    constructor(public readonly methods: { [fullname: string]: MethodLike }) {}
+    public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
+    public getNames() : string[] {
+        return Object.keys(this.methods);
+    }
+    public get(fullname: string): MethodLike | undefined {
+        return (fullname in this.methods) ? this.methods[fullname] : this.methods['*'];
+    }
+    public remove(fullname: string) {
+        delete this.methods[fullname];
+    }
     public add(method: MethodLike) {
         const fullname = method.fullname;
         if (fullname === '') {

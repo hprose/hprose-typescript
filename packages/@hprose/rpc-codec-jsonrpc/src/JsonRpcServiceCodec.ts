@@ -46,8 +46,7 @@ export class JsonRpcServiceCodec implements ServiceCodec {
     }
     private decodeMethod(fullname: string, context: ServiceContext): MethodLike {
         const service = context.service;
-        const methods = service.methods;
-        const method: MethodLike | undefined = (fullname in methods) ? methods[fullname] : methods['*'];
+        const method: MethodLike | undefined = service.get(fullname);
         if (method === undefined) {
             throw new Error('Method not found');
         }

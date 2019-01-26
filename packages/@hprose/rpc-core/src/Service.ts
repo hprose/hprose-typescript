@@ -45,9 +45,8 @@ export class Service {
     public nullType: undefined | null = undefined;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
     public maxRequestLength: number = 0x7FFFFFFF;
-    public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
     private readonly handlerManager: HandlerManager = new HandlerManager(this.execute.bind(this), this.process.bind(this));
-    private readonly methodManager: MethodManager = new MethodManager(this.methods);
+    private readonly methodManager: MethodManager = new MethodManager();
     private readonly handlers: { [name: string]: Handler } = Object.create(null);
     constructor() {
         Service.handlers.forEach(({ name, ctor }) => {
@@ -63,7 +62,7 @@ export class Service {
                 configurable: true
             });
         });
-        this.add(new Method(() => { return Object.keys(this.methods); }, '~'));
+        this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
     }
     public bind(server: any): this {
         const type = server.constructor;
@@ -106,12 +105,15 @@ export class Service {
         this.handlerManager.unuse(...handlers);
         return this;
     }
+    public get(fullname: string): MethodLike | undefined {
+        return this.methodManager.get(fullname);
+    }
     public add(method: MethodLike): this {
         this.methodManager.add(method);
         return this;
     }
     public remove(fullname: string): this {
-        delete this.methods[fullname];
+        this.methodManager.remove(fullname);
         return this;
     }
     public addFunction(f: Function, fullname?: string, paramTypes?: Function[]): this;
