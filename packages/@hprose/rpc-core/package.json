@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-core",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0-beta.5",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-core",
   "description": "hprose for TypeScript",
   "author": {
