@@ -28,5 +28,5 @@ export class ServiceContext implements Context {
         let result: ServiceContext = Object.create(ServiceContext.prototype);
         copy(this, result);
         return result;
-   }
+    }
 }
