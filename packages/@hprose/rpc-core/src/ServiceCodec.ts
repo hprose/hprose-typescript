@@ -57,9 +57,7 @@ export class DefaultServiceCodec {
         if (method === undefined) {
             throw new Error('Can\'t find this function ' + fullname + '().');
         }
-        context.missing = !!method.missing;
-        context.method = method.method;
-        context.target = method.target;
+        context.method = method;
         return method;
     }
     private decodeArguments(method: MethodLike, reader: Reader, context: ServiceContext): any[] {

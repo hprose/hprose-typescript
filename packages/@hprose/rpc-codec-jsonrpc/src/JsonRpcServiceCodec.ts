@@ -50,9 +50,7 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         if (method === undefined) {
             throw new Error('Method not found');
         }
-        context.missing = !!method.missing;
-        context.method = method.method;
-        context.obj = method.obj;
+        context.method = method;
         return method;
     }
     decode(request: Uint8Array, context: ServiceContext): [ string, any[] ] {

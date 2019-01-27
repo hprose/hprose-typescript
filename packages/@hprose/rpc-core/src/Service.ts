@@ -85,11 +85,11 @@ export class Service {
         return codec.encode(result, context as ServiceContext);
     }
     public async execute(fullname: string, args: any[], context: Context): Promise<any> {
-        const cxt = context as ServiceContext;
-        if (cxt.missing) {
-            return cxt.method.call(cxt.target, fullname, args);
+        const method = (context as ServiceContext).method;
+        if (method.missing) {
+            return method.method.call(method.target, fullname, args);
         }
-        return cxt.method.apply(cxt.target, args);
+        return method.method.apply(method.target, args);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         this.handlerManager.use(...handlers);
