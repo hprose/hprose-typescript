@@ -8,7 +8,7 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -75,16 +75,6 @@ class ServiceProxyHandler implements ProxyHandler<any> {
     }
 }
 
-export interface ClientSettings {
-    requestHeaders?: { [name: string]: any }
-    simple?: boolean;
-    utc?: boolean;
-    longType?: 'number' | 'bigint' | 'string';
-    dictType?: 'object' | 'map';
-    nullType?: null;
-    codec?: ClientCodec;
-}
-
 export interface Transport {
     transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
     abort(): Promise<void>;
@@ -103,16 +93,11 @@ export class Client {
     }
     public readonly settings: { [fullname: string]: Settings } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
-    public simple: boolean = false;
-    public utc: boolean = false;
-    public longType: 'number' | 'bigint' | 'string' = 'number';
-    public dictType: 'object' | 'map' = 'object';
-    public nullType: undefined | null = undefined;
     public codec: ClientCodec = DefaultClientCodec.instance;
     private urilist: string[] = [];
     private readonly transports: { [name: string]: Transport } = Object.create(null);
     private readonly handlerManager: HandlerManager = new HandlerManager(this.call.bind(this), this.transport.bind(this));
-    constructor(uri?: string | string[], settings?: ClientSettings) {
+    constructor(uri?: string | string[]) {
         Client.transports.forEach(({ name, ctor }) => {
             let transport = new ctor();
             this.transports[name] = transport;
@@ -131,11 +116,6 @@ export class Client {
                 this.urilist.push(uri);
             } else {
                 this.urilist.push(...uri);
-            }
-        }
-        if (settings) {
-            for (const key in settings) {
-                if ((settings as any)[key] !== undefined) (this as any)[key] = (settings as any)[key];
             }
         }
     }

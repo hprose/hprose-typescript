@@ -8,7 +8,7 @@
 |                                                          |
 | Prosumer for TypeScript.                                 |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,7 +36,7 @@ export class Prosumer {
     private async message(): Promise<void> {
         do {
             try {
-                const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<', [], { dictType: 'object', type: undefined });
+                const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<', []);
                 if (!topics) return;
                 setTimeout(() => {
                     for (const topic in topics) {
@@ -90,10 +90,10 @@ export class Prosumer {
         return this.client.invoke('>', [data, topic, id], { type: Boolean });
     }
     public multicast(data: any, topic: string, id: string[]): Promise<{ [id: string]: boolean }> {
-        return this.client.invoke('>?', [data, topic, id], { dictType: 'object' });
+        return this.client.invoke('>?', [data, topic, id]);
     }
     public broadcast(data: any, topic: string):  Promise<{ [id: string]: boolean }> {
-        return this.client.invoke('>*', [data, topic], { dictType: 'object' });
+        return this.client.invoke('>*', [data, topic]);
     }
     public push(data: any, topic: string, id?: string | string[]): Promise<boolean | { [id: string]: boolean }>  {
         switch (typeof id) {

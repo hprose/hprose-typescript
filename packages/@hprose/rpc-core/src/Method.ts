@@ -8,17 +8,12 @@
 |                                                          |
 | Method for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 export class Method {
-    public debug?: boolean;
-    public simple?: boolean;
-    public utc?: boolean;
-    public longType?: 'number' | 'bigint' | 'string';
-    public dictType?: 'object' | 'map';
     public missing?: boolean;
     public passContext?: boolean;
     [name: string]: any;

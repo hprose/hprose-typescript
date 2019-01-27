@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -52,13 +52,13 @@ export class Broker {
         message.passContext = true;
         this.service.add(message);
 
-        const unicast = new Method(this.unicast, '>', this, [this.service.nullType, String, String, String]);
+        const unicast = new Method(this.unicast, '>', this, [undefined, String, String, String]);
         this.service.add(unicast);
 
-        const multicast = new Method(this.multicast, '>?', this, [this.service.nullType, String, Array, String]);
+        const multicast = new Method(this.multicast, '>?', this, [undefined, String, Array, String]);
         this.service.add(multicast);
 
-        const broadcast = new Method(this.broadcast, '>*', this, [this.service.nullType, String, String]);
+        const broadcast = new Method(this.broadcast, '>*', this, [undefined, String, String]);
         this.service.add(broadcast);
 
         const exist = new Method(this.exist, '?', this, [String, String]);

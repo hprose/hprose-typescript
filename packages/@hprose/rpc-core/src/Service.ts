@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -37,12 +37,6 @@ export class Service {
         serverTypes.forEach((type) => Service.serverTypes.set(type, name));
     }
     public timeout: number = 300000;
-    public debug: boolean = false;
-    public simple: boolean = false;
-    public utc: boolean = false;
-    public longType: 'number' | 'bigint' | 'string' = 'number';
-    public dictType: 'object' | 'map' = 'object';
-    public nullType: undefined | null = undefined;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
     public maxRequestLength: number = 0x7FFFFFFF;
     private readonly handlerManager: HandlerManager = new HandlerManager(this.execute.bind(this), this.process.bind(this));

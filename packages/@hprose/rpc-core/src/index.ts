@@ -8,12 +8,12 @@
 |                                                          |
 | @hprose/rpc-core for TypeScript.                         |
 |                                                          |
-| LastModified: Jan 22, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export { Client, ClientSettings, Transport, TransportConstructor } from './Client';
+export { Client, Transport, TransportConstructor } from './Client';
 export { ClientCodec } from './ClientCodec';
 export { ClientContext } from './ClientContext';
 export { Context } from './Context';

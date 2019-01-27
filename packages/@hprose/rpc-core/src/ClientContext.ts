@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,28 +24,13 @@ export class ClientContext implements Context {
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     public uri: string;
-    public simple: boolean;
-    public utc: boolean;
-    public longType: 'number' | 'bigint' | 'string';
-    public dictType: 'object' | 'map';
-    public type: Function | null;
+    public type?: Function | null;
     [name: string]: any;
     constructor(public readonly client: Client, fullname: string, settings: Settings = Object.create(null)) {
         const uris = client.uris;
         this.uri = (uris.length > 0) ? uris[0] : '';
         const defaultSettings = (fullname in client.settings) ? client.settings[fullname] : emptySettings;
-        const getValue = (name: keyof Settings, defaultValue: any): any => {
-            return (name in settings)
-                ? settings[name]
-                : (name in defaultSettings)
-                    ? defaultSettings[name]
-                    : defaultValue;
-        };
-        this.simple = getValue('simple', client.simple);
-        this.utc = getValue('utc', client.utc);
-        this.longType = getValue('longType', client.longType);
-        this.dictType = getValue('dictType', client.dictType);
-        this.type = getValue('type', client.nullType);
+        this.type = ('type' in settings) ? settings.type : defaultSettings.type;
         copy(client.requestHeaders, this.requestHeaders);
         copy(defaultSettings.requestHeaders, this.requestHeaders);
         copy(settings.requestHeaders, this.requestHeaders);

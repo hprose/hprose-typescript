@@ -8,7 +8,7 @@
 |                                                          |
 | ClientCodec for TypeScript.                              |
 |                                                          |
-| LastModified: Jan 9, 2019                                |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,9 +22,13 @@ export interface ClientCodec {
 }
 export class DefaultClientCodec {
     public static instance: ClientCodec = new DefaultClientCodec();
+    public simple: boolean = false;
+    public utc: boolean = false;
+    public longType: 'number' | 'bigint' | 'string' = 'number';
+    public dictType: 'object' | 'map' = 'object';
     public encode(name: string, args: any[], context: ClientContext): Uint8Array {
         const stream = new ByteStream();
-        const writer = new Writer(stream, context.simple, context.utc);
+        const writer = new Writer(stream, this.simple, this.utc);
         const headers = context.requestHeaders;
         let size = 0;
         for (const _ in headers) { size++; }
@@ -45,8 +49,8 @@ export class DefaultClientCodec {
     public decode(response: Uint8Array, context: ClientContext): any {
         const stream = new ByteStream(response);
         const reader = new Reader(stream, false);
-        reader.longType = context.longType;
-        reader.dictType = context.dictType;
+        reader.longType = this.longType;
+        reader.dictType = this.dictType;
         let tag = stream.readByte();
         if (tag === Tags.TagHeader) {
             const headers = reader.deserialize();

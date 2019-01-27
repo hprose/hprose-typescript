@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceCodec for TypeScript.                             |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,9 +24,15 @@ export interface ServiceCodec {
 
 export class DefaultServiceCodec {
     public static instance: ServiceCodec = new DefaultServiceCodec();
+    public debug: boolean = false;
+    public simple: boolean = false;
+    public utc: boolean = false;
+    public longType: 'number' | 'bigint' | 'string' = 'number';
+    public dictType: 'object' | 'map' = 'object';
+    public nullType: undefined | null = undefined;
     public encode(result: any, context: ServiceContext): Uint8Array {
         const stream = new ByteStream();
-        const writer = new Writer(stream, context.simple, context.utc);
+        const writer = new Writer(stream, this.simple, this.utc);
         const headers = context.responseHeaders;
         let size = 0;
         for (const _ in headers) { size++; }
@@ -37,7 +43,7 @@ export class DefaultServiceCodec {
         }
         if (result instanceof Error) {
             stream.writeByte(Tags.TagError);
-            writer.serialize(context.debug ? result.stack ? result.stack : result.message : result.message);
+            writer.serialize(this.debug ? result.stack ? result.stack : result.message : result.message);
         } else {
             stream.writeByte(Tags.TagResult);
             writer.serialize(result);
@@ -51,16 +57,12 @@ export class DefaultServiceCodec {
         if (method === undefined) {
             throw new Error('Can\'t find this function ' + fullname + '().');
         }
-        if (method.debug !== undefined) context.debug = method.debug;
-        if (method.simple !== undefined) context.simple = method.simple;
-        if (method.utc !== undefined) context.utc = method.utc;
         context.missing = !!method.missing;
         context.method = method.method;
         context.target = method.target;
         return method;
     }
     private decodeArguments(method: MethodLike, reader: Reader, context: ServiceContext): any[] {
-        const service = context.service;
         const stream = reader.stream;
         const tag = stream.readByte();
         let args: any[] = [];
@@ -69,19 +71,19 @@ export class DefaultServiceCodec {
             const count = ValueReader.readCount(stream);
             let paramTypes = method.paramTypes;
             if (paramTypes === undefined) {
-                paramTypes = new Array(count).fill(service.nullType);
+                paramTypes = new Array(count).fill(this.nullType);
             } else {
                 paramTypes.length = count;
                 for (let i = 0; i < count; ++i) {
                     if (paramTypes[i] === undefined) {
-                        paramTypes[i] = service.nullType;
+                        paramTypes[i] = this.nullType;
                     }
                 }
             }
             args = new Array(count);
             reader.addReference(args);
-            reader.longType = (method.longType === undefined) ? service.longType : method.longType;
-            reader.dictType = (method.dictType === undefined) ? service.dictType : method.dictType;
+            reader.longType = this.longType;
+            reader.dictType = this.dictType;
             for (let i = 0; i < count; ++i) {
                 args[i] = reader.deserialize(paramTypes[i]);
             }
@@ -91,18 +93,17 @@ export class DefaultServiceCodec {
         return args;
     }
     public decode(request: Uint8Array, context: ServiceContext): [string, any[]] {
-        const service = context.service;
         const stream = new ByteStream(request);
         const reader = new Reader(stream, false);
         if (request.length === 0) {
             this.decodeMethod('~', context);
             return ['~', []];
         }
-        reader.longType = service.longType;
-        reader.dictType = service.dictType;
+        reader.longType = this.longType;
+        reader.dictType = this.dictType;
         let tag = stream.readByte();
         if (tag === Tags.TagHeader) {
-            const headers = reader.deserialize(service.nullType);
+            const headers = reader.deserialize(this.nullType);
             for (const name in headers) {
                 context.requestHeaders[name] = headers[name];
             }
