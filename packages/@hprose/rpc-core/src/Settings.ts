@@ -15,6 +15,7 @@
 
 export interface Settings {
     type?: Function | null;
+    returnContext?: boolean;
     requestHeaders?: { [name: string]: any };
     context?: { [name: string]: any };
 }

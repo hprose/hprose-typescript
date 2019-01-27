@@ -8,7 +8,7 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -175,7 +175,7 @@ export class Caller {
             }
         }, 0);
     }
-    public async invoke<T>(id: string, fullname: string, args: any[] = []): Promise<T> {
+    public async invoke(id: string, fullname: string, args: any[] = []): Promise<any> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
@@ -184,7 +184,7 @@ export class Caller {
             this.counter = 0;
         }
         const index = this.counter;
-        const result = defer<T>();
+        const result = defer<any>();
         if (this.calls[id] === undefined) {
             this.calls[id] = [];
         }
@@ -212,8 +212,8 @@ export class Caller {
         return useService(this, id, fullnames);
     }
     public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        (context as CallerContext).invoke = <T>(fullname: string, args: any[] = []): Promise<T> => {
-            return this.invoke<T>(this.id(context), fullname, args);
+        (context as CallerContext).invoke = (fullname: string, args: any[] = []): Promise<any> => {
+            return this.invoke(this.id(context), fullname, args);
         };
         return next(name, args, context);
     }

@@ -43,8 +43,12 @@ test('test headers', async () => {
     const client = new Client('http://127.0.0.1:8001/');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
+    client.settings.hello = {
+        returnContext: true
+    };
     const result = await proxy.hello('world');
-    expect(result).toBe('hello world');
+    expect(result.value).toBe('hello world');
+    expect(result.context.responseHeaders.pong).toBe(true);
     server.close();
 });
 

@@ -173,13 +173,18 @@ export class Client {
         this.handlerManager.unuse(...handlers);
         return this;
     }
-    public async invoke<T>(fullname: string, args: any[] = [], settings?: Settings): Promise<T> {
+    public async invoke(fullname: string, args: any[] = [], settings?: Settings): Promise<any> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
         const context = new ClientContext(this, fullname, settings);
         const invokeHandler = this.handlerManager.invokeHandler;
-        return invokeHandler(fullname, args, context);
+        const value = await invokeHandler(fullname, args, context);
+        if (settings && settings.returnContext
+            || this.settings[fullname] && this.settings[fullname].returnContext) {
+            return { value, context };
+        }
+        return value;
     }
     public async call(fullname: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;
