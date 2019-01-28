@@ -91,12 +91,12 @@ export class DefaultServiceCodec {
         return args;
     }
     public decode(request: Uint8Array, context: ServiceContext): [string, any[]] {
-        const stream = new ByteStream(request);
-        const reader = new Reader(stream, false);
         if (request.length === 0) {
             this.decodeMethod('~', context);
             return ['~', []];
         }
+        const stream = new ByteStream(request);
+        const reader = new Reader(stream, false);
         reader.longType = this.longType;
         reader.dictType = this.dictType;
         let tag = stream.readByte();
