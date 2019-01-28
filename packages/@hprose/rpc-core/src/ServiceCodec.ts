@@ -80,8 +80,6 @@ export class DefaultServiceCodec {
             }
             args = new Array(count);
             reader.addReference(args);
-            reader.longType = this.longType;
-            reader.dictType = this.dictType;
             for (let i = 0; i < count; ++i) {
                 args[i] = reader.deserialize(paramTypes[i]);
             }
