@@ -29,7 +29,7 @@ export class WebSocketTransport implements Transport {
             return websocket;
         }
         const ws = defer<WebSocket>();
-        websocket = new WebSocket(uri);
+        websocket = new WebSocket(uri, 'hprose');
         websocket.binaryType = 'arraybuffer';
         websocket.onopen = () => ws.resolve(websocket);
         websocket.onmessage = async (event: MessageEvent) => {

@@ -40,6 +40,7 @@ export class WebSocketHandler {
     }
     public handler = (websocket: WebSocket, request: http.IncomingMessage): void => {
         try {
+            websocket.protocol = 'hprose';
             websocket.binaryType = 'arraybuffer';
             if (this.onaccept) this.onaccept();
         }

@@ -33,6 +33,7 @@ export class WebSocketTransport implements Transport {
         }
         const ws = defer<WebSocket>();
         this.options.perMessageDeflate = false;
+        this.options.protocol = 'hprose';
         websocket = new WebSocket(uri, this.options);
         websocket.binaryType = 'arraybuffer';
         websocket.on('open', () => ws.resolve(websocket));

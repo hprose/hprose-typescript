@@ -38,7 +38,10 @@ export class WebSocketTransport implements Transport {
             return websocket;
         }
         const ws = defer<SocketTask>();
-        websocket = wx.connectSocket(uri);
+        websocket = wx.connectSocket({
+            url: uri,
+            protocols: ['hprose']
+        });
         websocket.onOpen(() => ws.resolve(websocket));
         websocket.onMessage((res: { data: ArrayBuffer }) => {
             const instream = new ByteStream(res.data);
