@@ -55,7 +55,7 @@ export class DefaultServiceCodec {
         const service = context.service;
         const method: MethodLike | undefined = service.get(fullname);
         if (method === undefined) {
-            throw new Error('Can\'t find this function ' + fullname + '().');
+            throw new Error('Can\'t find this method ' + fullname + '().');
         }
         context.method = method;
         return method;
