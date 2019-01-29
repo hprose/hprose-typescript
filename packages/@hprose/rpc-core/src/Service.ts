@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Jan 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -31,10 +31,17 @@ export interface HandlerConstructor {
 
 export class Service {
     private static handlers: { name: string, ctor: HandlerConstructor }[] = [];
-    private static serverTypes: Map<Function, string> = new Map();
+    private static serverTypes: Map<Function, string[]> = new Map();
     public static register(name: string, ctor: HandlerConstructor, serverTypes: Function[]): void {
         Service.handlers.push({name, ctor});
-        serverTypes.forEach((type) => Service.serverTypes.set(type, name));
+        serverTypes.forEach((type) => {
+            if (Service.serverTypes.has(type)) {
+                (Service.serverTypes.get(type) as string[]).push(name);
+            }
+            else {
+                Service.serverTypes.set(type, [name]);
+            }
+        });
     }
     public timeout: number = 300000;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
@@ -58,11 +65,16 @@ export class Service {
         });
         this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
     }
-    public bind(server: any): this {
+    public bind(server: any, name?: string): this {
         const type = server.constructor;
         const serverTypes = Service.serverTypes;
         if (serverTypes.has(type)) {
-            this.handlers[serverTypes.get(type) as string].bind(server);
+            const names = serverTypes.get(type) as string[];
+            for (let i = 0, n = names.length; i < n; ++i) {
+                if ((name === undefined) || (name === names[i])) {
+                    this.handlers[names[i]].bind(server);
+                }
+            }
         } else {
             throw new Error('This type server is not supported.');
         }

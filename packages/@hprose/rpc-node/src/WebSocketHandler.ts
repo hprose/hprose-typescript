@@ -8,13 +8,14 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import WebSocket from 'ws';
 import * as http from 'http';
+import * as https from 'https';
 import { Service, ServiceContext } from '@hprose/rpc-core';
 import { ByteStream } from '@hprose/io';
 
@@ -30,7 +31,10 @@ export class WebSocketHandler {
     public onclose?: () => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
-    public bind(server: WebSocket.Server): void {
+    public bind(server: http.Server | https.Server | WebSocket.Server): void {
+        if (server instanceof http.Server || server instanceof https.Server) {
+            server = new WebSocket.Server({server});
+        }
         server.options.perMessageDeflate = false;
         server.options.maxPayload = this.service.maxRequestLength + 4;
         server.on('connection', this.handler);
@@ -75,7 +79,7 @@ export class WebSocketHandler {
 }
 
 
-Service.register('websocket', WebSocketHandler, [WebSocket.Server]);
+Service.register('websocket', WebSocketHandler, [http.Server, https.Server, WebSocket.Server]);
 
 declare module '@hprose/rpc-core' {
     export interface Service {
