@@ -34,6 +34,9 @@ export class DefaultServiceCodec {
         const stream = new ByteStream();
         const writer = new Writer(stream, this.simple, this.utc);
         const headers = context.responseHeaders;
+        if (this.simple) {
+            headers.simple = true;
+        }
         let size = 0;
         for (const _ in headers) { size++; }
         if (size > 0) {
@@ -94,7 +97,7 @@ export class DefaultServiceCodec {
             return ['~', []];
         }
         const stream = new ByteStream(request);
-        const reader = new Reader(stream, false);
+        let reader = new Reader(stream, false);
         reader.longType = this.longType;
         reader.dictType = this.dictType;
         let tag = stream.readByte();
@@ -108,6 +111,9 @@ export class DefaultServiceCodec {
         }
         switch (tag) {
             case Tags.TagCall:
+                if (context.requestHeaders.simple) {
+                    reader = new Reader(stream, true);
+                }
                 const fullname = reader.deserialize(String);
                 const args = this.decodeArguments(this.decodeMethod(fullname, context), reader, context);
                 return [fullname, args];

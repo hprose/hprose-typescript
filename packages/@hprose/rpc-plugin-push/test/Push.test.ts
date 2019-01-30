@@ -12,6 +12,7 @@ test('test push', async() => {
     service.bind(server);
     server.listen(8081);
     const client1 = new Client('http://127.0.0.1:8081/');
+    // (client1.codec as any).simple = true;
     // client1.use(Log.invokeHandler);
     const prosumer1 = new Prosumer(client1, '1');
     const client2 = new Client('http://127.0.0.1:8081/');

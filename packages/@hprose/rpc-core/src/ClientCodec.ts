@@ -30,6 +30,9 @@ export class DefaultClientCodec {
         const stream = new ByteStream();
         const writer = new Writer(stream, this.simple, this.utc);
         const headers = context.requestHeaders;
+        if (this.simple) {
+            headers.simple = true;
+        }
         let size = 0;
         for (const _ in headers) { size++; }
         if (size > 0) {
@@ -48,7 +51,7 @@ export class DefaultClientCodec {
     }
     public decode(response: Uint8Array, context: ClientContext): any {
         const stream = new ByteStream(response);
-        const reader = new Reader(stream, false);
+        let reader = new Reader(stream, false);
         reader.longType = this.longType;
         reader.dictType = this.dictType;
         let tag = stream.readByte();
@@ -62,6 +65,9 @@ export class DefaultClientCodec {
         }
         switch (tag) {
             case Tags.TagResult:
+                if (context.responseHeaders.simple) {
+                    reader = new Reader(stream, true);
+                }
                 return reader.deserialize(context.type);
             case Tags.TagError:
                 throw new Error(reader.deserialize(String));
