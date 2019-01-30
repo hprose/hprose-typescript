@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-log",
-  "version": "3.0.0-beta.6",
+  "version": "3.0.0-beta.7",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-log",
   "description": "hprose for TypeScript",
   "author": {
@@ -33,8 +33,8 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@hprose/io": "^3.0.0-beta.6",
-    "@hprose/rpc-core": "^3.0.0-beta.6"
+    "@hprose/io": "^3.0.0-beta.7",
+    "@hprose/rpc-core": "^3.0.0-beta.7"
   },
   "files": [
     "./lib/"
