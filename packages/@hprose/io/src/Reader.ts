@@ -41,12 +41,18 @@ class ReaderRefer {
 }
 
 export class Reader {
-    private readonly refer?: ReaderRefer;
+    private refer?: ReaderRefer;
     private readonly ref: TypeInfo[] = [];
     public longType: 'number' | 'bigint' | 'string' = 'number';
     public dictType: 'object' | 'map' = 'object';
     constructor(public readonly stream: ByteStream, simple: boolean = false) {
-        this.refer = simple ? undefined : new ReaderRefer();
+        this.simple = simple;
+    }
+    get simple(): boolean {
+        return this.refer === undefined;
+    }
+    set simple(value: boolean) {
+        this.refer = value ? undefined : new ReaderRefer();
     }
     deserialize(type?: Function | null): any {
         return Deserializer.getInstance(type).deserialize(this);

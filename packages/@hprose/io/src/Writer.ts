@@ -45,11 +45,17 @@ class WriterRefer {
 }
 
 export class Writer {
-    private readonly refer?: WriterRefer;
+    private refer?: WriterRefer;
     private readonly ref: Map<any, number> = new Map<any, number>();
     private last: number = 0;
     constructor(public readonly stream: ByteStream, simple: boolean = false, public utc = false) {
-        this.refer = simple ? undefined : new WriterRefer();
+        this.simple = simple;
+    }
+    get simple(): boolean {
+        return this.refer === undefined;
+    }
+    set simple(value: boolean) {
+        this.refer = value ? undefined : new WriterRefer();
     }
     public serialize<T>(value: T): void {
         if (value === undefined || value === null) {

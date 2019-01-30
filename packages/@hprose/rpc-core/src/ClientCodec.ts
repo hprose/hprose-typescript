@@ -51,7 +51,7 @@ export class DefaultClientCodec {
     }
     public decode(response: Uint8Array, context: ClientContext): any {
         const stream = new ByteStream(response);
-        let reader = new Reader(stream, false);
+        const reader = new Reader(stream, false);
         reader.longType = this.longType;
         reader.dictType = this.dictType;
         let tag = stream.readByte();
@@ -66,7 +66,7 @@ export class DefaultClientCodec {
         switch (tag) {
             case Tags.TagResult:
                 if (context.responseHeaders.simple) {
-                    reader = new Reader(stream, true);
+                    reader.simple = true;
                 }
                 return reader.deserialize(context.type);
             case Tags.TagError:

@@ -97,7 +97,7 @@ export class DefaultServiceCodec {
             return ['~', []];
         }
         const stream = new ByteStream(request);
-        let reader = new Reader(stream, false);
+        const reader = new Reader(stream, false);
         reader.longType = this.longType;
         reader.dictType = this.dictType;
         let tag = stream.readByte();
@@ -112,7 +112,7 @@ export class DefaultServiceCodec {
         switch (tag) {
             case Tags.TagCall:
                 if (context.requestHeaders.simple) {
-                    reader = new Reader(stream, true);
+                    reader.simple = true;
                 }
                 const fullname = reader.deserialize(String);
                 const args = this.decodeArguments(this.decodeMethod(fullname, context), reader, context);
