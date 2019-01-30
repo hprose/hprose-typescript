@@ -2,6 +2,8 @@
 
 # Hprose 3.0 for TypeScript
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+
 ## Introduction
 
 *Hprose* is a High Performance Remote Object Service Engine.
