@@ -1,21 +1,21 @@
 import * as http from 'http';
 import { Context, Service, Client } from '@hprose/rpc-core';
 import '@hprose/rpc-node';
-// import { logIOHandler, logInvokeHandler } from '@hprose/rpc-plugin-log';
+// import { Log } from '@hprose/rpc-plugin-log';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
     const service = new Service();
     service.use(new Broker(service).handler);
-    // service.use(logIOHandler);
+    // service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);
     server.listen(8081);
     const client1 = new Client('http://127.0.0.1:8081/');
-    // client1.use(logInvokeHandler);
+    // client1.use(Log.invokeHandler);
     const prosumer1 = new Prosumer(client1, '1');
     const client2 = new Client('http://127.0.0.1:8081/');
-    // client2.use(logInvokeHandler);
+    // client2.use(Log.invokeHandler);
     const prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) => {
         // console.log(message);
@@ -51,7 +51,7 @@ test('test server push', async() => {
         return 'hello ' + name;
     }
     const service = new Service();
-    // service.use(logIOHandler);
+    // service.use(Log.ioHandler);
     const broker = new Broker(service);
     service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
