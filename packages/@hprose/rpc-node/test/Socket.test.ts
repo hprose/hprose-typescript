@@ -64,7 +64,7 @@ test('test maxRequestLength', async () => {
         await proxy.hello('world');
     }
     catch (e) {
-        expect(e).toEqual(new Error('connection closed'));
+        expect(e).toEqual(new Error('request too large'));
     }
     server.close();
 });

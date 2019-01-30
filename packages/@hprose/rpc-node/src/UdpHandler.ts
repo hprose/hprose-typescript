@@ -52,10 +52,10 @@ export class UdpHandler implements Handler {
             if (crc32(header) !== crc) return;
             const bodyLength = msg.readUInt16BE(4);
             const index = msg.readUInt16BE(6);
-            if (bodyLength !== msg.length - 8) return;
-            if ((index & 0x8000) === 0x8000) return;
+            if (bodyLength !== msg.length - 8 || (index & 0x8000) !== 0) return;
             if (bodyLength > this.service.maxRequestLength) {
                 this.send(socket, Buffer.from('request too large'), index | 0x8000, rinfo);
+                return;
             }
             const request = new Uint8Array(msg.buffer, msg.byteOffset + 8, bodyLength);
             const context = new UdpServiceContext(this.service, socket, rinfo);

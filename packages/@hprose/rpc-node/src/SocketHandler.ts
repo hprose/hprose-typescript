@@ -72,12 +72,13 @@ export class SocketHandler {
                     }
                     instream.reset();
                     bodyLength = instream.readInt32BE() & 0x7FFFFFFF;
+                    index = instream.readInt32BE();
                     if (bodyLength > this.service.maxRequestLength) {
                         socket.removeListener('data', ondata);
-                        socket.destroy(new Error('request too large'));
+                        this.send(socket, (new ByteStream('request too large')).bytes, index | 0x80000000);
+                        socket.end();
                         return;
                     }
-                    index = instream.readInt32BE();
                 }
                 if ((bodyLength >= 0) && ((instream.length - headerLength) >= bodyLength)) {
                     const request = instream.read(bodyLength);

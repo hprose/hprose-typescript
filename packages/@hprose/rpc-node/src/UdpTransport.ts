@@ -53,12 +53,14 @@ export class UdpTransport implements Transport {
             if (crc32(header) !== crc) return;
             const bodyLength = msg.readUInt16BE(4);
             if (bodyLength !== msg.length - 8) return;
-            const index = msg.readUInt16BE(6);
+            let index = msg.readUInt16BE(6);
+            const has_error = (index & 0x8000) !== 0;
+            index &= 0x7FFF;
             const response = new Uint8Array(msg.buffer, msg.byteOffset + 8, bodyLength);
             const result = this.results[uri][index];
             delete this.results[uri][index];
             if (result) {
-                if ((index & 0x8000) === 0x8000) {
+                if (has_error) {
                     result.reject(new Error(fromUint8Array(response)));
                 }
                 else {

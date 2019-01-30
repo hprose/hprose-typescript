@@ -16,7 +16,7 @@
 import * as net from 'net';
 import * as tls from 'tls';
 import { parse } from 'url';
-import { ByteStream, writeInt32BE } from '@hprose/io';
+import { ByteStream, writeInt32BE, fromUint8Array } from '@hprose/io';
 import { Transport, Deferred, crc32, defer, Context, TimeoutError, Client } from '@hprose/rpc-core';
 
 export class SocketTransport implements Transport {
@@ -100,7 +100,7 @@ export class SocketTransport implements Transport {
                     const crc = instream.readInt32BE();
                     instream.mark();
                     const header = instream.read(8);
-                    if (crc32(header) !== crc || (header[0] & 0x80) === 0 || (header[4] & 0x80) !== 0) {
+                    if (crc32(header) !== crc || (header[0] & 0x80) === 0) {
                         socket.removeListener('data', ondata);
                         socket.destroy(new Error('invalid response'));
                         return;
@@ -113,10 +113,18 @@ export class SocketTransport implements Transport {
                     const response = instream.read(bodyLength);
                     instream.trunc();
                     bodyLength = -1;
+                    const has_error = (index & 0x80000000) !== 0;
+                    index &= 0x7FFFFFFF;
                     const result = this.results[uri][index];
                     delete this.results[uri][index];
                     if (result) {
-                        result.resolve(response);
+                        if (has_error) {
+                            result.reject(new Error(fromUint8Array(response)));
+                            socket.end();
+                        }
+                        else {
+                            result.resolve(response);
+                        }
                     }
                 } else {
                     break;
@@ -188,7 +196,7 @@ export class SocketTransport implements Transport {
         outstream.write(header);
         outstream.write(request);
         request = outstream.takeBytes();
-        socket.write(Buffer.from(request.buffer, request.byteOffset, request.length));
+        socket.write(Buffer.from(request.buffer, request.byteOffset, request.length), () => {});
         return result.promise;
     }
     public async abort(): Promise<void> {
