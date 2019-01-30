@@ -42,8 +42,29 @@ function pow2roundup(value: number): number {
     return value + 1;
 }
 
+let arrayLikeObjectArgumentsEnabled = true;
+
+try {
+    fromCharCode(new Uint8Array([1, 2]));
+}
+catch (e) {
+    arrayLikeObjectArgumentsEnabled = false;
+}
+
+function toArray<T>(arraylike: ArrayLike<T>): T[] {
+    const n = arraylike.length;
+    const array = new Array(n);
+    for (let i = 0; i < n; ++i) {
+        array[i] = arraylike[i];
+    }
+    return array;
+}
+
 function fromCharCode(charCodes: ArrayLike<number>): string {
-    return String.fromCharCode.apply(String, charCodes as number[]);
+    if (arrayLikeObjectArgumentsEnabled) {
+        return String.fromCharCode.apply(String, charCodes as number[]);
+    }
+    return String.fromCharCode.apply(String, toArray(charCodes));
 }
 
 function readString(bytes: Uint8Array, charLength: number): [string, number] {
