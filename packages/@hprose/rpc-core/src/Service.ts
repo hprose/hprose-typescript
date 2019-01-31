@@ -19,6 +19,7 @@ import { ServiceContext } from './ServiceContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
 import { MethodLike, Method } from './Method';
 import { MethodManager, MissingFunction } from './MethodManager';
+import { TimeoutError } from './TimeoutError';
 
 export interface Handler {
     bind(server: any): void;
@@ -81,6 +82,23 @@ export class Service {
         return this;
     }
     public handle(request: Uint8Array, context: Context): Promise<Uint8Array> {
+        if (this.timeout > 0) {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                    reject(new TimeoutError());
+                }, this.timeout);
+                this.handlerManager.ioHandler(request, context).then(
+                    (value) => {
+                        clearTimeout(timeoutId);
+                        resolve(value);
+                    },
+                    (reason) => {
+                        clearTimeout(timeoutId);
+                        reject(reason);
+                    }
+                );
+            });
+        }
         return this.handlerManager.ioHandler(request, context);
     }
     public async process(request: Uint8Array, context: Context): Promise<Uint8Array> {
