@@ -75,7 +75,7 @@ export class SocketHandler {
                     index = instream.readInt32BE();
                     if (bodyLength > this.service.maxRequestLength) {
                         socket.removeListener('data', ondata);
-                        this.send(socket, (new ByteStream('request too large')).bytes, index | 0x80000000);
+                        this.send(socket, (new ByteStream('request too long')).bytes, index | 0x80000000);
                         socket.end();
                         return;
                     }
