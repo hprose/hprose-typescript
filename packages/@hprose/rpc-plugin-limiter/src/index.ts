@@ -13,12 +13,12 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context, NextIOHandler, NextInvokeHandler, Deferred, defer } from '@hprose/rpc-core';
+import { Context, NextIOHandler, NextInvokeHandler, Deferred, defer, TimeoutError } from '@hprose/rpc-core';
 
 export class RateLimiter {
     private readonly interval: number;
     private next: number = Date.now();
-    constructor(permitsPerSecond: number, private readonly maxPermits: number) {
+    constructor(permitsPerSecond: number, private readonly maxPermits: number, private readonly timeout: number = 0) {
         this.interval = 1000 % permitsPerSecond;
     }
     public async acquire(tokens: number = 1): Promise<number> {
@@ -30,6 +30,9 @@ export class RateLimiter {
         }
         this.next = now - permits * this.interval;
         if (next <= now) return next;
+        if (this.timeout > 0 && next - now > this.timeout) {
+            throw new TimeoutError();
+        }
         return new Promise<number>(function(resolve) {
             setTimeout(resolve, next - now, next);
         });
@@ -47,10 +50,20 @@ export class RateLimiter {
 export class Limiter {
     private counter: number = 0;
     private tasks: Deferred<void>[] = [];
-    constructor(private readonly maxConcurrentRequests: number) { }
+    constructor(private readonly maxConcurrentRequests: number, private readonly timeout: number = 0) { }
     public async acquire(): Promise<void> {
         if (this.counter++ < this.maxConcurrentRequests) return;
         const task = defer<void>();
+        if (this.timeout > 0) {
+            const timeoutId = setTimeout(() => {
+                task.reject(new TimeoutError());
+            }, this.timeout);
+            task.promise.then(() => {
+                clearTimeout(timeoutId);
+            }, () => {
+                clearTimeout(timeoutId);
+            });
+        }
         this.tasks.push(task);
         return task.promise;
     }
