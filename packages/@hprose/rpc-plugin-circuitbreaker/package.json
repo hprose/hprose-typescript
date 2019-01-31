@@ -1,0 +1,42 @@
+{
+  "name": "@hprose/rpc-plugin-circuitbreaker",
+  "version": "3.0.0-beta.8",
+  "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-circuitbreaker",
+  "description": "hprose for TypeScript",
+  "author": {
+    "name": "Ma Bingyao",
+    "email": "mabingyao@gmail.com",
+    "url": "http://hprose.com/"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "typings": "lib/index.d.ts",
+  "repository": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-circuitbreaker",
+  "bugs": {
+    "url": "https://github.com/hprose/hprose-typescript/issues",
+    "email": "andot@hprose.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "compile": "tsc -b tsconfig.json",
+    "prepublish": "npm run compile"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "@types/node": "^10.12.18",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "@hprose/rpc-core": "^3.0.0-beta.8"
+  },
+  "files": [
+    "./lib/"
+  ],
+  "gitHead": "9d10af9a0f2c254ee419195f543f6b0ba584f64e"
+}
