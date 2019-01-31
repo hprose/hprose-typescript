@@ -15,10 +15,12 @@
 
 import { Context, NextInvokeHandler } from '@hprose/rpc-core';
 
-export async function onewayHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
-    const result = next(name, args, context);
-    if (context.oneway) {
-        return undefined;
+export class Oneway {
+    public static async handler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+        const result = next(name, args, context);
+        if (context.oneway) {
+            return undefined;
+        }
+        return result;
     }
-    return result;
 }
