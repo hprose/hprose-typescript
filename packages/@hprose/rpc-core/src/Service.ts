@@ -44,7 +44,7 @@ export class Service {
             }
         });
     }
-    public timeout: number = 300000;
+    public timeout: number = 30000;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
     public maxRequestLength: number = 0x7FFFFFFF;
     private readonly handlerManager: HandlerManager = new HandlerManager(this.execute.bind(this), this.process.bind(this));
