@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context, ClientContext, IOHandler, NextIOHandler, NextInvokeHandler } from '@hprose/rpc-core';
+import { Context, ClientContext, NextIOHandler, NextInvokeHandler } from '@hprose/rpc-core';
 
 export interface ClusterSettings {
     retry?: number;
@@ -68,49 +68,48 @@ export class FailfastSettings implements ClusterSettings {
 }
 
 export class Cluster {
-    public static getHandler(settings: ClusterSettings = FailoverSettings.default): IOHandler {
+    public constructor(public settings: ClusterSettings = FailoverSettings.default) {
         if (settings.retry === undefined) settings.retry = 10;
         if (settings.idempotent === undefined) settings.idempotent = false;
-        async function handler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
-            try {
-                const result = await next(request, context);
-                if (settings.onsuccess) {
-                    settings.onsuccess(context);
-                }
-                return result;
-            }
-            catch (e) {
-                if (settings.onfailure) {
-                    settings.onfailure(context);
-                }
-                if (settings.onretry) {
-                    const idempotent = context.idempotent === undefined ? settings.idempotent : context.idempotent;
-                    const retry = context.retry === undefined ? settings.retry : context.retry;
-                    if (context.retried === undefined) {
-                        context.retried = 0;
-                    }
-                    if (idempotent && context.retried < retry) {
-                        const interval = settings.onretry(context);
-                        if (interval > 0) {
-                            return new Promise<Uint8Array>((resolve, reject) => {
-                                setTimeout(() => {
-                                    handler(request, context, next)
-                                        .then((result) => resolve(result))
-                                        .catch((reason) => reject(reason));
-                                }, interval);
-                            });
-                        } else {
-                            return handler(request, context, next);
-                        }
-                    }
-                }
-                throw e;
-            }
-        }
-        return handler;
     }
-    
-    public static forkingHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public handler = async(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
+        const settings = this.settings;
+        try {
+            const result = await next(request, context);
+            if (settings.onsuccess) {
+                settings.onsuccess(context);
+            }
+            return result;
+        }
+        catch (e) {
+            if (settings.onfailure) {
+                settings.onfailure(context);
+            }
+            if (settings.onretry) {
+                const idempotent = context.idempotent === undefined ? settings.idempotent : context.idempotent;
+                const retry = context.retry === undefined ? settings.retry : context.retry;
+                if (context.retried === undefined) {
+                    context.retried = 0;
+                }
+                if (idempotent && context.retried < retry) {
+                    const interval = settings.onretry(context);
+                    if (interval > 0) {
+                        return new Promise<Uint8Array>((resolve, reject) => {
+                            setTimeout(() => {
+                                this.handler(request, context, next)
+                                    .then((result) => resolve(result))
+                                    .catch((reason) => reject(reason));
+                            }, interval);
+                        });
+                    } else {
+                        return this.handler(request, context, next);
+                    }
+                }
+            }
+            throw e;
+        }
+    }
+    public static forking(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
         const clientContext = context as ClientContext;
         const uris = clientContext.client.uris;
         const n = uris.length;
@@ -133,8 +132,7 @@ export class Cluster {
             });
         });
     }
-    
-    public static broadcastHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public static broadcast(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
         const clientContext = context as ClientContext;
         const uris = clientContext.client.uris;
         const n = uris.length;
