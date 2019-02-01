@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context, NextIOHandler } from '@hprose/rpc-core';
+import { Context, NextIOHandler, URI } from '@hprose/rpc-core';
 
 export interface WeightedURIList {
     [uri: string]: number
@@ -185,21 +185,22 @@ export class LeastActiveLoadBalance {
     private readonly actives: number[] = [];
     public handler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const uris = context.client.uris;
-        if (this.actives.length === 0) {
-            this.actives.length = uris.length;
+        const n = uris.length;
+        if (this.actives.length < n) {
+            this.actives.length = n;
             this.actives.fill(0);
         }
-        const leastActive = Math.min(...this.actives);
-        const leastActiveIndexes = this.actives.reduce((indexes, active, index) => {
-            if (active === leastActive) {
-                indexes.push(index);
+        const leastActive = Math.min(...(this.actives.length > n ? this.actives.slice(0, n) : this.actives));
+        const leastActiveIndexes: number[] = [];
+        for (let i = 0; i < n; ++i) {
+            if (this.actives[i] === leastActive) {
+                leastActiveIndexes.push(i);
             }
-            return indexes;
-        }, [] as number[]);
+        }
         let index = leastActiveIndexes[0];
-        const n = leastActiveIndexes.length;
-        if (n > 1) {
-            index = leastActiveIndexes[Math.floor(Math.random() * n)];
+        const count = leastActiveIndexes.length;
+        if (count > 1) {
+            index = leastActiveIndexes[Math.floor(Math.random() * count)];
         }
         context.uri = uris[index];
         this.actives[index]++;
