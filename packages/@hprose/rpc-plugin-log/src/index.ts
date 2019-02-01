@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-log for TypeScript.                   |
 |                                                          |
-| LastModified: Jan 30, 2019                               |
+| LastModified: Feb 1, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,7 +27,7 @@ export class Log {
         return response;
     }
     public static async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
-        const a = JSON.stringify(args);
+        const a = JSON.stringify((context.method && context.method.passContext) ? args.slice(0, args.length - 1) : args);
         const result = next(name, args, context);
         result.then(
             (value) => console.log(`${name}(${a.substring(1, a.length - 1)}) = ${JSON.stringify(value)}`),
