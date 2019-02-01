@@ -68,18 +68,18 @@ export class FailfastConfig implements ClusterConfig {
 }
 
 export class Cluster {
-    public constructor(public config: ClusterConfig = FailoverConfig.instance) {
+    public constructor(public readonly config: ClusterConfig = FailoverConfig.instance) {
         if (config.retry === undefined) config.retry = 10;
         if (config.idempotent === undefined) config.idempotent = false;
     }
     public handler = async(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const config = this.config;
         try {
-            const result = await next(request, context);
+            const response = await next(request, context);
             if (config.onsuccess) {
                 config.onsuccess(context);
             }
-            return result;
+            return response;
         }
         catch (e) {
             if (config.onfailure) {
@@ -110,26 +110,20 @@ export class Cluster {
         }
     }
     public static forking(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
-        const clientContext = context as ClientContext;
-        const uris = clientContext.client.uris;
-        const n = uris.length;
-        const results: Promise<any>[] = new Array(n);
-        for (let i = 0; i < n; i++) {
-            const forkingContext = clientContext.clone();
-            forkingContext.uri = uris[i];
-            results[i] = next(name, args, forkingContext);
-        }
         return new Promise<any>((resolve, reject) => {
-            const reasons: Error[] = new Array(n);
+            const clientContext = context as ClientContext;
+            const uris = clientContext.client.uris;
+            const n = uris.length;
             let count = n;
-            results.forEach((result, index) => {
-                result.then(resolve, (reason) => {
-                    reasons[index] = reason;
+            for (let i = 0; i < n; ++i) {
+                const forkingContext = clientContext.clone();
+                forkingContext.uri = uris[i];
+                next(name, args, forkingContext).then(resolve, (reason) => {
                     if (--count === 0) {
-                        reject(reasons[0]);
+                        reject(reason);
                     }
                 });
-            });
+            }
         });
     }
     public static broadcast(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
@@ -137,7 +131,7 @@ export class Cluster {
         const uris = clientContext.client.uris;
         const n = uris.length;
         const results: Promise<any>[] = new Array(n);
-        for (let i = 0; i < n; i++) {
+        for (let i = 0; i < n; ++i) {
             const forkingContext = clientContext.clone();
             forkingContext.uri = uris[i];
             results[i] = next(name, args, forkingContext);
