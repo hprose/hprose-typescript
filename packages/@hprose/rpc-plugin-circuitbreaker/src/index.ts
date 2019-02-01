@@ -36,9 +36,8 @@ export class CircuitBreaker {
             const interval = Date.now() - this.lastFailTime;
             if (interval < this.recoverTime) {
                 throw new BreakerError();
-            } else {
-                this.failCount = this.threshold >> 1;
             }
+            this.failCount = this.threshold >> 1;
         }
         const response = next(request, context);
         response.then(() => {
