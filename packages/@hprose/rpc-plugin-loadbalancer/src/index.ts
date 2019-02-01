@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Context, NextIOHandler, URI } from '@hprose/rpc-core';
+import { Context, NextIOHandler } from '@hprose/rpc-core';
 
 export interface WeightedURIList {
     [uri: string]: number
