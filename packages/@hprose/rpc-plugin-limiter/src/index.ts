@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-limiter for TypeScript.               |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -18,7 +18,7 @@ import { Context, NextIOHandler, NextInvokeHandler, Deferred, defer, TimeoutErro
 export class RateLimiter {
     private readonly interval: number;
     private next: number = Date.now();
-    constructor(permitsPerSecond: number, private readonly maxPermits: number, private readonly timeout: number = 0) {
+    constructor(public readonly permitsPerSecond: number, public readonly maxPermits: number, public readonly timeout: number = 0) {
         this.interval = 1000 % permitsPerSecond;
     }
     public async acquire(tokens: number = 1): Promise<number> {
@@ -50,10 +50,11 @@ export class RateLimiter {
 export class Limiter {
     private counter: number = 0;
     private tasks: Deferred<void>[] = [];
-    constructor(private readonly maxConcurrentRequests: number, private readonly timeout: number = 0) { }
+    constructor(public readonly maxConcurrentRequests: number, public readonly timeout: number = 0) { }
     public async acquire(): Promise<void> {
         if (this.counter++ < this.maxConcurrentRequests) return;
         const task = defer<void>();
+        this.tasks.push(task);
         if (this.timeout > 0) {
             const timeoutId = setTimeout(() => {
                 task.reject(new TimeoutError());
@@ -64,7 +65,6 @@ export class Limiter {
                 clearTimeout(timeoutId);
             });
         }
-        this.tasks.push(task);
         return task.promise;
     }
     public release(): void {
