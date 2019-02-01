@@ -24,7 +24,7 @@ export interface ClusterConfig {
 }
 
 export class FailoverConfig implements ClusterConfig {
-    static readonly default: ClusterConfig = new FailoverConfig();
+    public static readonly instance: ClusterConfig = new FailoverConfig();
     public onfailure: (context: Context) => void;
     public onretry: (context: Context) => number;
     constructor(public retry: number = 10, minInterval: number = 500, maxInterval: number = 5000) {
@@ -49,7 +49,7 @@ export class FailoverConfig implements ClusterConfig {
 }
 
 export class FailtryConfig implements ClusterConfig {
-    static readonly default: ClusterConfig = new FailtryConfig();
+    public static readonly instance: ClusterConfig = new FailtryConfig();
     public onretry: (context: Context) => number;
     constructor(public retry: number = 10, minInterval: number = 500, maxInterval: number = 5000) {
         this.onretry = (context: Context) => {
@@ -68,7 +68,7 @@ export class FailfastConfig implements ClusterConfig {
 }
 
 export class Cluster {
-    public constructor(public config: ClusterConfig = FailoverConfig.default) {
+    public constructor(public config: ClusterConfig = FailoverConfig.instance) {
         if (config.retry === undefined) config.retry = 10;
         if (config.idempotent === undefined) config.idempotent = false;
     }
