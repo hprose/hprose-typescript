@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-log for TypeScript.                   |
 |                                                          |
-| LastModified: Feb 1, 2019                                |
+| LastModified: Feb 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,17 @@ import { ByteStream } from '@hprose/io';
 import { Context, NextIOHandler, NextInvokeHandler } from '@hprose/rpc-core';
 
 export class Log {
-    public static async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+    private static readonly instance: Log = new Log();
+    public constructor(public enabled: boolean = true) {}
+    public static ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+        return Log.instance.ioHandler(request, context, next);
+    }
+    public static invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+        return Log.instance.invokeHandler(name, args, context, next);
+    }
+    public async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+        const enabled = (context.log === undefined) ? this.enabled : context.log;
+        if (!enabled) return next(request, context);
         console.log(ByteStream.toString(request));
         const response = next(request, context);
         response.then(
@@ -26,7 +36,9 @@ export class Log {
         );
         return response;
     }
-    public static async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+        const enabled = (context.log === undefined) ? this.enabled : context.log;
+        if (!enabled) return next(name, args, context);
         const a = JSON.stringify((context.method && context.method.passContext) ? args.slice(0, args.length - 1) : args);
         const result = next(name, args, context);
         result.then(
