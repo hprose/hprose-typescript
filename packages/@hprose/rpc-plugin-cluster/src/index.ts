@@ -8,14 +8,14 @@
 |                                                          |
 | @hprose/rpc-plugin-cluster for TypeScript.               |
 |                                                          |
-| LastModified: Jan 31, 2019                               |
+| LastModified: Feb 1, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { Context, ClientContext, NextIOHandler, NextInvokeHandler } from '@hprose/rpc-core';
 
-export interface ClusterSettings {
+export interface ClusterConfig {
     retry?: number;
     idempotent?: boolean;
     onsuccess?: (context: Context) => void;
@@ -23,8 +23,8 @@ export interface ClusterSettings {
     onretry?: (context: Context) => number;
 }
 
-export class FailoverSettings implements ClusterSettings {
-    static readonly default: ClusterSettings = new FailoverSettings();
+export class FailoverConfig implements ClusterConfig {
+    static readonly default: ClusterConfig = new FailoverConfig();
     public onfailure: (context: Context) => void;
     public onretry: (context: Context) => number;
     constructor(public retry: number = 10, minInterval: number = 500, maxInterval: number = 5000) {
@@ -48,8 +48,8 @@ export class FailoverSettings implements ClusterSettings {
     }
 }
 
-export class FailtrySettings implements ClusterSettings {
-    static readonly default: ClusterSettings = new FailtrySettings();
+export class FailtryConfig implements ClusterConfig {
+    static readonly default: ClusterConfig = new FailtryConfig();
     public onretry: (context: Context) => number;
     constructor(public retry: number = 10, minInterval: number = 500, maxInterval: number = 5000) {
         this.onretry = (context: Context) => {
@@ -62,37 +62,37 @@ export class FailtrySettings implements ClusterSettings {
     }
 }
 
-export class FailfastSettings implements ClusterSettings {
+export class FailfastConfig implements ClusterConfig {
     public retry: number = 0;
     constructor(public onfailure: (context: Context) => void) { }
 }
 
 export class Cluster {
-    public constructor(public settings: ClusterSettings = FailoverSettings.default) {
-        if (settings.retry === undefined) settings.retry = 10;
-        if (settings.idempotent === undefined) settings.idempotent = false;
+    public constructor(public config: ClusterConfig = FailoverConfig.default) {
+        if (config.retry === undefined) config.retry = 10;
+        if (config.idempotent === undefined) config.idempotent = false;
     }
     public handler = async(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
-        const settings = this.settings;
+        const config = this.config;
         try {
             const result = await next(request, context);
-            if (settings.onsuccess) {
-                settings.onsuccess(context);
+            if (config.onsuccess) {
+                config.onsuccess(context);
             }
             return result;
         }
         catch (e) {
-            if (settings.onfailure) {
-                settings.onfailure(context);
+            if (config.onfailure) {
+                config.onfailure(context);
             }
-            if (settings.onretry) {
-                const idempotent = context.idempotent === undefined ? settings.idempotent : context.idempotent;
-                const retry = context.retry === undefined ? settings.retry : context.retry;
+            if (config.onretry) {
+                const idempotent = context.idempotent === undefined ? config.idempotent : context.idempotent;
+                const retry = context.retry === undefined ? config.retry : context.retry;
                 if (context.retried === undefined) {
                     context.retried = 0;
                 }
                 if (idempotent && context.retried < retry) {
-                    const interval = settings.onretry(context);
+                    const interval = config.onretry(context);
                     if (interval > 0) {
                         return new Promise<Uint8Array>((resolve, reject) => {
                             setTimeout(() => {
