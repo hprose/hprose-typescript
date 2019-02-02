@@ -8,15 +8,16 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 2, 2019                                |
+| LastModified: Feb 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Context, Deferred, Service, Method, defer, TimeoutError, ServiceContext, NextInvokeHandler } from '@hprose/rpc-core';
+import { Context, Deferred, Service, Method, defer, ServiceContext, NextInvokeHandler } from '@hprose/rpc-core';
 import { Message } from './Message';
 
 export interface Producer {
+    readonly from: string;
     unicast(data: any, topic: string, id: string): boolean;
     multicast(data: any, topic: string, id: string[]): { [id: string]: boolean };
     broadcast(data: any, topic: string): { [id: string]: boolean };
@@ -33,39 +34,33 @@ export interface BrokerContext extends Context {
 export class Broker {
     protected messages: { [id: string]: { [topic: string]: Message[] | null } } = Object.create(null);
     protected responders: { [id: string]: Deferred<any> } = Object.create(null);
-    protected timers: { [id: string]: Deferred<void> } = Object.create(null);
+    protected timers: { [id: string]: Deferred<boolean> } = Object.create(null);
     public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     public heartbeat: number = 10000;
     public onsubscribe?: (id: string, topic: string, context: Context) => void;
-    public onunsubscribe?: (id: string, topic: string, messages: any[], context: Context) => void;
-    constructor(public service: Service) {
+    public onunsubscribe?: (id: string, topic: string, messages: any[] | null, context: Context) => void;
+    constructor(public readonly service: Service) {
         const subscribe = new Method(this.subscribe, '+', this, [String]);
         subscribe.passContext = true;
-        this.service.add(subscribe);
-
         const unsubscribe = new Method(this.unsubscribe, '-', this, [String]);
         unsubscribe.passContext = true;
-        this.service.add(unsubscribe);
-
         const message = new Method(this.message, '<', this);
         message.passContext = true;
-        this.service.add(message);
-
         const unicast = new Method(this.unicast, '>', this, [undefined, String, String, String]);
-        this.service.add(unicast);
-
         const multicast = new Method(this.multicast, '>?', this, [undefined, String, Array, String]);
-        this.service.add(multicast);
-
         const broadcast = new Method(this.broadcast, '>*', this, [undefined, String, String]);
-        this.service.add(broadcast);
-
         const exists = new Method(this.exists, '?', this, [String, String]);
-        this.service.add(exists);
-
         const idlist = new Method(this.idlist, '|', this, [String]);
-        this.service.add(idlist);
+        this.service.add(subscribe)
+                    .add(unsubscribe)
+                    .add(message)
+                    .add(unicast)
+                    .add(multicast)
+                    .add(broadcast)
+                    .add(exists)
+                    .add(idlist)
+                    .use(this.handler)
     }
     protected send(id: string, responder: Deferred<any>): boolean {
         const topics = this.messages[id];
@@ -91,31 +86,49 @@ export class Broker {
             } else if (count > 0) {
                 responder.resolve(result);
                 if (this.heartbeat > 0) {
-                    let timer = this.timers[id];
-                    if (timer) timer.resolve();
-                    timer = defer();
+                    let timer = defer<boolean>();
+                    if (this.timers[id]) {
+                        this.timers[id].resolve(false);
+                    }
+                    this.timers[id] = timer;
                     const timeoutId = setTimeout(() => {
-                        timer.reject(new TimeoutError());
+                        timer.resolve(true);
                     }, this.heartbeat);
-                    timer.promise.then(() => {
+                    timer.promise.then((value) => {
                         clearTimeout(timeoutId);
-                    }, (reason) => {
-                        clearTimeout(timeoutId);
-                        if (reason instanceof TimeoutError && this.messages[id]) {
-                            for (const topic in this.messages[id]) {
-                                const context = new ServiceContext(this.service);
-                                context.requestHeaders['id'] = id;
-                                this.unsubscribe(topic, context);
+                        const topics = this.messages[id];
+                        if (value && topics) {
+                            for (const topic in topics) {
+                                this.offline(topics, id, topic, new ServiceContext(this.service));
                             }
                         }
                     });
-                    this.timers[id] = timer;
                 }
             } else {
                 return false;
             }
         } else {
             responder.resolve();
+        }
+        return true;
+    }
+    protected id(context: Context): string {
+        if (context.requestHeaders['id']) {
+            return context.requestHeaders['id'].toString();
+        }
+        throw new Error('client unique id not found');
+    }
+    protected subscribe(topic: string, context: Context): boolean {
+        const id = this.id(context);
+        if (this.messages[id] === undefined) {
+            this.messages[id] = Object.create(null);
+        }
+        if (this.messages[id][topic]) {
+            return false;
+        }
+        this.messages[id][topic] = [];
+        if (this.onsubscribe) {
+            this.onsubscribe(id, topic, context);
         }
         return true;
     }
@@ -127,16 +140,14 @@ export class Broker {
             }
         }
     }
-    protected subscribe(topic: string, context: Context): boolean {
-        const id = this.id(context);
-        if (this.messages[id] === undefined) {
-            this.messages[id] = Object.create(null);
-        }
-        if (!Array.isArray(this.messages[id][topic])) {
-            this.messages[id][topic] = [];
-            if (this.onsubscribe) {
-                this.onsubscribe(id, topic, context);
+    protected offline(topics: { [topic: string]: Message[] | null }, id: string, topic: string, context: Context) {
+        if (topic in topics) {
+            const messages = topics[topic];
+            delete topics[topic];
+            if (this.onunsubscribe) {
+                this.onunsubscribe(id, topic, messages, context);
             }
+            this.response(id);
             return true;
         }
         return false;
@@ -144,15 +155,7 @@ export class Broker {
     protected unsubscribe(topic: string, context: Context): boolean {
         const id = this.id(context);
         if (this.messages[id]) {
-            const messages = this.messages[id][topic];
-            if (Array.isArray(messages)) {
-                delete this.messages[id][topic];
-                if (this.onunsubscribe) {
-                    this.onunsubscribe(id, topic, messages, context);
-                }
-                this.response(id);
-                return true;
-            }
+            return this.offline(this.messages[id], id, topic, context);
         }
         return false;
     }
@@ -166,10 +169,11 @@ export class Broker {
         if (this.timers[id]) {
             const timer = this.timers[id];
             delete this.timers[id];
-            timer.resolve();
+            timer.resolve(false);
         }
         const responder = defer<any>();
         if (!this.send(id, responder)) {
+            this.responders[id] = responder;
             if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
                     responder.resolve(Object.create(null));
@@ -178,34 +182,26 @@ export class Broker {
                     clearTimeout(timeoutId);
                 });
             }
-            this.responders[id] = responder;
         }
         return responder.promise;
     }
-    protected id(context: Context): string {
-        if (context.requestHeaders['id']) {
-            return context.requestHeaders['id'].toString();
-        }
-        throw new Error('client unique id not found');
-    }
     public unicast(data: any, topic: string, id: string, from: string = ''): boolean {
-        let result = false;
         if (this.messages[id]) {
             const messages = this.messages[id][topic];
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
                     messages.push({ from, data });
-                    result = true;
+                    this.response(id);
+                    return true;
                 }
             }
-            this.response(id);
         }
-        return result;
+        return false;
     }
-    public multicast(data: any, topic: string, id: string[], from: string = ''): { [id: string]: boolean } {
+    public multicast(data: any, topic: string, ids: string[], from: string = ''): { [id: string]: boolean } {
         const result: { [id: string]: boolean } = Object.create(null);
-        for (let i = 0; i < id.length; ++i) {
-            result[id[i]] = this.unicast(data, topic, id[i], from);
+        for (let i = 0; i < ids.length; ++i) {
+            result[ids[i]] = this.unicast(data, topic, ids[i], from);
         }
         return result;
     }
@@ -216,12 +212,12 @@ export class Broker {
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
                     messages.push({ from, data });
+                    this.response(id);
                     result[id] = true;
                 } else {
                     result[id] = false;
                 }
             }
-            this.response(id);
         }
         return result;
     }
@@ -270,8 +266,9 @@ export class Broker {
                 break;
         }
         const producer: Producer = {
+            from,
             unicast: (data, topic, id) => this.unicast(data, topic, id, from),
-            multicast: (data, topic, id) => this.multicast(data, topic, id, from),
+            multicast: (data, topic, ids) => this.multicast(data, topic, ids, from),
             broadcast: (data, topic) => this.broadcast(data, topic, from),
             push: (data, topic, id?) => this.push(data, topic, id, from),
             deny: (id = from, topic?) => this.deny(id, topic),

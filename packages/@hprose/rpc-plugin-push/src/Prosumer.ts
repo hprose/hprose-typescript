@@ -21,7 +21,7 @@ export class Prosumer {
     public onerror?: (error: Error) => void;
     public onsubscribe?:(topic: string) => void;
     public onunsubscribe?:(topic: string) => void;
-    constructor(public client: Client, id?: string) {
+    constructor(public readonly client: Client, id?: string) {
         if (id) this.id = id;
     }
     public get id(): string {
@@ -89,8 +89,8 @@ export class Prosumer {
     public unicast(data: any, topic: string, id: string): Promise<boolean> {
         return this.client.invoke('>', [data, topic, id], { type: Boolean });
     }
-    public multicast(data: any, topic: string, id: string[]): Promise<{ [id: string]: boolean }> {
-        return this.client.invoke('>?', [data, topic, id]);
+    public multicast(data: any, topic: string, ids: string[]): Promise<{ [id: string]: boolean }> {
+        return this.client.invoke('>?', [data, topic, ids]);
     }
     public broadcast(data: any, topic: string):  Promise<{ [id: string]: boolean }> {
         return this.client.invoke('>*', [data, topic]);

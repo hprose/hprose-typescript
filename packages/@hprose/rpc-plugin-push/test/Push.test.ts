@@ -5,8 +5,7 @@ import '@hprose/rpc-node';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
-    const service = new Service();
-    service.use(new Broker(service).handler);
+    const service = new Broker(new Service()).service;
     // service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);
@@ -54,7 +53,6 @@ test('test server push', async() => {
     const service = new Service();
     // service.use(Log.ioHandler);
     const broker = new Broker(service);
-    service.use(broker.handler);
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer();
     service.bind(server);
