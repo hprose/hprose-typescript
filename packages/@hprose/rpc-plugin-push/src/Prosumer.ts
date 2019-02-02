@@ -8,7 +8,7 @@
 |                                                          |
 | Prosumer for TypeScript.                                 |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -102,7 +102,7 @@ export class Prosumer {
             default: return this.multicast(data, topic, id);
         }
     }
-    public exist(topic: string, id: string = this.id): Promise<boolean> {
+    public exists(topic: string, id: string = this.id): Promise<boolean> {
         return this.client.invoke('?', [topic, id], { type: Boolean });
     }
     public idlist(topic: string): Promise<string[]> {

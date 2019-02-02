@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ export interface Producer {
     broadcast(data: any, topic: string): { [id: string]: boolean };
     push(data: any, topic: string, id?: string | string[]): boolean | { [id: string]: boolean };
     deny(id?: string, topic?: string): void;
-    exist(topic: string, id?: string): boolean;
+    exists(topic: string, id?: string): boolean;
     idlist(topic: string): string[];
 }
 
@@ -61,8 +61,8 @@ export class Broker {
         const broadcast = new Method(this.broadcast, '>*', this, [undefined, String, String]);
         this.service.add(broadcast);
 
-        const exist = new Method(this.exist, '?', this, [String, String]);
-        this.service.add(exist);
+        const exists = new Method(this.exists, '?', this, [String, String]);
+        this.service.add(exists);
 
         const idlist = new Method(this.idlist, '|', this, [String]);
         this.service.add(idlist);
@@ -246,7 +246,7 @@ export class Broker {
             this.response(id);
         }
     }
-    public exist(topic: string, id: string): boolean {
+    public exists(topic: string, id: string): boolean {
         return (id in this.messages) && Array.isArray(this.messages[id][topic]);
     }
     public idlist(topic: string): string[] {
@@ -275,7 +275,7 @@ export class Broker {
             broadcast: (data, topic) => this.broadcast(data, topic, from),
             push: (data, topic, id?) => this.push(data, topic, id, from),
             deny: (id = from, topic?) => this.deny(id, topic),
-            exist: (topic, id = from) => this.exist(topic, id),
+            exists: (topic, id = from) => this.exists(topic, id),
             idlist: (topic) => this.idlist(topic)
         };
         context.producer = producer;
