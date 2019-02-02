@@ -23,18 +23,19 @@ export class RateLimiter {
     }
     public async acquire(tokens: number = 1): Promise<number> {
         const now = Date.now();
-        const next = this.next;
-        let permits = (now - next) / this.interval - tokens;
+        const last = this.next;
+        let permits = (now - last) / this.interval - tokens;
         if (permits > this.maxPermits) {
             permits = this.maxPermits;
         }
         this.next = now - permits * this.interval;
-        if (next <= now) return next;
-        if (this.timeout > 0 && next - now > this.timeout) {
+        const delay = last - now;
+        if (delay <= 0) return last;
+        if (this.timeout > 0 && delay > this.timeout) {
             throw new TimeoutError();
         }
         return new Promise<number>(function(resolve) {
-            setTimeout(resolve, next - now, next);
+            setTimeout(resolve, delay, last);
         });
     }
     public async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
