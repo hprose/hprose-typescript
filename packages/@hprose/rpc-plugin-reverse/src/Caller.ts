@@ -111,10 +111,9 @@ export class Caller {
             }
             this.calls[id] = [];
             responder.resolve(calls);
-        } else {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     protected response(id: string): void {
         if (this.responders[id]) {
