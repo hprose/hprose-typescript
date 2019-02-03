@@ -13,7 +13,10 @@
 |                                                          |
 \*________________________________________________________*/
 
-export interface Message {
-    from: string;
-    data: any;
+import { TypeManager } from '@hprose/io';
+
+export class Message {
+    public constructor(public readonly data: any, public readonly from: string) { }
 }
+
+TypeManager.register(Message, '@');

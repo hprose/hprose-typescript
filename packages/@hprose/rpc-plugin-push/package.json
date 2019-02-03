@@ -36,6 +36,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
+    "@hprose/io": "^3.0.0-beta.8",
     "@hprose/rpc-core": "^3.0.0-beta.8"
   },
   "files": [

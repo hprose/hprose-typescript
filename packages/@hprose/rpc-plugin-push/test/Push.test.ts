@@ -1,12 +1,12 @@
 import * as http from 'http';
 import { Context, Service, Client } from '@hprose/rpc-core';
 import '@hprose/rpc-node';
-// import { Log } from '@hprose/rpc-plugin-log';
+import { Log } from '@hprose/rpc-plugin-log';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
     const service = new Broker(new Service()).service;
-    // service.use(Log.ioHandler);
+    service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);
     server.listen(8081);

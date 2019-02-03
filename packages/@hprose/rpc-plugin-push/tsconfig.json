@@ -5,6 +5,7 @@
     "outDir": "lib",
   },
   "references": [
+    { "path": "../io" },
     { "path": "../rpc-core" },
     { "path": "../rpc-plugin-log" },
     { "path": "../rpc-node" }

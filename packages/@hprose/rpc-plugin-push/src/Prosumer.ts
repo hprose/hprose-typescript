@@ -33,35 +33,36 @@ export class Prosumer {
     public set id(value: string) {
         this.client.requestHeaders['id'] = value;
     }
-    private async message(): Promise<void> {
-        do {
-            try {
-                const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<', []);
-                if (!topics) return;
-                setTimeout(() => {
-                    for (const topic in topics) {
-                        const callback = this.callbacks[topic];
-                        if (callback) {
-                            const messages = topics[topic];
-                            if (messages) {
-                                for (let i = 0, n = messages.length; i < n; ++i) {
-                                    callback(messages[i]);
-                                }
-                            } else {
-                                if (this.onunsubscribe) {
-                                    this.onunsubscribe(topic);
-                                }
-                            }
-                        }
+    private async dispatch(topics: { [topic: string]: Message[] }): Promise<void> {
+        for (const topic in topics) {
+            const callback = this.callbacks[topic];
+            if (callback) {
+                const messages = topics[topic];
+                if (messages) {
+                    for (let i = 0, n = messages.length; i < n; ++i) {
+                        callback(messages[i]);
                     }
-                }, 0);
+                } else {
+                    if (this.onunsubscribe) {
+                        this.onunsubscribe(topic);
+                    }
+                }
+            }
+        }
+    }
+    private async message(): Promise<void> {
+        while(true) {
+            try {
+                const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<');
+                if (!topics) return;
+                this.dispatch(topics);
             }
             catch(e) {
                 if (this.onerror) {
                     this.onerror(e);
                 }
             }
-        } while(true);
+        }
     }
     public async subscribe(topic: string, callback: (message: Message) => void): Promise<boolean> {
         if (this.id) {

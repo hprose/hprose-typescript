@@ -190,7 +190,7 @@ export class Broker {
             const messages = this.messages[id][topic];
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
-                    messages.push({ from, data });
+                    messages.push(new Message(data, from));
                     this.response(id);
                     return true;
                 }
@@ -211,7 +211,7 @@ export class Broker {
             const messages = this.messages[id][topic];
             if (messages) {
                 if (messages.length < this.messageQueueMaxLength) {
-                    messages.push({ from, data });
+                    messages.push(new Message(data, from));
                     this.response(id);
                     result[id] = true;
                 } else {
@@ -254,7 +254,7 @@ export class Broker {
         }
         return idlist;
     }
-    public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+    protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         const from = (context.requestHeaders['id']) ? context.requestHeaders['id'].toString() : '';
         switch(name) {
             case '>':
