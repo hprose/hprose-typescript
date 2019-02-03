@@ -136,6 +136,7 @@ export class Caller {
         const id = this.close(context);
         const responder = defer<[number, string, any[]][]>();
         if (!this.send(id, responder)) {
+            this.responders[id] = responder;
             if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
                     responder.resolve([]);
@@ -144,22 +145,21 @@ export class Caller {
                     clearTimeout(timeoutId);
                 });
             }
-            this.responders[id] = responder;
         }
         return responder.promise;
     }
     protected end(results: [number, any, string][], context: Context): void {
         const id = this.id(context);
         for (let i = 0, n = results.length; i < n; ++i) {
-            const result = results[i];
-            const [index, value, error] = result;
+            const [index, value, error] = results[i];
             if (this.results[id] && this.results[id][index]) {
-                if (error) {
-                    this.results[id][index].reject(new Error(error));
-                } else {
-                    this.results[id][index].resolve(value);
-                }
+                const result = this.results[id][index];                
                 delete this.results[id][index];
+                if (error) {
+                    result.reject(new Error(error));
+                } else {
+                    result.resolve(value);
+                }
             }
         }
     }
