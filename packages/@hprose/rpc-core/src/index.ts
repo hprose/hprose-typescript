@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-core for TypeScript.                         |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,9 @@ export { ClientContext } from './ClientContext';
 export { Context } from './Context';
 export { getCookie, setCookie } from './CookieManager';
 export { Deferred, defer } from './Deferred';
-export { HandlerManager, InvokeHandler, NextInvokeHandler, IOHandler, NextIOHandler } from './HandlerManager';
+export { HandlerManager } from './HandlerManager';
+export { InvokeManager, InvokeHandler, NextInvokeHandler } from './InvokeManager';
+export { IOManager, IOHandler, NextIOHandler } from './IOManager';
 export { Method, MethodLike } from './Method';
 export { MissingMethod, MethodManager } from './MethodManager';
 export { Settings } from './Settings';
