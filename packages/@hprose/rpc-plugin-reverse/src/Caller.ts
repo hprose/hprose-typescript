@@ -8,7 +8,7 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -150,30 +150,19 @@ export class Caller {
     protected end(...args: any[]): void {
         const results: ([number, any] | [number, undefined, string])[] = args.slice(0, -1);
         const context: Context = args[args.length - 1];
-        setTimeout(() => {
-            const id = this.id(context);
-            for (let i = 0, n = results.length; i < n; ++i) {
-                const result = results[i];
-                switch (result.length) {
-                    case 2: {
-                        const [index, returnValue] = result;
-                        if (this.results[id] && this.results[id][index]) {
-                            this.results[id][index].resolve(returnValue);
-                            delete this.results[id][index];
-                        }
-                        break;
-                    }
-                    case 3: {
-                        const [index, , error] = result;
-                        if (this.results[id] && this.results[id][index]) {
-                            this.results[id][index].reject(new Error(error));
-                            delete this.results[id][index];
-                        }
-                        break;
-                    }
+        const id = this.id(context);
+        for (let i = 0, n = results.length; i < n; ++i) {
+            const result = results[i];
+            const [index, value, error] = result;
+            if (this.results[id] && this.results[id][index]) {
+                if (error) {
+                    this.results[id][index].reject(new Error(error));
+                } else {
+                    this.results[id][index].resolve(value);
                 }
+                delete this.results[id][index];
             }
-        }, 0);
+        }
     }
     public async invoke(id: string, fullname: string, args: any[] = []): Promise<any> {
         if (args.length > 0) {
