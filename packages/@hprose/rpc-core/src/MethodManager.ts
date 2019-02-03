@@ -13,9 +13,12 @@
 |                                                          |
 \*________________________________________________________*/
 
+import { Context } from './Context';
 import { MethodLike, Method } from './Method';
 
-export type MissingFunction = (fullname: string, args: any[]) => any;
+export type MissingMethod1 = (fullname: string, args: any[]) => any;
+export type MissingMethod2 = (fullname: string, args: any[], context: Context) => any;
+export type MissingMethod = MissingMethod1 | MissingMethod2;
 
 export class MethodManager {
     public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
@@ -82,14 +85,12 @@ export class MethodManager {
             }
         }
     }
-    public addMissingFunction(fn: MissingFunction): void {
-        const method = new Method(fn, '*');
-        method.missing = true;
-        this.add(method);
-    }
-    public addMissingMethod(fn: MissingFunction, target: any): void {
+    public addMissingMethod(fn: MissingMethod, target?: any): void {
         const method = new Method(fn, '*', target);
         method.missing = true;
+        if (fn.length === 3) {
+            method.passContext = true;
+        }
         this.add(method);
     }
     public addFunctions(functions: Function[], fullnames?: string[], paramTypes?: Function[]): void;

@@ -21,7 +21,7 @@ export { getCookie, setCookie } from './CookieManager';
 export { Deferred, defer } from './Deferred';
 export { HandlerManager, InvokeHandler, NextInvokeHandler, IOHandler, NextIOHandler } from './HandlerManager';
 export { Method, MethodLike } from './Method';
-export { MissingFunction, MethodManager } from './MethodManager';
+export { MissingMethod, MethodManager } from './MethodManager';
 export { Settings } from './Settings';
 export { TimeoutError } from './TimeoutError';
 export { URI, parseURI, copy, normalize, promisify, crc32 } from './Utils';

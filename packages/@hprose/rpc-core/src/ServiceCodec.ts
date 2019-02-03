@@ -88,7 +88,7 @@ export class DefaultServiceCodec {
             }
             stream.readByte();
         }
-        if (method.passContext) args.push(context);
+        if (!method.missing && method.passContext) args.push(context);
         return args;
     }
     public decode(request: Uint8Array, context: ServiceContext): [string, any[]] {

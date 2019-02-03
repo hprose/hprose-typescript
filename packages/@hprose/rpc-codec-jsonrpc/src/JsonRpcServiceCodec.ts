@@ -62,9 +62,11 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         const fullname = call.method;
         const method = this.decodeMethod(fullname, context);
         const args = call.params ? call.params : [];
-        if (method.passContext) args.push(context);
-        if (method.method.length > args.length) {
-            throw new Error('Invalid params');
+        if (!method.missing) {
+            if (method.passContext) args.push(context);
+            if (method.method.length > args.length) {
+                throw new Error('Invalid params');
+            }
         }
         return [fullname, args];
     }

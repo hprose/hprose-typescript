@@ -18,7 +18,7 @@ import { Context } from './Context';
 import { ServiceContext } from './ServiceContext';
 import { HandlerManager, IOHandler, InvokeHandler } from './HandlerManager';
 import { MethodLike, Method } from './Method';
-import { MethodManager, MissingFunction } from './MethodManager';
+import { MethodManager, MissingMethod } from './MethodManager';
 import { TimeoutError } from './TimeoutError';
 
 export interface Handler {
@@ -116,10 +116,7 @@ export class Service {
     }
     public async execute(fullname: string, args: any[], context: Context): Promise<any> {
         const method = (context as ServiceContext).method;
-        if (method.missing) {
-            return method.method.call(method.target, fullname, args);
-        }
-        return method.method.apply(method.target, args);
+        return method.method.apply(method.target, method.missing ? method.passContext ? [fullname, args, context] : [fullname, args] : args);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         this.handlerManager.use(...handlers);
@@ -153,11 +150,7 @@ export class Service {
         this.methodManager.addMethod(args[0], args[1], ...args.slice(2));
         return this;
     }
-    public addMissingFunction(fn: MissingFunction): this {
-        this.methodManager.addMissingFunction(fn);
-        return this;
-    }
-    public addMissingMethod(fn: MissingFunction, target: any): this {
+    public addMissingMethod(fn: MissingMethod, target?: any): this {
         this.methodManager.addMissingMethod(fn, target);
         return this;
     }
