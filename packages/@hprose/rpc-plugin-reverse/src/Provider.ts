@@ -16,6 +16,7 @@
 import { MethodManager, MissingMethod, Method, MethodLike, Client } from '@hprose/rpc-core';
 
 export class Provider {
+    private closed: boolean = true;
     public debug: boolean = false;
     public onerror?: (error: Error) => void;
     private methodManager: MethodManager = new MethodManager();
@@ -61,6 +62,7 @@ export class Provider {
         }
     }
     public async listen(): Promise<void> {
+        this.closed = false;
         do {
             try {
                 const calls: [number, string, any[]][] = await this.client.invoke('!', [], { type: Array });
@@ -72,9 +74,10 @@ export class Provider {
                     this.onerror(e);
                 }
             }
-        } while (true);
+        } while (this.closed);
     }
     public async close(): Promise<void> {
+        this.closed = true;
         await this.client.invoke('!!');
     }
     public get(fullname: string): MethodLike | undefined {
