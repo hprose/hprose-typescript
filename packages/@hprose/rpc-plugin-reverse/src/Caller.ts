@@ -89,7 +89,7 @@ export class Caller {
         const begin = new Method(this.begin, '!', this);
         begin.passContext = true;
 
-        const end = new Method(this.end, '=', this);
+        const end = new Method(this.end, '=', this, [Array]);
         end.passContext = true;
 
         this.service.add(close)
@@ -148,9 +148,7 @@ export class Caller {
         }
         return responder.promise;
     }
-    protected end(...args: any[]): void {
-        const results: ([number, any] | [number, undefined, string])[] = args.slice(0, -1);
-        const context: Context = args[args.length - 1];
+    protected end(results: [number, any, string][], context: Context): void {
         const id = this.id(context);
         for (let i = 0, n = results.length; i < n; ++i) {
             const result = results[i];

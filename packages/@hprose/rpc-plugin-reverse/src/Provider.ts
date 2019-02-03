@@ -53,7 +53,7 @@ export class Provider {
             results[i] = this.execute(calls[i]);
         }
         try {
-            await this.client.invoke('=', results);
+            await this.client.invoke('=', [await Promise.all(results)]);
         }
         catch (e) {
             if (this.onerror) {
