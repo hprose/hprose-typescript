@@ -66,6 +66,13 @@ export class DefaultServiceCodec {
     private decodeArguments(method: MethodLike, reader: Reader, context: ServiceContext): any[] {
         const stream = reader.stream;
         const tag = stream.readByte();
+        if (method.missing) {
+            if (tag === Tags.TagList) {
+                reader.reset();
+                return reader.read(tag, Array);
+            }
+            return [];
+        }
         let args: any[] = [];
         if (tag === Tags.TagList) {
             reader.reset();
@@ -88,7 +95,7 @@ export class DefaultServiceCodec {
             }
             stream.readByte();
         }
-        if (!method.missing && method.passContext) args.push(context);
+        if (method.passContext) args.push(context);
         return args;
     }
     public decode(request: Uint8Array, context: ServiceContext): [string, any[]] {

@@ -18,6 +18,38 @@ test('test hello world rpc', async () => {
     server.close();
 });
 
+test('test mssing method1', async () => {
+    function missing(name: string, args: any[]): string {
+        return name + JSON.stringify(args);
+    }
+    const service = new Service();
+    service.addMissingMethod(missing);
+    const server = http.createServer();
+    service.bind(server);
+    server.listen(8000);
+    const client = new Client('http://127.0.0.1:8000/');
+    const proxy = client.useService<any>();
+    const result = await proxy.hello('world');
+    expect(result).toBe('hello["world"]');
+    server.close();
+});
+
+test('test mssing method2', async () => {
+    function missing(name: string, args: any[], context: Context): string {
+        return name + JSON.stringify(args) + context.request.socket.localPort;
+    }
+    const service = new Service();
+    service.addMissingMethod(missing);
+    const server = http.createServer();
+    service.bind(server);
+    server.listen(8000);
+    const client = new Client('http://127.0.0.1:8000/');
+    const proxy = client.useService<any>();
+    const result = await proxy.hello('world');
+    expect(result).toBe('hello["world"]8000');
+    server.close();
+});
+
 test('test headers', async () => {
     const clientHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         context.requestHeaders['ping'] = true;
