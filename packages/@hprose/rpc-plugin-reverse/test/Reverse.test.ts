@@ -10,7 +10,6 @@ test('test reverse RPC', async () => {
     }
     const service = new Service();
     const caller = new Caller(service);
-    service.use(caller.handler);
     // service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);

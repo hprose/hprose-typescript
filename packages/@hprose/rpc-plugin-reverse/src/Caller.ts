@@ -85,15 +85,17 @@ export class Caller {
     constructor(public service: Service) {
         const close = new Method(this.close, '!!', this);
         close.passContext = true;
-        this.service.add(close);
 
         const begin = new Method(this.begin, '!', this);
         begin.passContext = true;
-        this.service.add(begin);
 
         const end = new Method(this.end, '=', this);
         end.passContext = true;
-        this.service.add(end);
+
+        this.service.add(close)
+                    .add(begin)
+                    .add(end)
+                    .use(this.handler)
     }
     protected id(context: Context): string {
         if (context.requestHeaders['id']) {
@@ -200,7 +202,7 @@ export class Caller {
         const fullnames: string[] = await this.invoke(id, '~');
         return useService(this, id, fullnames);
     }
-    public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+    protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         (context as CallerContext).invoke = (fullname: string, args: any[] = []): Promise<any> => {
             return this.invoke(this.id(context), fullname, args);
         };
