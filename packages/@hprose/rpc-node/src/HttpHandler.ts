@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,10 +24,10 @@ const etag = '"' + Math.floor(Math.random() * 2147483647).toString(16) +
     ':' + Math.floor(Math.random() * 2147483647).toString(16) + '"';
 const empty = new Uint8Array(0);
 
-export class HttpServiceContext extends ServiceContext {
-    constructor(service: Service, public request: http.IncomingMessage, public response: http.ServerResponse) {
-        super(service);
-    }
+export interface HttpServiceContext extends ServiceContext {
+    readonly request: http.IncomingMessage;
+    readonly response: http.ServerResponse;
+    readonly handler: HttpHandler;
 }
 
 export class HttpHandler {
@@ -163,7 +163,10 @@ export class HttpHandler {
     }
 
     public handler = async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
-        const context = new HttpServiceContext(this.service, request, response);
+        const context = new ServiceContext(this.service);
+        context.request = request;
+        context.response = response;
+        context.handler = this;
         const size = Number(request.headers['content-length']);
         if (size > this.service.maxRequestLength) {
             response.statusCode = 413;

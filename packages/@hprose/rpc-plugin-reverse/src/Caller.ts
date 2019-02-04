@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-import { Service, normalize, Context, Deferred, Method, defer, NextInvokeHandler } from '@hprose/rpc-core';
+import { Service, normalize, Context, Deferred, Method, defer, NextInvokeHandler, ServiceContext } from '@hprose/rpc-core';
 
 function makeInvoke(caller: Caller, id: string, fullname: string): () => Promise<any> {
     return function (): Promise<any> {
@@ -70,7 +70,7 @@ class ServiceProxyHandler implements ProxyHandler<any> {
     }
 }
 
-export interface CallerContext extends Context {
+export interface CallerContext extends ServiceContext {
     invoke<T>(fullname: string, args?: any[]): Promise<T>;
 }
 
@@ -80,7 +80,6 @@ export class Caller {
     protected results: { [id: string]: { [index: number]: Deferred<any> } } = Object.create(null);
     protected responders: { [id: string]: Deferred<[number, string, any[]][]> } = Object.create(null);
     protected timers: { [id: string]: Deferred<void> } = Object.create(null);
-    public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     constructor(public service: Service) {
         const close = new Method(this.close, '!!', this);

@@ -8,7 +8,7 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,10 +17,9 @@ import * as net from 'net';
 import { writeInt32BE, ByteStream } from '@hprose/io';
 import { ServiceContext, Service, crc32 } from '@hprose/rpc-core';
 
-export class SocketServiceContext extends ServiceContext {
-    constructor(service: Service, public socket: net.Socket) {
-        super(service);
-    }
+export interface SocketServiceContext extends ServiceContext {
+    readonly socket:  net.Socket
+    readonly handler: SocketHandler;
 }
 
 export class SocketHandler {
@@ -48,7 +47,9 @@ export class SocketHandler {
         socket.write(Buffer.from(response.buffer, response.byteOffset, response.length));
     }
     private async run(socket: net.Socket, request: Uint8Array, index: number): Promise<void> {
-        const context = new SocketServiceContext(this.service, socket);
+        const context = new ServiceContext(this.service);
+        context.socket = socket;
+        context.handler = this;
         const response = await this.service.handle(request, context);
         this.send(socket, response, index);
     }
