@@ -41,16 +41,6 @@ export function parseURI(uri: string): URI {
     throw new Error('Invalid URI');
 }
 
-export function copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
-    if (src) {
-        for (let name in src) {
-            if (!src.hasOwnProperty || src.hasOwnProperty(name)) {
-                dist[name] = src[name];
-            }
-        }
-    }
-}
-
 export function normalize(functions: string[]): any[] {
     const root = [Object.create(null)];
     for (let i = 0, n = functions.length; i < n; ++i) {

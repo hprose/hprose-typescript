@@ -26,7 +26,7 @@ export { Method, MethodLike } from './Method';
 export { MissingMethod, MethodManager } from './MethodManager';
 export { Settings } from './Settings';
 export { TimeoutError } from './TimeoutError';
-export { URI, parseURI, copy, normalize, promisify, crc32 } from './Utils';
+export { URI, parseURI, normalize, promisify, crc32 } from './Utils';
 
 export { Service, Handler, HandlerConstructor } from './Service';
 export { ServiceCodec } from './ServiceCodec';

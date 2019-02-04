@@ -4,20 +4,17 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| ServiceContext.ts                                        |
+| ProviderContext.ts                                       |
 |                                                          |
-| ServiceContext for TypeScript.                           |
+| ProviderContext for TypeScript.                          |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Context } from './Context';
-import { Service } from './Service';
-import { MethodLike } from './Method';
+import { Client, Context, MethodLike } from '@hprose/rpc-core';
 
-export class ServiceContext extends Context {
-    public method!: MethodLike;
-    constructor(public readonly service: Service) { super(); }
+export class ProviderContext extends Context {
+    constructor(public readonly client: Client, public readonly method: MethodLike) { super(); }
 }
