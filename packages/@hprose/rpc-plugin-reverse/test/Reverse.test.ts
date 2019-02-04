@@ -1,7 +1,7 @@
 import * as http from 'http';
 import { Service, Client } from '@hprose/rpc-core';
 import '@hprose/rpc-node';
-// import { Log } from '@hprose/rpc-plugin-log';
+import { Log } from '@hprose/rpc-plugin-log';
 import { Caller, Provider } from '../src/index';
 
 test('test reverse RPC', async () => {
@@ -18,6 +18,7 @@ test('test reverse RPC', async () => {
     const client = new Client('http://127.0.0.1:8083/');
     // client.use(Log.invokeHandler);
     const provider = new Provider(client, '1');
+    provider.use(Log.invokeHandler);
     provider.addFunction(hello);
     provider.listen();
 

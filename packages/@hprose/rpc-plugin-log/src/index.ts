@@ -28,10 +28,16 @@ export class Log {
     public async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
         const enabled = (context.log === undefined) ? this.enabled : context.log;
         if (!enabled) return next(request, context);
-        console.log(ByteStream.toString(request));
+        try {
+            console.log(ByteStream.toString(request));
+        }
+        catch(e) {
+            console.error(e);
+        }
         const response = next(request, context);
         response.then(
-            (value) => console.log(ByteStream.toString(value)),
+            (value) => console.log(ByteStream.toString(value))
+        ).catch(
             (reason) => console.error(reason)
         );
         return response;
@@ -39,10 +45,17 @@ export class Log {
     public async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
         const enabled = (context.log === undefined) ? this.enabled : context.log;
         if (!enabled) return next(name, args, context);
-        const a = JSON.stringify((args.length > 0 && context.method && context.method.passContext && !context.method.missing) ? args.slice(0, args.length - 1) : args);
+        let a: string = '';
+        try {
+            a = JSON.stringify((args.length > 0 && context.method && context.method.passContext && !context.method.missing) ? args.slice(0, args.length - 1) : args);
+        }
+        catch(e) {
+            console.error(e);
+        }
         const result = next(name, args, context);
         result.then(
-            (value) => console.log(`${name}(${a.substring(1, a.length - 1)}) = ${JSON.stringify(value)}`),
+            (value) => console.log(`${name}(${a.substring(1, a.length - 1)}) = ${JSON.stringify(value)}`)
+        ).catch(
             (reason) => console.error(reason)
         );
         return result;

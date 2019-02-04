@@ -8,19 +8,25 @@
 |                                                          |
 | Provider for TypeScript.                                 |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Feb 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { MethodManager, MissingMethod, Method, MethodLike, Client } from '@hprose/rpc-core';
+import { MethodManager, MissingMethod, Method, MethodLike, Client, Context, InvokeManager, InvokeHandler } from '@hprose/rpc-core';
+
+export class ProviderContext extends Context {
+    constructor(public readonly client: Client, public readonly method: MethodLike) { super(); }
+}
 
 export class Provider {
     private closed: boolean = true;
     public debug: boolean = false;
     public onerror?: (error: Error) => void;
-    private methodManager: MethodManager = new MethodManager();
+    private readonly methodManager: MethodManager = new MethodManager();
+    private readonly invokeManager: InvokeManager;
     constructor(public readonly client: Client, id?: string) {
+        this.invokeManager = new InvokeManager(this.execute.bind(this));
         if (id) this.id = id;
         this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
     }
@@ -33,14 +39,20 @@ export class Provider {
     public set id(value: string) {
         this.client.requestHeaders['id'] = value;
     }
-    private async execute(call: [number, string, any[]]): Promise<[number, any, string | undefined]> {
+    private async execute(name: string, args: any[], context: Context): Promise<any> {
+        const method = (context as ProviderContext).method;
+        return method.method.apply(method.target, method.missing ? method.passContext ? [name, args, context] : [name, args] : args);
+    }
+    private async process(call: [number, string, any[]]): Promise<[number, any, string | undefined]> {
         const [index, name, args] = call;
         const method: MethodLike | undefined = this.get(name);
         try {
             if (method === undefined) {
                 throw new Error('Can\'t find this method ' + name + '().');
             }
-            return [index, await method.method.apply(method.obj, method.missing ? [name, args] : args), undefined];
+            const context = new ProviderContext(this.client, method);
+            if (!method.missing && method.passContext) args.push(context);
+            return [index, await this.invokeManager.handler(name, args, context), undefined];
         }
         catch (e) {
             return [index, undefined, this.debug ? e.stack ? e.stack : e.message : e.message];
@@ -50,7 +62,7 @@ export class Provider {
         const n = calls.length;
         const results: Promise<[number, any, string | undefined]>[] = new Array(n);
         for (let i = 0; i < n; ++i) {
-            results[i] = this.execute(calls[i]);
+            results[i] = this.process(calls[i]);
         }
         try {
             await this.client.invoke('=', [await Promise.all(results)]);
@@ -79,6 +91,14 @@ export class Provider {
     public async close(): Promise<void> {
         this.closed = true;
         await this.client.invoke('!!');
+    }
+    public use(...handlers: InvokeHandler[]): this {
+        this.invokeManager.use(...handlers);
+        return this;
+    }
+    public unuse(...handlers: InvokeHandler[]): this {
+        this.invokeManager.unuse(...handlers);
+        return this;
     }
     public get(fullname: string): MethodLike | undefined {
         return this.methodManager.get(fullname);
