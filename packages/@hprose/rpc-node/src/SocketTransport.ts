@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,6 +20,7 @@ import { ByteStream, writeInt32BE, fromUint8Array } from '@hprose/io';
 import { Transport, Deferred, crc32, defer, Context, TimeoutError, Client } from '@hprose/rpc-core';
 
 export class SocketTransport implements Transport {
+    public static readonly schemes: string[] = ['tcp', 'tcp4', 'tcp6', 'tls', 'tls4', 'tls6', 'ssl', 'ssl4', 'ssl6', 'unix'];
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private sockets: { [uri: string]: Promise<net.Socket> } = Object.create(null);
@@ -210,7 +211,7 @@ export class SocketTransport implements Transport {
     }
 }
 
-Client.register('socket', SocketTransport, ['tcp:', 'tcp4:', 'tcp6:', 'tls:', 'tls4:', 'tls6:', 'ssl:', 'ssl4:', 'ssl6:', 'unix:']);
+Client.register('socket', SocketTransport);
 
 declare module '@hprose/rpc-core' {
     export interface Client {

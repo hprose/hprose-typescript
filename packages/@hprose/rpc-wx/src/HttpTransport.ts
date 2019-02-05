@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,6 +28,7 @@ interface RequestTask {
 }
 
 export class HttpTransport implements Transport {
+    public static readonly schemes: string[] = ['https'];
     private counter: number = 0;
     private requests: { [index: number]: RequestTask } = Object.create(null);
     public timeout: number = 30000;
@@ -106,7 +107,7 @@ export class HttpTransport implements Transport {
     }
 }
 
-Client.register('http', HttpTransport, ['https:']);
+Client.register('http', HttpTransport);
 
 declare module '@hprose/rpc-core' {
     export interface Client {

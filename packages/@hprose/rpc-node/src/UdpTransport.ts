@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for TypeScript.                             |
 |                                                          |
-| LastModified: Jan 31, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,7 @@ import { Client, Context, Transport, TimeoutError, Deferred, defer, crc32 } from
 import { fromUint8Array } from '@hprose/io';
 
 export class UdpTransport implements Transport {
+    public static readonly schemes: string[] = ['udp', 'udp4', 'udp6'];
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private sockets: { [uri: string]: Promise<dgram.Socket> } = Object.create(null);
@@ -135,7 +136,7 @@ export class UdpTransport implements Transport {
     }
 }
 
-Client.register('udp', UdpTransport, ['udp:', 'udp4:', 'udp6:']);
+Client.register('udp', UdpTransport);
 
 declare module '@hprose/rpc-core' {
     export interface Client {

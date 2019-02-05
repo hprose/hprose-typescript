@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -43,6 +43,7 @@ function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | 
 }
 
 export class HttpTransport implements Transport {
+    public static readonly schemes: string[] = ['http', 'https'];
     private counter: number = 0;
     private requests: { [index: number]: XMLHttpRequest } = Object.create(null);
     public timeout: number = 30000;
@@ -134,7 +135,7 @@ export class HttpTransport implements Transport {
     }
 }
 
-Client.register('http', HttpTransport, ['', 'http:', 'https:']);
+Client.register('http', HttpTransport);
 
 declare module '@hprose/rpc-core' {
     export interface Client {

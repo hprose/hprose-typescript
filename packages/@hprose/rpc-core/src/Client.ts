@@ -82,15 +82,16 @@ export interface Transport {
 }
 
 export interface TransportConstructor {
+    readonly schemes: string[];
     new(): Transport
 }
 
 export class Client {
     private static transports: { name: string, ctor: TransportConstructor }[] = [];
     private static protocols: { [protocol: string]: string } = Object.create(null);
-    public static register(name: string, ctor: TransportConstructor, protocols: string[]): void {
+    public static register(name: string, ctor: TransportConstructor): void {
         Client.transports.push({ name, ctor });
-        protocols.forEach((protocol) => Client.protocols[protocol] = name);
+        ctor.schemes.forEach((scheme) => Client.protocols[scheme + ":"] = name);
     }
     public readonly settings: { [fullname: string]: Settings } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);

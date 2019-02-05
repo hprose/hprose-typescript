@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Feb 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,6 +28,7 @@ interface SocketTask {
 }
 
 export class WebSocketTransport implements Transport {
+    public static readonly schemes: string[] = ['wss'];
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private websockets: { [uri: string]: Promise<SocketTask> } = Object.create(null);
@@ -112,7 +113,7 @@ export class WebSocketTransport implements Transport {
     }
 }
 
-Client.register('websocket', WebSocketTransport, ['wss:']);
+Client.register('websocket', WebSocketTransport);
 
 declare module '@hprose/rpc-core' {
     export interface Client {
