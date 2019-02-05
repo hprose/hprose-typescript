@@ -8,13 +8,13 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 4, 2019                                |
+| LastModified: Feb 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import * as net from 'net';
-import { writeInt32BE, ByteStream } from '@hprose/io';
+import { ByteStream } from '@hprose/io';
 import { ServiceContext, Service, crc32 } from '@hprose/rpc-core';
 
 export interface SocketServiceContext extends ServiceContext {
@@ -35,15 +35,12 @@ export class SocketHandler {
     }
     private send(socket: net.Socket, response: Uint8Array, index: number): void {
         const n = response.length;
-        const header = new Uint8Array(8);
-        writeInt32BE(header, 0, n | 0x80000000);
-        writeInt32BE(header, 4, index);
-        const crc = crc32(header);
-        const outstream = new ByteStream(12 + n);
-        outstream.writeInt32BE(crc);
-        outstream.write(header);
-        outstream.write(response);
-        response = outstream.takeBytes();
+        const header = new Buffer(12);
+        header.writeInt32BE(n | 0x80000000, 4);
+        header.writeInt32BE(index, 8);
+        const crc = crc32(header.subarray(4, 12));
+        header.writeInt32BE(crc, 0);
+        socket.write(header);
         socket.write(Buffer.from(response.buffer, response.byteOffset, response.length));
     }
     private async run(socket: net.Socket, request: Uint8Array, index: number): Promise<void> {

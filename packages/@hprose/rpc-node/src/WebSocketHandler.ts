@@ -17,7 +17,7 @@ import WebSocket from 'ws';
 import * as http from 'http';
 import * as https from 'https';
 import { Service, ServiceContext } from '@hprose/rpc-core';
-import { ByteStream } from '@hprose/io';
+import { writeInt32BE, ByteStream } from '@hprose/io';
 
 export interface WebSocketServiceContext extends ServiceContext {
     websocket: WebSocket;
@@ -66,10 +66,18 @@ export class WebSocketHandler {
             context.request = request;
             context.handler = this;
             const result = await this.service.handle(instream.remains, context);
-            const outstream = new ByteStream(4 + result.length);
-            outstream.writeInt32BE(index);
-            outstream.write(result);
-            websocket.send(outstream.toBytes(), {
+            const header = new Uint8Array(4);
+            writeInt32BE(header, 0, index);
+            websocket.send(header, {
+                binary: true,
+                compress: this.compress,
+                fin: false
+            }, (error) => {
+                if (error) {
+                    if (this.onerror) this.onerror(error);
+                }
+            });
+            websocket.send(result, {
                 binary: true,
                 compress: this.compress,
             }, (error) => {

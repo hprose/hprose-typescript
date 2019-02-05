@@ -15,7 +15,7 @@
 
 import WebSocket from 'ws';
 import { Client, Context, Transport, TimeoutError, Deferred, defer } from '@hprose/rpc-core';
-import { ByteStream } from '@hprose/io';
+import { writeInt32BE, ByteStream } from '@hprose/io';
 
 export class WebSocketTransport implements Transport {
     public static readonly schemes: string[] = ['ws', 'wss'];
@@ -89,10 +89,20 @@ export class WebSocketTransport implements Transport {
                 clearTimeout(timeoutId);
             });
         }
-        const outstream = new ByteStream(4 + request.length);
-        outstream.writeInt32BE(index);
-        outstream.write(request);
-        websocket.send(outstream.takeBytes(), {
+        const header = new Uint8Array(4);
+        writeInt32BE(header, 0, index);
+        websocket.send(header, {
+            binary: true,
+            compress: this.compress,
+            fin: false,
+
+        }, (error?: Error) => {
+            if (error) {
+                result.reject(error);
+                delete this.results[uri][index];
+            }
+        });
+        websocket.send(request, {
             binary: true,
             compress: this.compress
         }, (error?: Error) => {

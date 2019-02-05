@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 import * as net from 'net';
 import * as tls from 'tls';
 import { parse } from 'url';
-import { ByteStream, writeInt32BE, fromUint8Array } from '@hprose/io';
+import { ByteStream, fromUint8Array } from '@hprose/io';
 import { Transport, Deferred, crc32, defer, Context, TimeoutError, Client } from '@hprose/rpc-core';
 
 export class SocketTransport implements Transport {
@@ -188,16 +188,13 @@ export class SocketTransport implements Transport {
         }
         const socket: net.Socket = await this.getSocket(uri);
         const n = request.length;
-        const header = new Uint8Array(8);
-        writeInt32BE(header, 0, n | 0x80000000);
-        writeInt32BE(header, 4, index);
-        const crc = crc32(header);
-        const outstream = new ByteStream(12 + n);
-        outstream.writeInt32BE(crc);
-        outstream.write(header);
-        outstream.write(request);
-        request = outstream.takeBytes();
-        socket.write(Buffer.from(request.buffer, request.byteOffset, request.length), () => {});
+        const header = new Buffer(12);
+        header.writeInt32BE(n | 0x80000000, 4);
+        header.writeInt32BE(index, 8);
+        const crc = crc32(header.subarray(4, 12));
+        header.writeInt32BE(crc, 0);
+        socket.write(header);
+        socket.write(Buffer.from(request.buffer, request.byteOffset, request.length));
         return result.promise;
     }
     public async abort(): Promise<void> {
