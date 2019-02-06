@@ -23,8 +23,8 @@ export interface SocketServiceContext extends ServiceContext {
 }
 
 export class SocketHandler {
-    public onaccept?: () => void;
-    public onclose?: () => void;
+    public onaccept?: (socket: net.Socket) => void;
+    public onclose?: (socket: net.Socket) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
     public bind(server: net.Server): void {
@@ -92,14 +92,14 @@ export class SocketHandler {
     }
     public handler = (socket: net.Socket): void => {
         try {
-            if (this.onaccept) this.onaccept();
+            if (this.onaccept) this.onaccept(socket);
         }
         catch (e) {
             socket.destroy(e);
             return;
         }
         socket.on('close', () => {
-            if (this.onclose) this.onclose();
+            if (this.onclose) this.onclose(socket);
         });
         socket.on('error', (error) => {
             if (this.onerror) this.onerror(error);

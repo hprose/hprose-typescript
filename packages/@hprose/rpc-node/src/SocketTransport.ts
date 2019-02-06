@@ -118,14 +118,14 @@ export class SocketTransport implements Transport {
                     index &= 0x7FFFFFFF;
                     const result = this.results[uri][index];
                     delete this.results[uri][index];
-                    if (result) {
-                        if (has_error) {
+                    if (has_error) {
+                        if (result) {
                             result.reject(new Error(fromUint8Array(response)));
-                            socket.end();
                         }
-                        else {
-                            result.resolve(response);
-                        }
+                        socket.end();
+                    }
+                    else if (result) {
+                        result.resolve(response);
                     }
                 } else {
                     break;

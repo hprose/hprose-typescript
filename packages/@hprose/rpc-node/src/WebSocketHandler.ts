@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Feb 4, 2019                                |
+| LastModified: Feb 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,8 +27,8 @@ export interface WebSocketServiceContext extends ServiceContext {
 
 export class WebSocketHandler {
     public compress: boolean = false;
-    public onaccept?: () => void;
-    public onclose?: () => void;
+    public onaccept?: (websocket: WebSocket) => void;
+    public onclose?: (websocket: WebSocket) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
     public bind(server: http.Server | https.Server | WebSocket.Server): void {
@@ -46,14 +46,14 @@ export class WebSocketHandler {
         try {
             websocket.protocol = 'hprose';
             websocket.binaryType = 'arraybuffer';
-            if (this.onaccept) this.onaccept();
+            if (this.onaccept) this.onaccept(websocket);
         }
         catch {
             websocket.close();
             return;
         }
         websocket.on('close', () => {
-            if (this.onclose) this.onclose();
+            if (this.onclose) this.onclose(websocket);
         });
         websocket.on('error', (error) => {
             if (this.onerror) this.onerror(error);

@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Feb 4, 2019                                |
+| LastModified: Feb 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,8 +24,8 @@ export interface UdpServiceContext extends ServiceContext {
 }
 
 export class UdpHandler implements Handler {
-    public onlisten?: () => void;
-    public onclose?: () => void;
+    public onlisten?: (socket: dgram.Socket) => void;
+    public onclose?: (socket: dgram.Socket) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
     public send(socket: dgram.Socket, body: Buffer, index: number, rinfo: AddressInfo) {
@@ -42,7 +42,7 @@ export class UdpHandler implements Handler {
     public bind(socket: dgram.Socket): void {
         this.handler(socket);
         socket.on('listening', () => {
-            if (this.onlisten) this.onlisten();
+            if (this.onlisten) this.onlisten(socket);
         });
     }
     public handler = (socket: dgram.Socket): void => {
@@ -66,7 +66,7 @@ export class UdpHandler implements Handler {
             this.send(socket, Buffer.from(response.buffer, response.byteOffset, response.length), index, rinfo);
         });
         socket.on('close', () => {
-            if (this.onclose) this.onclose();
+            if (this.onclose) this.onclose(socket);
         });
         socket.on('error', (error) => {
             if (this.onerror) this.onerror(error);
