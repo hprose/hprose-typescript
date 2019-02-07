@@ -6,7 +6,7 @@ import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
     const service = new Broker(new Service()).service;
-    service.use(Log.ioHandler);
+    //service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);
     server.listen(8081);
@@ -40,7 +40,7 @@ test('test push', async() => {
             await prosumer2.unsubscribe('test2');
             server.close();
             resolve();
-        }, 100);
+        }, 10);
     });
 });
 
@@ -51,7 +51,7 @@ test('test server push', async() => {
         return 'hello ' + name;
     }
     const service = new Service();
-    // service.use(Log.ioHandler);
+    service.use(Log.ioHandler);
     const broker = new Broker(service);
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = http.createServer();

@@ -8,7 +8,7 @@
 |                                                          |
 | Prosumer for TypeScript.                                 |
 |                                                          |
-| LastModified: Feb 2, 2019                                |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -40,7 +40,16 @@ export class Prosumer {
                 const messages = topics[topic];
                 if (messages) {
                     for (let i = 0, n = messages.length; i < n; ++i) {
-                        callback(messages[i]);
+                        setTimeout(() => {
+                            try {
+                                callback(messages[i]);
+                            }
+                            catch(e) {
+                                if (this.onerror) {
+                                    this.onerror(e);
+                                }
+                            }
+                        }, 0);
                     }
                 } else {
                     delete this.callbacks[topic];
@@ -52,8 +61,7 @@ export class Prosumer {
         }
     }
     private async message(): Promise<void> {
-        let has_callbacks: boolean;
-        do {
+        while(true) {
             try {
                 const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<');
                 if (!topics) return;
@@ -64,14 +72,7 @@ export class Prosumer {
                     this.onerror(e);
                 }
             }
-            has_callbacks = false;
-            for (const topic in this.callbacks) {
-                if (this.callbacks[topic]) {
-                    has_callbacks = true;
-                    break;
-                }
-            }
-        } while (has_callbacks);
+        }
     }
     public async subscribe(topic: string, callback: (message: Message) => void): Promise<boolean> {
         if (this.id) {
