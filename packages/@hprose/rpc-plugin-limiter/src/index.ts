@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-limiter for TypeScript.               |
 |                                                          |
-| LastModified: Feb 2, 2019                                |
+| LastModified: Feb 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -53,7 +53,7 @@ export class Limiter {
     private tasks: Deferred<void>[] = [];
     constructor(public readonly maxConcurrentRequests: number, public readonly timeout: number = 0) { }
     public async acquire(): Promise<void> {
-        if (this.counter++ < this.maxConcurrentRequests) return;
+        if (++this.counter <= this.maxConcurrentRequests) return;
         const task = defer<void>();
         this.tasks.push(task);
         if (this.timeout > 0) {
@@ -69,7 +69,7 @@ export class Limiter {
         return task.promise;
     }
     public release(): void {
-        if (--this.counter >= this.maxConcurrentRequests) return;
+        --this.counter;
         const task = this.tasks.shift();
         if (task) task.resolve();
     }
