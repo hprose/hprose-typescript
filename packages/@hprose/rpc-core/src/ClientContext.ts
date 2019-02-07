@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,6 +22,8 @@ const emptySettings: Settings = Object.create(null);
 export class ClientContext extends Context {
     public uri: string;
     public type?: Function | null;
+    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
+    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     constructor(public readonly client: Client, fullname: string, settings: Settings = Object.create(null)) {
         super();
         const uris = client.uris;

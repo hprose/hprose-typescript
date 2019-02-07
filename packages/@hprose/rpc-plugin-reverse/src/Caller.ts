@@ -8,7 +8,7 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -96,7 +96,7 @@ export class Caller {
                     .add(end)
                     .use(this.handler)
     }
-    protected id(context: Context): string {
+    protected id(context: ServiceContext): string {
         if (context.requestHeaders['id']) {
             return context.requestHeaders['id'].toString();
         }
@@ -122,7 +122,7 @@ export class Caller {
             }
         }
     }
-    protected close(context: Context): string {
+    protected close(context: ServiceContext): string {
         const id = this.id(context);
         if (this.responders[id]) {
             const responder = this.responders[id];
@@ -131,7 +131,7 @@ export class Caller {
         }
         return id;
     }
-    protected async begin(context: Context): Promise<[number, string, any[]][]> {
+    protected async begin(context: ServiceContext): Promise<[number, string, any[]][]> {
         const id = this.close(context);
         const responder = defer<[number, string, any[]][]>();
         if (!this.send(id, responder)) {
@@ -147,7 +147,7 @@ export class Caller {
         }
         return responder.promise;
     }
-    protected end(results: [number, any, string][], context: Context): void {
+    protected end(results: [number, any, string][], context: ServiceContext): void {
         const id = this.id(context);
         for (let i = 0, n = results.length; i < n; ++i) {
             const [index, value, error] = results[i];
@@ -200,7 +200,7 @@ export class Caller {
     }
     protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         (context as CallerContext).invoke = (fullname: string, args: any[] = []): Promise<any> => {
-            return this.invoke(this.id(context), fullname, args);
+            return this.invoke(this.id(context as ServiceContext), fullname, args);
         };
         return next(name, args, context);
     }

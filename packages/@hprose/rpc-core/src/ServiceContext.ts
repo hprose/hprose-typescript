@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceContext for TypeScript.                           |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,5 +19,7 @@ import { MethodLike } from './Method';
 
 export class ServiceContext extends Context {
     public method!: MethodLike;
+    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
+    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     constructor(public readonly service: Service) { super(); }
 }

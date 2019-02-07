@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -38,8 +38,8 @@ export class Broker {
     public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     public heartbeat: number = 10000;
-    public onsubscribe?: (id: string, topic: string, context: Context) => void;
-    public onunsubscribe?: (id: string, topic: string, messages: any[] | null, context: Context) => void;
+    public onsubscribe?: (id: string, topic: string, context: ServiceContext) => void;
+    public onunsubscribe?: (id: string, topic: string, messages: any[] | null, context: ServiceContext) => void;
     constructor(public readonly service: Service) {
         const subscribe = new Method(this.subscribe, '+', this, [String]);
         subscribe.passContext = true;
@@ -112,13 +112,13 @@ export class Broker {
         }
         return true;
     }
-    protected id(context: Context): string {
+    protected id(context: ServiceContext): string {
         if (context.requestHeaders['id']) {
             return context.requestHeaders['id'].toString();
         }
         throw new Error('client unique id not found');
     }
-    protected subscribe(topic: string, context: Context): boolean {
+    protected subscribe(topic: string, context: ServiceContext): boolean {
         const id = this.id(context);
         if (this.messages[id] === undefined) {
             this.messages[id] = Object.create(null);
@@ -140,7 +140,7 @@ export class Broker {
             }
         }
     }
-    protected offline(topics: { [topic: string]: Message[] | null }, id: string, topic: string, context: Context) {
+    protected offline(topics: { [topic: string]: Message[] | null }, id: string, topic: string, context: ServiceContext) {
         if (topic in topics) {
             const messages = topics[topic];
             delete topics[topic];
@@ -152,14 +152,14 @@ export class Broker {
         }
         return false;
     }
-    protected unsubscribe(topic: string, context: Context): boolean {
+    protected unsubscribe(topic: string, context: ServiceContext): boolean {
         const id = this.id(context);
         if (this.messages[id]) {
             return this.offline(this.messages[id], id, topic, context);
         }
         return false;
     }
-    protected async message(context: Context): Promise<any> {
+    protected async message(context: ServiceContext): Promise<any> {
         const id = this.id(context);
         if (this.responders[id]) {
             const responder = this.responders[id];
