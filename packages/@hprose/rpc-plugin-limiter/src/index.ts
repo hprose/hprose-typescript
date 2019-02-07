@@ -48,7 +48,7 @@ export class RateLimiter {
     }
 }
 
-export class Limiter {
+export class ConcurrentLimiter {
     private counter: number = 0;
     private tasks: Deferred<void>[] = [];
     constructor(public readonly maxConcurrentRequests: number, public readonly timeout: number = 0) { }
