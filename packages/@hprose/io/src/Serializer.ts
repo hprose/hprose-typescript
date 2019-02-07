@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for TypeScript.                        |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,6 +28,7 @@ import { SetSerializer } from './serializers/SetSerializer';
 import { MapSerializer } from './serializers/MapSerializer';
 import { DictionarySerializer } from './serializers/DictionarySerializer';
 import { ObjectSerializer } from './serializers/ObjectSerializer';
+import { ErrorSerializer } from './serializers/ErrorSerializer';
 import * as TypeManager from './TypeManager';
 import { writeInteger, writeDouble } from './ValueWriter';
 import { Guid } from 'guid-typescript';
@@ -46,6 +47,7 @@ const arraySerializer = new ArraySerializer();
 const setSerializer = new SetSerializer();
 const mapSerializer = new MapSerializer();
 const dictionarySerializer = new DictionarySerializer();
+const errorSerializer = new ErrorSerializer();
 
 export function register(type: Function, serializer: Serializer) {
     serializers.set(type, serializer);
@@ -74,10 +76,15 @@ export function getInstance<T>(value: T): Serializer {
         case Uint32Array: return intArraySerializer;
         case Float32Array:
         case Float64Array: return doubleArraySerializer;
+        case Error: return errorSerializer;
     }
     const serializer = serializers.get(type);
     if (serializer !== undefined) return serializer;
     if (Array.isArray(value) || Object.prototype.toString.call(value) === '[object Arguments]') return arraySerializer;
+    if (value instanceof Error) {
+        register(type, errorSerializer);
+        return errorSerializer;
+    }
     const name = TypeManager.getName(type);
     if (name === '') return dictionarySerializer;
     if (name === 'GeneratorFunction') return nullSerializer;

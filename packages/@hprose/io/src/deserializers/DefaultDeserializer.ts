@@ -8,7 +8,7 @@
 |                                                          |
 | hprose DefaultDeserializer for TypeScript.               |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -59,6 +59,7 @@ export class DefaultDeserializer extends BaseDeserializer implements Deserialize
             case Tags.TagUTF8Char: return stream.readString(1);
             case Tags.TagList: return ReferenceReader.readArray(reader);
             case Tags.TagMap: return (reader.dictType === 'map') ? ReferenceReader.readMap(reader) : readDict(reader);
+            case Tags.TagError: return new Error(reader.deserialize(String));
             default: return super.read(reader, tag);
         }
     }

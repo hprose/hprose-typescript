@@ -6,7 +6,7 @@ import { Broker, Prosumer, BrokerContext } from '../src/index';
 
 test('test push', async() => {
     const service = new Broker(new Service()).service;
-    //service.use(Log.ioHandler);
+    service.use(Log.ioHandler);
     const server = http.createServer();
     service.bind(server);
     server.listen(8081);
@@ -27,17 +27,23 @@ test('test push', async() => {
         expect(message.from).toBe('2');
         expect(message.data).toBe('world');
     });
+    await prosumer1.subscribe('test3', (message) => {
+        // console.log(message);
+        expect(message.from).toBe('2');
+        expect(message.data.message).toBe('error');
+    });
     const r1 = prosumer2.push('hello', 'test', '1');
     const r2 = prosumer2.push('hello', 'test', '1');
     const r3 = prosumer2.push('world', 'test2', '1');
     const r4 = prosumer2.push('world', 'test2', '1');
-    await Promise.all([r1, r2, r3, r4]);
+    const r5 = prosumer2.push(new Error('error'), 'test3', '1');
+
+    await Promise.all([r1, r2, r3, r4, r5]);
     await new Promise((resolve, reject) => {
         setTimeout(async () => {
             await prosumer1.unsubscribe('test');
-            await prosumer2.unsubscribe('test');
             await prosumer1.unsubscribe('test2');
-            await prosumer2.unsubscribe('test2');
+            await prosumer1.unsubscribe('test3');
             server.close();
             resolve();
         }, 10);
