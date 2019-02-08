@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Deserializer for TypeScript.                      |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Feb 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,6 +34,7 @@ import { DateDeserializer } from './deserializers/DateDeserializer';
 import { ByteStreamDeserializer } from './deserializers/ByteStreamDeserializer';
 import { SetDeserializer } from './deserializers/SetDeserializer';
 import { MapDeserializer } from './deserializers/MapDeserializer';
+import { ErrorDeserializer } from './deserializers/ErrorDeserializer';
 import { NullDeserializer } from './deserializers/NullDeserializer';
 import { DefaultDeserializer } from './deserializers/DefaultDeserializer';
 import { Deserializer } from './deserializers/Deserializer';
@@ -65,6 +66,7 @@ export function getInstance(type?: Function | null): Deserializer {
             case Float64Array: return Float64ArrayDeserializer.instance;
             case Set: return SetDeserializer.instance;
             case Map: return MapDeserializer.instance;
+            case Error: return ErrorDeserializer.instance;
         }
         const deserializer = deserializers.get(type);
         if (deserializer !== undefined) return deserializer;

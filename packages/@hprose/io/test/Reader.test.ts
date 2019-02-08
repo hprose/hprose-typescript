@@ -67,6 +67,13 @@ test('test guid deserialization', () => {
     expect(reader.deserialize()).toEqual(guid);
 });
 
+test('test error deserialization', () => {
+    let reader = new Reader(new ByteStream('Es5"error"Es5"error"'));
+    let error: Error = new Error("error");
+    expect(reader.deserialize()).toEqual(error);
+    expect(reader.deserialize()).toEqual(error);
+});
+
 // test('test bigint deserialization', () => {
 //     let reader = new Reader(new ByteStream('l1234567890987654321234567890;'));
 //     reader.longType = 'bigint';
