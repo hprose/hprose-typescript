@@ -24,7 +24,6 @@ export interface UdpServiceContext extends ServiceContext {
 }
 
 export class UdpHandler implements Handler {
-    public onlisten?: (socket: dgram.Socket) => void;
     public onclose?: (socket: dgram.Socket) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
@@ -41,9 +40,6 @@ export class UdpHandler implements Handler {
     }
     public bind(socket: dgram.Socket): void {
         this.handler(socket);
-        socket.on('listening', () => {
-            if (this.onlisten) this.onlisten(socket);
-        });
     }
     public handler = (socket: dgram.Socket): void => {
         socket.on('message', async (msg: Buffer, rinfo: AddressInfo) => {
