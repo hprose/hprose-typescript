@@ -166,6 +166,9 @@ export class HttpHandler {
         const context = new ServiceContext(this.service);
         context.request = request;
         context.response = response;
+        context.address = request.socket.remoteAddress;
+        context.port = request.socket.remotePort;
+        context.family = request.socket.remoteFamily;
         context.handler = this;
         const size = Number(request.headers['content-length']);
         if (size > this.service.maxRequestLength) {

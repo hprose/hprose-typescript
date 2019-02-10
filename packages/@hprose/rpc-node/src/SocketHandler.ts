@@ -46,6 +46,9 @@ export class SocketHandler {
     private async run(socket: net.Socket, request: Uint8Array, index: number): Promise<void> {
         const context = new ServiceContext(this.service);
         context.socket = socket;
+        context.address = socket.remoteAddress;
+        context.port = socket.remotePort;
+        context.family = socket.remoteFamily;
         context.handler = this;
         const response = await this.service.handle(request, context);
         this.send(socket, response, index);

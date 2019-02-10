@@ -19,6 +19,9 @@ import { MethodLike } from './Method';
 
 export class ServiceContext extends Context {
     public method!: MethodLike;
+    public family: string | undefined;
+    public address: string | undefined;
+    public port: number | undefined;
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     constructor(public readonly service: Service) { super(); }

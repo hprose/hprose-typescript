@@ -64,6 +64,9 @@ export class WebSocketHandler {
             const context = new ServiceContext(this.service);
             context.websocket = websocket;
             context.request = request;
+            context.address = request.socket.remoteAddress;
+            context.port = request.socket.remotePort;
+            context.family = request.socket.remoteFamily;
             context.handler = this;
             const result = await this.service.handle(instream.remains, context);
             const header = new Uint8Array(4);
@@ -88,7 +91,6 @@ export class WebSocketHandler {
         });
     }
 }
-
 
 Service.register('websocket', WebSocketHandler, [http.Server, https.Server, WebSocket.Server]);
 

@@ -19,9 +19,6 @@ import { ServiceContext, Service, crc32, Handler } from '@hprose/rpc-core';
 
 export interface UdpServiceContext extends ServiceContext {
     readonly socket: dgram.Socket;
-    readonly family: string;
-    readonly address: string;
-    readonly port: number;
     readonly handler: UdpHandler;
 }
 
