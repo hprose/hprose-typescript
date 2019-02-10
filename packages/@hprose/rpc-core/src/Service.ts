@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Jan 29, 2019                               |
+| LastModified: Feb 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -32,10 +32,10 @@ export interface HandlerConstructor {
 }
 
 export class Service {
-    private static handlers: { name: string, ctor: HandlerConstructor }[] = [];
-    private static serverTypes: Map<Function, string[]> = new Map();
+    private static readonly handlers: { [name: string]: HandlerConstructor } = Object.create(null);
+    private static readonly serverTypes: Map<Function, string[]> = new Map();
     public static register(name: string, ctor: HandlerConstructor, serverTypes: Function[]): void {
-        Service.handlers.push({name, ctor});
+        Service.handlers[name] = ctor;
         serverTypes.forEach((type) => {
             if (Service.serverTypes.has(type)) {
                 (Service.serverTypes.get(type) as string[]).push(name);
@@ -53,7 +53,8 @@ export class Service {
     private readonly methodManager: MethodManager = new MethodManager();
     private readonly handlers: { [name: string]: Handler } = Object.create(null);
     constructor() {
-        Service.handlers.forEach(({ name, ctor }) => {
+        for (var name in Service.handlers) {
+            var ctor = Service.handlers[name];
             let handler = new ctor(this);
             this.handlers[name] = handler;
             Object.defineProperty(this, name, {
@@ -65,7 +66,7 @@ export class Service {
                 enumerable: true,
                 configurable: true
             });
-        });
+        }
         this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
     }
     public bind(server: any, name?: string): this {
