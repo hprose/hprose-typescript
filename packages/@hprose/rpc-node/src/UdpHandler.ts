@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Feb 6, 2019                                |
+| LastModified: Feb 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,9 @@ import { ServiceContext, Service, crc32, Handler } from '@hprose/rpc-core';
 
 export interface UdpServiceContext extends ServiceContext {
     readonly socket: dgram.Socket;
-    readonly rinfo: AddressInfo;
+    readonly family: string;
+    readonly address: string;
+    readonly port: number;
     readonly handler: UdpHandler;
 }
 
@@ -56,7 +58,9 @@ export class UdpHandler implements Handler {
             const request = new Uint8Array(msg.buffer, msg.byteOffset + 8, bodyLength);
             const context = new ServiceContext(this.service);
             context.socket = socket;
-            context.rinfo = rinfo;
+            context.address = rinfo.address;
+            context.port = rinfo.port;
+            context.family = rinfo.family;
             context.handler = this;
             const response = await this.service.handle(request, context);
             this.send(socket, Buffer.from(response.buffer, response.byteOffset, response.length), index, rinfo);
