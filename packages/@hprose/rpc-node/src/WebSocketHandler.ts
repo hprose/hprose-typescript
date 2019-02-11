@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Feb 6, 2019                                |
+| LastModified: Feb 12, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -60,7 +60,7 @@ export class WebSocketHandler {
         });
         websocket.on('message', async (data: ArrayBuffer) => {
             const instream = new ByteStream(data);
-            const index = instream.readInt32BE();
+            let index = instream.readInt32BE();
             const context = new ServiceContext(this.service);
             context.websocket = websocket;
             context.request = request;
@@ -68,7 +68,14 @@ export class WebSocketHandler {
             context.port = request.socket.remotePort;
             context.family = request.socket.remoteFamily;
             context.handler = this;
-            const result = await this.service.handle(instream.remains, context);
+            let response: Uint8Array;
+            try {
+                response = await this.service.handle(instream.remains, context);
+            }
+            catch(e) {
+                index |= 0x80000000;
+                response = (new ByteStream(e.message)).bytes;
+            }
             const header = new Uint8Array(4);
             writeInt32BE(header, 0, index);
             websocket.send(header, {
@@ -80,7 +87,7 @@ export class WebSocketHandler {
                     if (this.onerror) this.onerror(error);
                 }
             });
-            websocket.send(result, {
+            websocket.send(response, {
                 binary: true,
                 compress: this.compress,
             }, (error) => {

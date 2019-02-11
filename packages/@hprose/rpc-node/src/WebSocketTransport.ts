@@ -15,7 +15,7 @@
 
 import WebSocket from 'ws';
 import { Client, Context, Transport, TimeoutError, Deferred, defer } from '@hprose/rpc-core';
-import { writeInt32BE, ByteStream } from '@hprose/io';
+import { writeInt32BE, ByteStream, fromUint8Array } from '@hprose/io';
 
 export class WebSocketTransport implements Transport {
     public static readonly schemes: string[] = ['ws', 'wss'];
@@ -40,11 +40,20 @@ export class WebSocketTransport implements Transport {
         websocket.on('open', () => ws.resolve(websocket));
         websocket.on('message', async (data: ArrayBuffer) => {
             const instream = new ByteStream(data);
-            const index = instream.readInt32BE();
+            let index = instream.readInt32BE();
+            const response = instream.remains;
+            const has_error = (index & 0x80000000) !== 0;
+            index &= 0x7FFFFFFF;
             const result = this.results[uri][index];
             delete this.results[uri][index];
-            if (result) {
-                result.resolve(instream.remains);
+            if (has_error) {
+                if (result) {
+                    result.reject(new Error(fromUint8Array(response)));
+                }
+                websocket.close();
+            }
+            else if (result) {
+                result.resolve(response);
             }
         });
         const onerror = (error?: Error) => {

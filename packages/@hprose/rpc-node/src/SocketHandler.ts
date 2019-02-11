@@ -8,7 +8,7 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 6, 2019                                |
+| LastModified: Feb 12, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -50,7 +50,14 @@ export class SocketHandler {
         context.port = socket.remotePort;
         context.family = socket.remoteFamily;
         context.handler = this;
-        const response = await this.service.handle(request, context);
+        let response: Uint8Array;
+        try {
+            response = await this.service.handle(request, context);
+        }
+        catch(e) {
+            index |= 0x80000000;
+            response = (new ByteStream(e.message)).bytes;
+        }
         this.send(socket, response, index);
     }
     private receive(socket: net.Socket): void {

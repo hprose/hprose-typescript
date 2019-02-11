@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Feb 9, 2019                                |
+| LastModified: Feb 12, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,7 @@
 import * as dgram from 'dgram';
 import { AddressInfo } from 'net';
 import { ServiceContext, Service, crc32, Handler } from '@hprose/rpc-core';
+import { ByteStream } from '@hprose/io';
 
 export interface UdpServiceContext extends ServiceContext {
     readonly socket: dgram.Socket;
@@ -46,7 +47,7 @@ export class UdpHandler implements Handler {
             const header = msg.subarray(4, 8);
             if (crc32(header) !== crc) return;
             const bodyLength = msg.readUInt16BE(4);
-            const index = msg.readUInt16BE(6);
+            let index = msg.readUInt16BE(6);
             if (bodyLength !== msg.length - 8 || (index & 0x8000) !== 0) return;
             if (bodyLength > this.service.maxRequestLength) {
                 this.send(socket, Buffer.from('request too long'), index | 0x8000, rinfo);
@@ -59,7 +60,14 @@ export class UdpHandler implements Handler {
             context.port = rinfo.port;
             context.family = rinfo.family;
             context.handler = this;
-            const response = await this.service.handle(request, context);
+            let response: Uint8Array;
+            try {
+                response = await this.service.handle(request, context);
+            }
+            catch(e) {
+                index |= 0x8000;
+                response = (new ByteStream(e.message)).bytes;
+            }
             this.send(socket, Buffer.from(response.buffer, response.byteOffset, response.length), index, rinfo);
         });
         socket.on('close', () => {
