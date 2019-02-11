@@ -5,7 +5,6 @@
   "command": {
     "publish": {
       "ignoreChanges": [
-        "ignored-file",
         "*.md"
       ]
     }
