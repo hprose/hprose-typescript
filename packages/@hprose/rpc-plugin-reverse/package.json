@@ -39,7 +39,7 @@
     "@hprose/rpc-core": "^3.0.0-beta.10"
   },
   "files": [
-    "./lib/"
-  ],
-  "gitHead": "9d10af9a0f2c254ee419195f543f6b0ba584f64e"
+    "lib",
+    "tsconfig.json"
+  ]
 }
