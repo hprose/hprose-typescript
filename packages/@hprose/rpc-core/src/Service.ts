@@ -85,23 +85,6 @@ export class Service {
         return this;
     }
     public handle(request: Uint8Array, context: Context): Promise<Uint8Array> {
-        if (this.timeout > 0) {
-            return new Promise<Uint8Array>((resolve, reject) => {
-                const timeoutId = setTimeout(() => {
-                    reject(new TimeoutError());
-                }, this.timeout);
-                this.ioManager.handler(request, context).then(
-                    (value) => {
-                        clearTimeout(timeoutId);
-                        resolve(value);
-                    },
-                    (reason) => {
-                        clearTimeout(timeoutId);
-                        reject(reason);
-                    }
-                );
-            });
-        }
         return this.ioManager.handler(request, context);
     }
     public async process(request: Uint8Array, context: Context): Promise<Uint8Array> {
@@ -109,7 +92,25 @@ export class Service {
         let result: any;
         try {
             const [ fullname, args ] = codec.decode(request, context as ServiceContext);
-            result = await this.invokeManager.handler(fullname, args, context);
+            if (this.timeout > 0) {
+                result = await new Promise<Uint8Array>((resolve, reject) => {
+                    const timeoutId = setTimeout(() => {
+                        reject(new TimeoutError());
+                    }, this.timeout);
+                    this.invokeManager.handler(fullname, args, context).then(
+                        (value) => {
+                            clearTimeout(timeoutId);
+                            resolve(value);
+                        },
+                        (reason) => {
+                            clearTimeout(timeoutId);
+                            reject(reason);
+                        }
+                    );
+                });
+            } else {
+                result = await this.invokeManager.handler(fullname, args, context);
+            }
         }
         catch(e) {
             result = e;
