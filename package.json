@@ -26,6 +26,12 @@
     "typescript": "^3.2.2",
     "lerna": "^3.10.6"
   },
+  "keywords": [
+    "hprose",
+    "rpc",
+    "serialize",
+    "microservices"
+  ],
   "workspaces": [
     "packages/@hprose/*"
   ]

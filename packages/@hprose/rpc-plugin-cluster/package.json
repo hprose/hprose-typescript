@@ -35,6 +35,11 @@
   "dependencies": {
     "@hprose/rpc-core": "^3.0.0-beta.10"
   },
+  "keywords": [
+    "hprose",
+    "rpc",
+    "microservices"
+  ],
   "files": [
     "lib",
     "tsconfig.json"

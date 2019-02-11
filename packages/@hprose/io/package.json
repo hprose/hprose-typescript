@@ -36,6 +36,10 @@
   "dependencies": {
     "guid-typescript": "^1.0.9"
   },
+  "keywords": [
+    "hprose",
+    "serialize"
+  ],
   "files": [
     "lib",
     "tsconfig.json"
