@@ -8,17 +8,21 @@
 |                                                          |
 | JsonRpc ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Feb 12, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { ByteStream } from '@hprose/io';
+import { ByteStream, Tags } from '@hprose/io';
 import { ServiceCodec, ServiceContext, MethodLike } from '@hprose/rpc-core';
+import { DefaultServiceCodec } from 'rpc-core/lib/ServiceCodec';
 
 export class JsonRpcServiceCodec implements ServiceCodec {
     public static instance: ServiceCodec = new JsonRpcServiceCodec();
     public encode(result: any, context: ServiceContext): Uint8Array {
+        if (!context['jsonrpc']) {
+            return DefaultServiceCodec.instance.encode(result, context);
+        }
         const response: any = {
             jsonrpc: '2.0',
             id: context['jsonrpc.id']
@@ -54,6 +58,10 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         return method;
     }
     decode(request: Uint8Array, context: ServiceContext): [ string, any[] ] {
+        context['jsonrpc'] = (request.length > 0 && request[0] === Tags.TagOpenbrace);
+        if (!context['jsonrpc']) {
+            return DefaultServiceCodec.instance.decode(request, context);
+        }
         const call = JSON.parse(ByteStream.toString(request));
         if (call.jsonrpc !== '2.0' || !('method' in call) || !('id' in call)) {
             throw new Error('Invalid Request');
