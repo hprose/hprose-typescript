@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-loadbalancer",
-  "version": "3.0.0-beta.9",
+  "version": "3.0.0-beta.10",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-loadbalancer",
   "description": "hprose for TypeScript",
   "author": {
@@ -33,7 +33,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@hprose/rpc-core": "^3.0.0-beta.9"
+    "@hprose/rpc-core": "^3.0.0-beta.10"
   },
   "files": [
     "./lib/"
