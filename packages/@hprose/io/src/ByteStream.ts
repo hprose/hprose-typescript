@@ -202,14 +202,15 @@ export class ByteStream {
     protected grow(n: number): void {
         const capacity = this.capacity;
         n = this.size + n;
-        if (capacity > 0) {
-            if (n > capacity) {
+        if (n > capacity) {
+            if (capacity > 0) {
                 const buf = new Uint8Array(pow2roundup(n));
                 buf.set(this.buffer);
                 this.buffer = buf;
             }
-        } else {
-            this.buffer = new Uint8Array(Math.max(pow2roundup(n), INIT_SIZE));
+            else {
+                this.buffer = new Uint8Array(Math.max(pow2roundup(n), INIT_SIZE));
+            }
         }
     }
     /**
