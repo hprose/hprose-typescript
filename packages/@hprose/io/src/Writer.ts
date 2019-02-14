@@ -32,7 +32,7 @@ class WriterRefer {
         const index = this.ref.get(value);
         if (index !== undefined) {
             stream.writeByte(Tags.TagRef);
-            stream.writeString('' + index);
+            stream.writeAsciiString('' + index);
             stream.writeByte(Tags.TagSemicolon);
             return true;
         }
