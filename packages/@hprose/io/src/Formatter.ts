@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Formatter for TypeScript.                         |
 |                                                          |
-| LastModified: Jan 6, 2019                                |
+| LastModified: Feb 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,11 +17,11 @@ import { ByteStream } from './ByteStream';
 import { Writer } from './Writer';
 import { Reader } from './Reader';
 
-export function serialize(value: any, simple?: boolean, utc?: boolean): ByteStream {
+export function serialize(value: any, simple?: boolean, utc?: boolean): Uint8Array {
     const stream = new ByteStream();
     const writer = new Writer(stream, simple, utc);
     writer.serialize(value);
-    return stream;
+    return stream.bytes;
 }
 
 export function deserialize(stream: ByteStream | string | Uint8Array | Uint8ClampedArray | ArrayLike<number> | ArrayBufferLike, type?: Function | null, simple?: boolean): any {
