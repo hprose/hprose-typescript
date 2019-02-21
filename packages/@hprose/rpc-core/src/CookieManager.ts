@@ -67,8 +67,7 @@ export function getCookie(host: string = '@', path: string = '/', secure: boolea
                 if (cookie.EXPIRES && ((new Date()).getTime() > cookie.EXPIRES)) {
                     names.push(name);
                 } else if (path.indexOf(cookie.PATH) === 0) {
-                    if (((secure && cookie.SECURE) ||
-                        !cookie.SECURE) && (cookie.value !== null)) {
+                    if ((secure === cookie.SECURE) && (cookie.value !== null)) {
                         cookies.push(cookie.name + '=' + cookie.value);
                     }
                 }
