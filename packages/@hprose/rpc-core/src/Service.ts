@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Feb 11, 2019                               |
+| LastModified: Feb 22, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -53,8 +53,8 @@ export class Service {
     private readonly methodManager: MethodManager = new MethodManager();
     private readonly handlers: { [name: string]: Handler } = Object.create(null);
     constructor() {
-        for (var name in Service.handlers) {
-            var ctor = Service.handlers[name];
+        for (const name in Service.handlers) {
+            const ctor = Service.handlers[name];
             let handler = new ctor(this);
             this.handlers[name] = handler;
             Object.defineProperty(this, name, {
