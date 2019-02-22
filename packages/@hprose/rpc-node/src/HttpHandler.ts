@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Feb 4, 2019                                |
+| LastModified: Feb 22, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -37,9 +37,9 @@ export class HttpHandler {
     private origins: { [origin: string]: boolean } = Object.create(null);
     private originCount: number = 0;
     private _crossDomainXmlFile: string = '';
-    private _crossDomainXmlContent: Buffer = new Buffer(0);
+    private _crossDomainXmlContent: Buffer = Buffer.alloc(0);
     private _clientAccessPolicyXmlFile: string = '';
-    private _clientAccessPolicyXmlContent: Buffer = new Buffer(0);
+    private _clientAccessPolicyXmlContent: Buffer = Buffer.alloc(0);
     public onclose?: () => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) {}
