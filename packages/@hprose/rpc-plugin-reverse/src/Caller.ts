@@ -92,9 +92,9 @@ export class Caller {
         end.passContext = true;
 
         this.service.add(close)
-                    .add(begin)
-                    .add(end)
-                    .use(this.handler)
+            .add(begin)
+            .add(end)
+            .use(this.handler)
     }
     protected id(context: ServiceContext): string {
         if (context.requestHeaders['id']) {
@@ -152,7 +152,7 @@ export class Caller {
         for (let i = 0, n = results.length; i < n; ++i) {
             const [index, value, error] = results[i];
             if (this.results[id] && this.results[id][index]) {
-                const result = this.results[id][index];                
+                const result = this.results[id][index];
                 delete this.results[id][index];
                 if (error) {
                     result.reject(new Error(error));
