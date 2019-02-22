@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Feb 6, 2019                                |
+| LastModified: Feb 22, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -188,7 +188,7 @@ export class SocketTransport implements Transport {
         }
         const socket: net.Socket = await this.getSocket(uri);
         const n = request.length;
-        const header = new Buffer(12);
+        const header = Buffer.allocUnsafe(12);
         header.writeInt32BE(n | 0x80000000, 4);
         header.writeInt32BE(index, 8);
         const crc = crc32(header.subarray(4, 12));
