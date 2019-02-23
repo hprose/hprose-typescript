@@ -28,10 +28,10 @@ export class MethodManager {
     public get(fullname: string): MethodLike | undefined {
         return (fullname in this.methods) ? this.methods[fullname] : this.methods['*'];
     }
-    public remove(fullname: string) {
+    public remove(fullname: string): void {
         delete this.methods[fullname];
     }
-    public add(method: MethodLike) {
+    public add(method: MethodLike): void {
         const fullname = method.fullname;
         if (fullname === '') {
             throw new Error('fullname must not be empty');
