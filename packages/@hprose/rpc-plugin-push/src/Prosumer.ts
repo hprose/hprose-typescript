@@ -77,7 +77,7 @@ export class Prosumer {
     public async subscribe(topic: string, callback: (message: Message) => void): Promise<boolean> {
         if (this.id) {
             this.callbacks[topic] = callback;
-            const result: boolean = await this.client.invoke('+', [topic], { type: Boolean });
+            const result: boolean = await this.client.invoke('+', [topic], Boolean);
             this.message();
             if (this.onsubscribe) {
                 this.onsubscribe(topic);
@@ -88,7 +88,7 @@ export class Prosumer {
     }
     public async unsubscribe(topic: string): Promise<boolean> {
         if (this.id) {
-            const result: boolean = await this.client.invoke('-', [topic], { type: Boolean });
+            const result: boolean = await this.client.invoke('-', [topic], Boolean);
             delete this.callbacks[topic];
             if (this.onunsubscribe) {
                 this.onunsubscribe(topic);
@@ -98,7 +98,7 @@ export class Prosumer {
         return false;
     }
     public unicast(data: any, topic: string, id: string): Promise<boolean> {
-        return this.client.invoke('>', [data, topic, id], { type: Boolean });
+        return this.client.invoke('>', [data, topic, id], Boolean);
     }
     public multicast(data: any, topic: string, ids: string[]): Promise<{ [id: string]: boolean }> {
         return this.client.invoke('>?', [data, topic, ids]);
@@ -114,9 +114,9 @@ export class Prosumer {
         }
     }
     public exists(topic: string, id: string = this.id): Promise<boolean> {
-        return this.client.invoke('?', [topic, id], { type: Boolean });
+        return this.client.invoke('?', [topic, id], Boolean);
     }
     public idlist(topic: string): Promise<string[]> {
-        return this.client.invoke('|', [topic], { type: Array });
+        return this.client.invoke('|', [topic], Array);
     }
 }

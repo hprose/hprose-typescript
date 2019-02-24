@@ -8,7 +8,7 @@
 |                                                          |
 | Provider for TypeScript.                                 |
 |                                                          |
-| LastModified: Feb 4, 2019                                |
+| LastModified: Feb 24, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -77,7 +77,7 @@ export class Provider {
         this.closed = false;
         do {
             try {
-                const calls: [number, string, any[]][] = await this.client.invoke('!', [], { type: Array });
+                const calls: [number, string, any[]][] = await this.client.invoke('!', [], Array);
                 if (!calls) return;
                 this.dispatch(calls);
             }

@@ -8,12 +8,11 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Feb 24, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Settings } from './Settings';
 import { ClientCodec, DefaultClientCodec } from './ClientCodec';
 import { Context } from './Context';
 import { ClientContext } from './ClientContext';
@@ -91,9 +90,9 @@ export class Client {
     private static protocols: { [protocol: string]: string } = Object.create(null);
     public static register(name: string, ctor: TransportConstructor): void {
         Client.transports.push({ name, ctor });
-        ctor.schemes.forEach((scheme) => Client.protocols[scheme + ":"] = name);
+        ctor.schemes.forEach((scheme) => Client.protocols[scheme + ':'] = name);
     }
-    public readonly settings: { [fullname: string]: Settings } = Object.create(null);
+    public readonly returnTypes: { [fullname: string]: Function | null } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public codec: ClientCodec = DefaultClientCodec.instance;
     private urilist: string[] = [];
@@ -131,12 +130,12 @@ export class Client {
             this.urilist.sort(() => Math.random() - 0.5);
         }
     }
-    public useService<T extends object>(settings?: { [name in keyof T]: Settings }): T;
-    public useService<T extends object>(namespace: string, settings?: { [name in keyof T]: Settings }): T;
+    public useService<T extends object>(returnTypes?: { [name in keyof T]: Function | null }): T;
+    public useService<T extends object>(namespace: string, returnTypes?: { [name in keyof T]: Function | null }): T;
     public useService(fullnames: string[]): any;
     public useService(...args: any[]): any {
         let namespace: string | undefined;
-        let settings: { [name in keyof any]: Settings } | undefined;
+        let returnTypes: { [name in keyof any]: Function | null } | undefined;
         switch (args.length) {
             case 1:
                 if (Array.isArray(args[0])) {
@@ -144,20 +143,20 @@ export class Client {
                 } else if (typeof args[0] === 'string') {
                     namespace = args[0];
                 } else {
-                    settings = args[0];
+                    returnTypes = args[0];
                 }
                 break;
             case 2:
                 namespace = args[0];
-                settings = args[1];
+                returnTypes = args[1];
                 break;
         }
         let service = Object.create(null);
-        if (settings) {
-            for (let name in settings) {
+        if (returnTypes) {
+            for (let name in returnTypes) {
                 let fullname = '' + name;
                 if (namespace) { fullname = namespace + '_' + name; }
-                this.settings[fullname] = settings[name];
+                this.returnTypes[fullname] = returnTypes[name];
                 service[name] = makeInvoke(this, fullname);
             }
             return service;
@@ -186,16 +185,13 @@ export class Client {
         }
         return this;
     }
-    public async invoke(fullname: string, args: any[] = [], settings?: Settings): Promise<any> {
+    public async invoke(fullname: string, args: any[] = [], returnType?: Function | null): Promise<any> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
-        const context = new ClientContext(this, fullname, settings);
+        const context = (args.length > 0 && args[args.length - 1] instanceof ClientContext) ? args.pop() : new ClientContext();
+        context.init(this, (returnType !== undefined) ? returnType : this.returnTypes[fullname]);
         const value = await this.invokeManager.handler(fullname, args, context);
-        if (settings && settings.returnContext
-            || this.settings[fullname] && this.settings[fullname].returnContext) {
-            return { value, context };
-        }
         return value;
     }
     public async call(fullname: string, args: any[], context: Context): Promise<any> {

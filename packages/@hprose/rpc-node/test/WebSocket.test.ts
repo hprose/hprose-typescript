@@ -1,6 +1,6 @@
 import * as http from 'http';
 import WebSocket from 'ws';
-import { Context, NextInvokeHandler, Service, Client } from '@hprose/rpc-core';
+import { Context, NextInvokeHandler, Service, Client, ClientContext } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -48,8 +48,10 @@ test('test headers', async () => {
     const client = new Client('ws://127.0.0.1:8088/');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
-    const result = await proxy.hello('world');
+    const context = new ClientContext();
+    const result = await proxy.hello('world', context);
     expect(result).toBe('hello world');
+    expect(context.responseHeaders.pong).toBe(true);
     server.close();
 });
 

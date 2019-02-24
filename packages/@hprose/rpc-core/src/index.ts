@@ -24,7 +24,6 @@ export { InvokeManager, InvokeHandler, NextInvokeHandler } from './InvokeManager
 export { IOManager, IOHandler, NextIOHandler } from './IOManager';
 export { Method, MethodLike } from './Method';
 export { MissingMethod, MethodManager } from './MethodManager';
-export { Settings } from './Settings';
 export { TimeoutError } from './TimeoutError';
 export { URI, parseURI, normalize, promisify, crc32 } from './Utils';
 

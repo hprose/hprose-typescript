@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-loadbalance for TypeScript.           |
 |                                                          |
-| LastModified: Feb 1, 2019                                |
+| LastModified: Feb 24, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -104,6 +104,16 @@ export class RoundRobinLoadBalance {
     };
 }
 
+function gcd(x: number, y: number): number {
+    if (x < y) {
+        [x, y] = [y, x];
+    }
+    while (y !== 0) {
+        [x, y] = [y, x % y];
+    }
+    return x;
+}
+
 export class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
     private readonly maxWeight: number;
     private readonly gcdWeight: number;
@@ -112,16 +122,7 @@ export class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
     public constructor(uriList: WeightedURIList) {
         super(uriList);
         this.maxWeight = Math.max(...this.weights);
-        this.gcdWeight = this.weights.reduce(this.gcd);
-    }
-    private gcd(x: number, y: number): number {
-        if (x < y) {
-            [x, y] = [y, x];
-        }
-        while (y !== 0) {
-            [x, y] = [y, x % y];
-        }
-        return x;
+        this.gcdWeight = this.weights.reduce(gcd);
     }
     public handler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const n = this.uris.length;
@@ -230,7 +231,7 @@ export class WeightedLeastActiveLoadBalance extends WeightedLoadBalance {
         const leastActiveIndexes: number[] = [];
         let totalWeight = 0;
         for (let i = 0; i < this.weights.length; ++i) {
-            if (this.actives[i] == leastActive) {
+            if (this.actives[i] === leastActive) {
                 leastActiveIndexes.push(i);
                 totalWeight += this.effectiveWeights[i];
             }
