@@ -68,7 +68,7 @@ export class DefaultClientCodec {
                 if (context.responseHeaders.simple) {
                     reader.simple = true;
                 }
-                return reader.deserialize(context.type);
+                return reader.deserialize(context.returnType);
             case Tags.TagError:
                 throw new Error(reader.deserialize(String));
             case Tags.TagEnd:

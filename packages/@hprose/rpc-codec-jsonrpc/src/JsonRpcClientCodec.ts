@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpc ClientCodec for TypeScript.                      |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Jan 24, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -42,6 +42,6 @@ export class JsonRpcClientCodec implements ClientCodec {
             }
             throw new Error(error.message);
         }
-        return context.type === null ? null : undefined;
+        return context.returnType === null ? null : undefined;
     }
 }
