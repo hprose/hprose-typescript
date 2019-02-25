@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { Context, NextInvokeHandler, Service, Client, ClientContext } from '@hprose/rpc-core';
+import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -100,5 +100,26 @@ test('test maxRequestLength', async () => {
     catch (e) {
         expect(e).toEqual(new Error('413:Request Entity Too Large'));
     }
+    server.close();
+});
+
+test('test ipaddress', async () => {
+    function hello(name: string, context: ServiceContext): string {
+        console.log(context.address + ':' + context.port);
+        return 'hello ' + name;
+    }
+    const service = new Service();
+    service.add({method: hello, fullname: 'hello', passContext: true});
+    const server = http.createServer();
+    service.bind(server);
+    server.listen(8003);
+    const client = new Client('http://127.0.0.1:8003/');
+    const proxy = await client.useServiceAsync();
+    const result = await proxy.hello('world');
+    expect(result).toBe('hello world');
+    await proxy.hello('world 1');
+    await client.abort();
+    await proxy.hello('world 2');
+    await proxy.hello('world 3');
     server.close();
 });

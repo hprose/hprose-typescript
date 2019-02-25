@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -30,6 +30,8 @@ export class HttpTransport implements Transport {
     private requests: { [index: number]: http.ClientRequest } = Object.create(null);
     public keepAlive: boolean = true;
     public timeout: number = 30000;
+    public httpAgent: http.Agent = new http.Agent({ keepAlive: true });
+    public httpsAgent: https.Agent = new https.Agent({ keepAlive: true });
     public options: https.RequestOptions = Object.create(null);
     public readonly httpRequestHeaders: http.OutgoingHttpHeaders = Object.create(null);
     private getRequestHeader(httpRequestHeaders?: http.OutgoingHttpHeaders): http.OutgoingHttpHeaders {
@@ -52,10 +54,12 @@ export class HttpTransport implements Transport {
             case 'http:':
                 client = http;
                 secure = false;
+                options.agent = this.httpAgent;
                 break;
             case 'https:':
                 client = https;
                 secure = true;
+                options.agent = this.httpsAgent;
                 break;
             default:
                 throw new Error('unsupported ' + options.protocol + 'protocol');
@@ -77,7 +81,7 @@ export class HttpTransport implements Transport {
             const req = client.request(options, (res: http.IncomingMessage) => {
                 const size = res.headers['content-length'];
                 const instream = size ? new ByteStream(parseInt(size, 10)) : new ByteStream();
-                res.on('data', function(chunk: Buffer) {
+                res.on('data', function (chunk: Buffer) {
                     instream.write(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.length));
                 });
                 res.on('end', () => {
