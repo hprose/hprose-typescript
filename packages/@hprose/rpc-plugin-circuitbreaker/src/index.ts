@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-circuitbreaker for TypeScript.        |
 |                                                          |
-| LastModified: Jan 31, 2019                               |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,7 @@ export class CircuitBreaker {
         public readonly recoverTime: number = 30000,
         public readonly mock?: MockService) {
     }
-    public async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+    public ioHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         if (this.failCount > this.threshold) {
             const interval = Date.now() - this.lastFailTime;
             if (interval < this.recoverTime) {
@@ -48,7 +48,7 @@ export class CircuitBreaker {
         });
         return response;
     }
-    public async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public invokeHandler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         if (this.mock) {
             const mock = this.mock;
             return next(name, args, context).catch((e) => {

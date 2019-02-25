@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-cluster for TypeScript.               |
 |                                                          |
-| LastModified: Feb 1, 2019                                |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -72,7 +72,7 @@ export class Cluster {
         if (config.retry === undefined) config.retry = 10;
         if (config.idempotent === undefined) config.idempotent = false;
     }
-    public handler = async(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
+    public handler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const config = this.config;
         try {
             const response = await next(request, context);

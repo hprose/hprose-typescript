@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-loadbalance for TypeScript.           |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -82,7 +82,7 @@ export class WeightedRandomLoadBalance extends WeightedLoadBalance {
             }
             return response;
         }
-        catch(e) {
+        catch (e) {
             if (this.effectiveWeights[index] > 0) {
                 this.effectiveWeights[index]--;
             }
@@ -101,7 +101,7 @@ export class RoundRobinLoadBalance {
             context.uri = uris[this.index];
         }
         return next(request, context);
-    };
+    }
 }
 
 function gcd(x: number, y: number): number {
@@ -173,7 +173,7 @@ export class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
             }
             return response;
         }
-        catch(e) {
+        catch (e) {
             if (this.effectiveWeights[index] > 0) {
                 this.effectiveWeights[index]--;
             }
@@ -210,7 +210,7 @@ export class LeastActiveLoadBalance {
             this.actives[index]--;
             return response;
         }
-        catch(e) {
+        catch (e) {
             this.actives[index]--;
             throw e;
         }
@@ -262,7 +262,7 @@ export class WeightedLeastActiveLoadBalance extends WeightedLoadBalance {
             }
             return response;
         }
-        catch(e) {
+        catch (e) {
             this.actives[index]--;
             if (this.effectiveWeights[index] > 0) {
                 this.effectiveWeights[index]--;

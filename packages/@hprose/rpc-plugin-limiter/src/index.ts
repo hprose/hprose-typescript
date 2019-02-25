@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-limiter for TypeScript.               |
 |                                                          |
-| LastModified: Feb 7, 2019                                |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,15 +34,15 @@ export class RateLimiter {
         if (this.timeout > 0 && delay > this.timeout) {
             throw new TimeoutError();
         }
-        return new Promise<number>(function(resolve) {
+        return new Promise<number>(function (resolve) {
             setTimeout(resolve, delay, last);
         });
     }
-    public async ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+    public ioHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         await this.acquire(request.length);
         return next(request, context);
     }
-    public async invokeHandler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public invokeHandler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         await this.acquire();
         return next(name, args, context);
     }
@@ -73,10 +73,13 @@ export class ConcurrentLimiter {
         const task = this.tasks.shift();
         if (task) task.resolve();
     }
-    public async handler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         await this.acquire();
-        const result = next(name, args, context);
-        result.then(() => this.release(), () => this.release());
-        return result;
+        try {
+            return await next(name, args, context);
+        }
+        finally {
+            this.release();
+        }
     }
 }
