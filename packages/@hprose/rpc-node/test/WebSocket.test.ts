@@ -1,6 +1,6 @@
 import * as http from 'http';
 import WebSocket from 'ws';
-import { Context, NextInvokeHandler, Service, Client, ClientContext } from '@hprose/rpc-core';
+import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -74,5 +74,29 @@ test('test maxRequestLength', async () => {
     catch (e) {
         expect(e).toEqual(new Error('1006'));
     }
+    server.close();
+});
+
+test('test ipaddress', async () => {
+    function hello(name: string, context: ServiceContext): string {
+        console.log(context.address + ':' + context.port);
+        return 'hello ' + name;
+    }
+    const service = new Service();
+    service.add({method: hello, fullname: 'hello', passContext: true});
+    const server = http.createServer();
+    const wsserver = new WebSocket.Server({server});
+    service.bind(wsserver);
+    service.websocket.compress = true;
+    server.listen(8090);
+    const client = new Client('ws://127.0.0.1:8090/');
+    client.websocket.compress = true;
+    const proxy = await client.useServiceAsync();
+    const result = await proxy.hello('world');
+    expect(result).toBe('hello world');
+    await proxy.hello('world 1');
+    await client.abort();
+    await proxy.hello('world 2');
+    await proxy.hello('world 3');
     server.close();
 });

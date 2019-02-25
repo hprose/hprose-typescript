@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for TypeScript.                             |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ import { fromUint8Array } from '@hprose/io';
 export class UdpTransport implements Transport {
     public static readonly schemes: string[] = ['udp', 'udp4', 'udp6'];
     private counter: number = 0;
-    private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
+    private results: Map<dgram.Socket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private sockets: { [uri: string]: Promise<dgram.Socket> } = Object.create(null);
     public compress: boolean = false;
     public timeout: number = 30000;
@@ -58,19 +58,22 @@ export class UdpTransport implements Transport {
             const has_error = (index & 0x8000) !== 0;
             index &= 0x7FFF;
             const response = new Uint8Array(msg.buffer, msg.byteOffset + 8, bodyLength);
-            const result = this.results[uri][index];
-            delete this.results[uri][index];
-            if (result) {
-                if (has_error) {
-                    result.reject(new Error(fromUint8Array(response)));
-                }
-                else {
-                    result.resolve(response);
+            const results = this.results.get(socket);
+            if (results) {
+                const result = results[index];
+                delete results[index];
+                if (result) {
+                    if (has_error) {
+                        result.reject(new Error(fromUint8Array(response)));
+                    }
+                    else {
+                        result.resolve(response);
+                    }
                 }
             }
         });
-        const onerror = (error?: Error) => {
-            const results = this.results[uri];
+        const onerror = async (error?: Error) => {
+            const results = this.results.get(socket);
             if (results) {
                 for (const index in results) {
                     const result = results[index];
@@ -78,7 +81,9 @@ export class UdpTransport implements Transport {
                     delete results[index];
                 }
             }
-            delete this.sockets[uri];
+            if ((await this.sockets[uri]) === socket) {
+                delete this.sockets[uri];
+            }
         };
         socket.on('error', onerror);
         socket.on('close', () => onerror(new Error('closed')));
@@ -94,13 +99,14 @@ export class UdpTransport implements Transport {
         const index = (this.counter < 0x7FFF) ? ++this.counter : this.counter = 0;
         const result = defer<Uint8Array>();
         const socket = await this.getSocket(uri);
-        if (this.results[uri] === undefined) {
-            this.results[uri] = Object.create(null);
+        if (this.results.get(socket) === undefined) {
+            this.results.set(socket, Object.create(null));
         }
-        this.results[uri][index] = result;
+        const results = this.results.get(socket)!;
+        results[index] = result;
         if (this.timeout > 0) {
             const timeoutId = setTimeout(() => {
-                delete this.results[uri][index];
+                delete results[index];
                 result.reject(new TimeoutError());
             }, this.timeout);
             result.promise.then(() => {
@@ -119,7 +125,7 @@ export class UdpTransport implements Transport {
         const body = Buffer.from(request.buffer, request.byteOffset, request.length);
         socket.send([header, body], parser.port ? parseInt(parser.port, 10) : 8412, parser.hostname, (error) => {
             if (error) {
-                delete this.results[uri][index];
+                delete results[index];
                 result.reject(error);
             }
         });

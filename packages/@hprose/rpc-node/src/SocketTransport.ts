@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ import { Transport, Deferred, crc32, defer, Context, TimeoutError, Client } from
 export class SocketTransport implements Transport {
     public static readonly schemes: string[] = ['tcp', 'tcp4', 'tcp6', 'tls', 'tls4', 'tls6', 'ssl', 'ssl4', 'ssl6', 'unix'];
     private counter: number = 0;
-    private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
+    private results: Map<net.Socket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private sockets: { [uri: string]: Promise<net.Socket> } = Object.create(null);
     public noDelay: boolean = true;
     public keepAlive: boolean = true;
@@ -116,16 +116,19 @@ export class SocketTransport implements Transport {
                     bodyLength = -1;
                     const has_error = (index & 0x80000000) !== 0;
                     index &= 0x7FFFFFFF;
-                    const result = this.results[uri][index];
-                    delete this.results[uri][index];
-                    if (has_error) {
-                        if (result) {
-                            result.reject(new Error(fromUint8Array(response)));
+                    const results = this.results.get(socket);
+                    if (results) {
+                        const result = results[index];
+                        delete results[index];
+                        if (has_error) {
+                            if (result) {
+                                result.reject(new Error(fromUint8Array(response)));
+                            }
+                            socket.end();
                         }
-                        socket.end();
-                    }
-                    else if (result) {
-                        result.resolve(response);
+                        else if (result) {
+                            result.resolve(response);
+                        }
                     }
                 } else {
                     break;
@@ -136,7 +139,7 @@ export class SocketTransport implements Transport {
     }
     private async getSocket(uri: string): Promise<net.Socket> {
         let socket = await this.sockets[uri];
-        if (socket !== undefined && socket.destroyed) {
+        if (socket !== undefined && !socket.destroyed) {
             return socket;
         }
         const conn = defer<net.Socket>();
@@ -148,7 +151,7 @@ export class SocketTransport implements Transport {
         });
         this.receive(uri, socket);
         const onerror = async (error?: Error) => {
-            const results = this.results[uri];
+            const results = this.results.get(socket);
             if (results) {
                 for (const index in results) {
                     const result = results[index];
@@ -156,8 +159,10 @@ export class SocketTransport implements Transport {
                     delete results[index];
                 }
             }
-            (await this.sockets[uri]).destroy();
-            delete this.sockets[uri];
+            if ((await this.sockets[uri]) === socket) {
+                (await this.sockets[uri]).destroy();
+                delete this.sockets[uri];
+            }
         };
         socket.on('error', onerror);
         socket.on('close', (had_error: boolean) => {
@@ -169,15 +174,17 @@ export class SocketTransport implements Transport {
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const uri: string = context.uri;
-        if (this.results[uri] === undefined) {
-            this.results[uri] = Object.create(null);
-        }
         const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
         const result = defer<Uint8Array>();
-        this.results[uri][index] = result;
+        const socket: net.Socket = await this.getSocket(uri);
+        if (this.results.get(socket) === undefined) {
+            this.results.set(socket, Object.create(null));
+        }
+        const results = this.results.get(socket)!;
+        results[index] = result;
         if (this.timeout > 0) {
             const timeoutId = setTimeout(() => {
-                delete this.results[uri][index];
+                delete results[index];
                 result.reject(new TimeoutError());
             }, this.timeout);
             result.promise.then(() => {
@@ -186,7 +193,6 @@ export class SocketTransport implements Transport {
                 clearTimeout(timeoutId);
             });
         }
-        const socket: net.Socket = await this.getSocket(uri);
         const n = request.length;
         const header = Buffer.allocUnsafe(12);
         header.writeInt32BE(n | 0x80000000, 4);

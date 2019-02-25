@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ import { writeInt32BE, ByteStream, fromUint8Array } from '@hprose/io';
 export class WebSocketTransport implements Transport {
     public static readonly schemes: string[] = ['ws', 'wss'];
     private counter: number = 0;
-    private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
+    private results: Map<WebSocket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private websockets: { [uri: string]: Promise<WebSocket> } = Object.create(null);
     public options: WebSocket.ClientOptions = Object.create(null);
     public compress: boolean = false;
@@ -44,20 +44,23 @@ export class WebSocketTransport implements Transport {
             const response = instream.remains;
             const has_error = (index & 0x80000000) !== 0;
             index &= 0x7FFFFFFF;
-            const result = this.results[uri][index];
-            delete this.results[uri][index];
-            if (has_error) {
-                if (result) {
-                    result.reject(new Error(fromUint8Array(response)));
+            const results = this.results.get(websocket);
+            if (results) {
+                const result = results[index];
+                delete results[index];
+                if (has_error) {
+                    if (result) {
+                        result.reject(new Error(fromUint8Array(response)));
+                    }
+                    websocket.close();
                 }
-                websocket.close();
-            }
-            else if (result) {
-                result.resolve(response);
+                else if (result) {
+                    result.resolve(response);
+                }
             }
         });
-        const onerror = (error?: Error) => {
-            const results = this.results[uri];
+        const onerror = async (error?: Error) => {
+            const results = this.results.get(websocket);
             if (results) {
                 for (const index in results) {
                     const result = results[index];
@@ -65,7 +68,9 @@ export class WebSocketTransport implements Transport {
                     delete results[index];
                 }
             }
-            delete this.websockets[uri];
+            if ((await this.websockets[uri]) === websocket) {
+                delete this.websockets[uri];
+            }
         };
         websocket.on('error', onerror);
         websocket.on('close', (code, reason) => {
@@ -83,13 +88,14 @@ export class WebSocketTransport implements Transport {
         const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
         const result = defer<Uint8Array>();
         const websocket = await this.connect(uri);
-        if (this.results[uri] === undefined) {
-            this.results[uri] = Object.create(null);
+        if (this.results.get(websocket) === undefined) {
+            this.results.set(websocket, Object.create(null));
         }
-        this.results[uri][index] = result;
+        const results = this.results.get(websocket)!;
+        results[index] = result;
         if (this.timeout > 0) {
             const timeoutId = setTimeout(() => {
-                delete this.results[uri][index];
+                delete results[index];
                 result.reject(new TimeoutError());
             }, this.timeout);
             result.promise.then(() => {
@@ -108,7 +114,7 @@ export class WebSocketTransport implements Transport {
         }, (error?: Error) => {
             if (error) {
                 result.reject(error);
-                delete this.results[uri][index];
+                delete results[index];
             }
         });
         websocket.send(request, {
@@ -117,7 +123,7 @@ export class WebSocketTransport implements Transport {
         }, (error?: Error) => {
             if (error) {
                 result.reject(error);
-                delete this.results[uri][index];
+                delete results[index];
             }
         });
         return result.promise;
