@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-limiter",
-  "version": "3.0.0-beta.12",
+  "version": "3.0.0-beta13",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-limiter",
   "description": "hprose for TypeScript",
   "author": {
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@hprose/io": "^3.0.0-beta.12",
-    "@hprose/rpc-core": "^3.0.0-beta.12"
+    "@hprose/rpc-core": "^3.0.0-beta13"
   },
   "keywords": [
     "hprose",
