@@ -16,13 +16,13 @@
 import { Context } from './Context';
 import { Client, Transport } from './Client';
 import { parseURI } from './Utils';
-import { MockManager } from './MockManager';
+import { MockAgent } from './MockAgent';
 
 export class MockTransport implements Transport {
     public static readonly schemes: string[] = ['mock'];
     async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const uri = parseURI(context.uri);
-        return MockManager.handler(uri.hostname, request);
+        return MockAgent.handler(uri.hostname, request);
     }
     async abort(): Promise<void> { }
 }

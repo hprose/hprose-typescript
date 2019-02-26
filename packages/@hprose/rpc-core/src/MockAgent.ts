@@ -4,25 +4,25 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| MockManager.ts                                           |
+| MockAgent.ts                                             |
 |                                                          |
-| MockManager for TypeScript.                              |
+| MockAgent for TypeScript.                                |
 |                                                          |
 | LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export class MockManager {
-    private static handlers: { [name: string] : (address: string, request: Uint8Array) => Promise<Uint8Array> } = Object.create(null);
+export class MockAgent {
+    private static handlers: { [name: string]: (address: string, request: Uint8Array) => Promise<Uint8Array> } = Object.create(null);
     public static register(address: string, handler: (address: string, request: Uint8Array) => Promise<Uint8Array>) {
-        MockManager.handlers[address] = handler;
+        MockAgent.handlers[address] = handler;
     }
     public static unregister(address: string) {
-        delete MockManager.handlers[address];
+        delete MockAgent.handlers[address];
     }
     public static async handler(address: string, request: Uint8Array): Promise<Uint8Array> {
-        const handler = MockManager.handlers[address];
+        const handler = MockAgent.handlers[address];
         if (handler) {
             return handler(address, request);
         }

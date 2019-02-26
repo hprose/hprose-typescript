@@ -15,7 +15,7 @@
 
 import { ServiceContext } from './ServiceContext';
 import { Service, Handler } from './Service';
-import { MockManager } from './MockManager';
+import { MockAgent } from './MockAgent';
 
 export interface MockServiceContext extends ServiceContext {
     readonly handler: MockHandler;
@@ -25,10 +25,10 @@ export class MockServer {
     public handler!: (address: string, request: Uint8Array) => Promise<Uint8Array>;
     constructor(public readonly address: string) {}
     public listen() {
-        MockManager.register(this.address, this.handler);
+        MockAgent.register(this.address, this.handler);
     }
     public close() {
-        MockManager.unregister(this.address);
+        MockAgent.unregister(this.address);
     }
 }
 
