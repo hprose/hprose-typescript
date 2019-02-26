@@ -27,7 +27,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@hprose/rpc-node": "^3.0.0-beta13",
     "@hprose/rpc-plugin-log": "^3.0.0-beta13",
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.18",
