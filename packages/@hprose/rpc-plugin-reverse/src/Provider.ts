@@ -86,7 +86,7 @@ export class Provider {
                     this.onerror(e);
                 }
             }
-        } while (this.closed);
+        } while (!this.closed);
     }
     public async close(): Promise<void> {
         this.closed = true;
