@@ -7,8 +7,7 @@
   "references": [
     { "path": "../io" },
     { "path": "../rpc-core" },
-    { "path": "../rpc-plugin-log" },
-    { "path": "../rpc-node" }
+    { "path": "../rpc-plugin-log" }
   ],
   "include": [
     "src/**/*"
