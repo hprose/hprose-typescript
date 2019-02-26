@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 import * as http from 'http';
 import * as https from 'https';
 import * as fs from 'fs';
-import { Service, ServiceContext, TimeoutError } from '@hprose/rpc-core';
+import { Service, ServiceContext, TimeoutError, Handler } from '@hprose/rpc-core';
 import { ByteStream } from '@hprose/io';
 
 const lastModified = (new Date()).toUTCString();
@@ -30,7 +30,7 @@ export interface HttpServiceContext extends ServiceContext {
     readonly handler: HttpHandler;
 }
 
-export class HttpHandler {
+export class HttpHandler implements Handler {
     public p3p: boolean = true;
     public get: boolean = true;
     public crossDomain: boolean = true;
