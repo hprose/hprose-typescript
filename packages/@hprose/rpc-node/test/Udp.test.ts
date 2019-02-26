@@ -66,7 +66,7 @@ test('test maxRequestLength', async () => {
         await proxy.hello('world');
     }
     catch (e) {
-        expect(e).toEqual(new Error('request too long'));
+        expect(e).toEqual(new Error('Request entity too large'));
     }
     server.close();
 });
