@@ -8,21 +8,21 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import * as net from 'net';
 import { ByteStream } from '@hprose/io';
-import { ServiceContext, Service, crc32 } from '@hprose/rpc-core';
+import { ServiceContext, Service, crc32, Handler } from '@hprose/rpc-core';
 
 export interface SocketServiceContext extends ServiceContext {
     readonly socket:  net.Socket
     readonly handler: SocketHandler;
 }
 
-export class SocketHandler {
+export class SocketHandler implements Handler {
     public onaccept?: (socket: net.Socket) => void;
     public onclose?: (socket: net.Socket) => void;
     public onerror?: (error: Error) => void;
@@ -75,7 +75,7 @@ export class SocketHandler {
                     const header = instream.read(8);
                     if (crc32(header) !== crc || (header[0] & 0x80) === 0 || (header[4] & 0x80) !== 0) {
                         socket.removeListener('data', ondata);
-                        socket.destroy(new Error('invalid request'));
+                        socket.destroy(new Error('Invalid request'));
                         return;
                     }
                     instream.reset();
@@ -83,7 +83,7 @@ export class SocketHandler {
                     index = instream.readInt32BE();
                     if (bodyLength > this.service.maxRequestLength) {
                         socket.removeListener('data', ondata);
-                        this.send(socket, (new ByteStream('request too long')).bytes, index | 0x80000000);
+                        this.send(socket, (new ByteStream('Request entity too large')).bytes, index | 0x80000000);
                         socket.end();
                         return;
                     }
