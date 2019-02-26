@@ -1,6 +1,4 @@
-import * as http from 'http';
-import { Service, Client } from '@hprose/rpc-core';
-import '@hprose/rpc-node';
+import { Service, Client, MockServer } from '@hprose/rpc-core';
 import { Log } from '@hprose/rpc-plugin-log';
 import { Caller, Provider } from '../src/index';
 
@@ -10,13 +8,13 @@ test('test reverse RPC', async () => {
     }
     const service = new Service();
     const caller = new Caller(service);
-    // service.use(Log.ioHandler);
-    const server = http.createServer();
+    //service.use(Log.ioHandler);
+    const server = new MockServer('TestReverseRPC');
     service.bind(server);
-    server.listen(8083);
+    server.listen();
 
-    const client = new Client('http://127.0.0.1:8083/');
-    // client.use(Log.invokeHandler);
+    const client = new Client('mock://TestReverseRPC');
+   // client.use(Log.invokeHandler);
     const provider = new Provider(client, '1');
     provider.use(Log.invokeHandler);
     provider.addFunction(hello);
