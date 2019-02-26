@@ -30,3 +30,6 @@ export { URI, parseURI, normalize, promisify, crc32 } from './Utils';
 export { Service, Handler, HandlerConstructor } from './Service';
 export { ServiceCodec } from './ServiceCodec';
 export { ServiceContext } from './ServiceContext';
+
+export { MockServer, MockHandler } from './MockHandler';
+export { MockTransport } from './MockTransport';
