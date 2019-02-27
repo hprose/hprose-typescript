@@ -80,7 +80,7 @@ export function readSet(reader: Reader): Set<any> {
 
 export function readMap(reader: Reader): Map<any, any> {
     const stream = reader.stream;
-    const map: Map<any, any> =new Map();
+    const map: Map<any, any> = new Map();
     reader.addReference(map);
     let count = ValueReader.readCount(stream);
     for (; count > 0; --count) {
