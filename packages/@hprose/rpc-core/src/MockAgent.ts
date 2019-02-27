@@ -14,11 +14,11 @@
 \*________________________________________________________*/
 
 export class MockAgent {
-    private static handlers: { [name: string]: (address: string, request: Uint8Array) => Promise<Uint8Array> } = Object.create(null);
-    public static register(address: string, handler: (address: string, request: Uint8Array) => Promise<Uint8Array>) {
+    private static readonly handlers: { [name: string]: (address: string, request: Uint8Array) => Promise<Uint8Array> } = Object.create(null);
+    public static register(address: string, handler: (address: string, request: Uint8Array) => Promise<Uint8Array>): void {
         MockAgent.handlers[address] = handler;
     }
-    public static unregister(address: string) {
+    public static cancel(address: string): void {
         delete MockAgent.handlers[address];
     }
     public static async handler(address: string, request: Uint8Array): Promise<Uint8Array> {

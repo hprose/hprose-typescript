@@ -28,7 +28,7 @@ export class MockServer {
         MockAgent.register(this.address, this.handler);
     }
     public close() {
-        MockAgent.unregister(this.address);
+        MockAgent.cancel(this.address);
     }
 }
 
