@@ -29,5 +29,5 @@ export class SetDeserializer extends BaseDeserializer implements Deserializer {
             default:
                 return super.read(reader, tag);
         }
-     }
+    }
 }

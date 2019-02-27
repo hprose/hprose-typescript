@@ -21,7 +21,7 @@ import { register } from '../Serializer';
 
 if ((typeof BigInt64Array !== 'undefined') && (typeof BigUint64Array !== 'undefined')) {
     class BigIntArraySerializer extends ReferenceSerializer<ArrayLike<bigint>> {
-        constructor () { super(); }
+        constructor() { super(); }
         public write(writer: Writer, value: ArrayLike<bigint>): void {
             super.write(writer, value);
             const stream = writer.stream;

@@ -19,7 +19,7 @@ import { ReferenceSerializer } from './ReferenceSerializer';
 import { Writer } from './Writer';
 
 export class TypedArraySerializer extends ReferenceSerializer<ArrayLike<number>> {
-    constructor (private readonly writeNumber: (stream: ByteStream, value: number) => void) { super(); }
+    constructor(private readonly writeNumber: (stream: ByteStream, value: number) => void) { super(); }
     public write(writer: Writer, value: ArrayLike<number>): void {
         super.write(writer, value);
         const stream = writer.stream;
