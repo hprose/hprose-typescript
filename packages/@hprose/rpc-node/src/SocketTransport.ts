@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -26,7 +26,6 @@ export class SocketTransport implements Transport {
     private sockets: { [uri: string]: Promise<net.Socket> } = Object.create(null);
     public noDelay: boolean = true;
     public keepAlive: boolean = true;
-    public timeout: number = 30000;
     public options: tls.SecureContextOptions = Object.create(null);
     private connect(uri: string): net.Socket {
         const parser = parse(uri);
@@ -182,11 +181,11 @@ export class SocketTransport implements Transport {
         }
         const results = this.results.get(socket)!;
         results[index] = result;
-        if (this.timeout > 0) {
+        if (context.timeout > 0) {
             const timeoutId = setTimeout(() => {
                 delete results[index];
                 result.reject(new TimeoutError());
-            }, this.timeout);
+            }, context.timeout);
             result.promise.then(() => {
                 clearTimeout(timeoutId);
             }, () => {

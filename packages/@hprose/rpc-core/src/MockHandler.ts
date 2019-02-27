@@ -22,11 +22,7 @@ export interface MockServiceContext extends ServiceContext {
 }
 
 export class MockServer {
-    public handler!: (address: string, request: Uint8Array) => Promise<Uint8Array>;
     constructor(public readonly address: string) {}
-    public listen() {
-        MockAgent.register(this.address, this.handler);
-    }
     public close() {
         MockAgent.cancel(this.address);
     }
@@ -35,7 +31,7 @@ export class MockServer {
 export class MockHandler implements Handler {
     constructor(public readonly service: Service) {}
     public bind(server: MockServer): void {
-        server.handler = this.handler;
+        MockAgent.register(server.address, this.handler);
     }
     public handler = async (address: string, request: Uint8Array): Promise<Uint8Array> => {
         if (request.length > this.service.maxRequestLength) {

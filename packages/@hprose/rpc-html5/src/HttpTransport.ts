@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -46,7 +46,6 @@ export class HttpTransport implements Transport {
     public static readonly schemes: string[] = ['http', 'https'];
     private counter: number = 0;
     private requests: { [index: number]: XMLHttpRequest } = Object.create(null);
-    public timeout: number = 30000;
     public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
     private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
@@ -91,6 +90,9 @@ export class HttpTransport implements Transport {
             xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
                 switch (this.readyState) {
                     case this.OPENED:
+                        xhr.withCredentials = true;
+                        xhr.responseType = 'arraybuffer';
+                        xhr.timeout = context.timeout;
                         for (const name in httpRequestHeaders) {
                             this.setRequestHeader(name, httpRequestHeaders[name]);
                         }
@@ -119,9 +121,6 @@ export class HttpTransport implements Transport {
             };
         });
         xhr.open('POST', context.uri, true);
-        xhr.withCredentials = true;
-        xhr.responseType = 'arraybuffer';
-        xhr.timeout = this.timeout;
         return result;
     }
     public async abort(): Promise<void> {

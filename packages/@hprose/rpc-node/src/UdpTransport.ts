@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for TypeScript.                             |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,6 @@ export class UdpTransport implements Transport {
     private results: Map<dgram.Socket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private sockets: { [uri: string]: Promise<dgram.Socket> } = Object.create(null);
     public compress: boolean = false;
-    public timeout: number = 30000;
     private async getSocket(uri: string): Promise<dgram.Socket> {
         let socket = await this.sockets[uri];
         if (socket !== undefined) {
@@ -104,11 +103,11 @@ export class UdpTransport implements Transport {
         }
         const results = this.results.get(socket)!;
         results[index] = result;
-        if (this.timeout > 0) {
+        if (context.timeout > 0) {
             const timeoutId = setTimeout(() => {
                 delete results[index];
                 result.reject(new TimeoutError());
-            }, this.timeout);
+            }, context.timeout);
             result.promise.then(() => {
                 clearTimeout(timeoutId);
             }, () => {

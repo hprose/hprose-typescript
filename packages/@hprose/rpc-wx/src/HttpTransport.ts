@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,6 @@ export class HttpTransport implements Transport {
     public static readonly schemes: string[] = ['https'];
     private counter: number = 0;
     private requests: { [index: number]: RequestTask } = Object.create(null);
-    public timeout: number = 30000;
     public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
     private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
         const headers: { [name: string]: string } = Object.create(null);
@@ -83,10 +82,10 @@ export class HttpTransport implements Transport {
                     }
                 }
             });
-            if (this.timeout > 0) {
+            if (context.timeout > 0) {
                 const timeoutId = setTimeout(() => {
                     reject(new TimeoutError());
-                }, this.timeout);
+                }, context.timeout);
                 result.then(() => {
                     clearTimeout(timeoutId);
                 }, () => {

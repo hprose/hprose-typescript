@@ -95,6 +95,7 @@ export class Client {
     public readonly returnTypes: { [fullname: string]: Function | null } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public codec: ClientCodec = DefaultClientCodec.instance;
+    public timeout: number = 30000;
     private urilist: string[] = [];
     private readonly transports: { [name: string]: Transport } = Object.create(null);
     private readonly invokeManager: InvokeManager = new InvokeManager(this.call.bind(this));

@@ -8,7 +8,6 @@ test('test hello world rpc', async () => {
     service.addFunction(hello);
     const server = new MockServer('test');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
@@ -24,7 +23,6 @@ test('test mssing method1', async () => {
     service.addMissingMethod(missing);
     const server = new MockServer('test1');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test1');
     const proxy = client.useService<any>();
     const result = await proxy.hello('world');
@@ -40,7 +38,6 @@ test('test mssing method2', async () => {
     service.addMissingMethod(missing);
     const server = new MockServer('test2');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test2');
     const proxy = client.useService<any>();
     const result = await proxy.hello('world');
@@ -69,7 +66,6 @@ test('test headers', async () => {
     service.use(serviceHandler);
     const server = new MockServer('test3');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test3');
     client.use(clientHandler);
     const proxy = await client.useServiceAsync();
@@ -89,7 +85,6 @@ test('test maxRequestLength', async () => {
     service.addFunction(hello);
     const server = new MockServer('test4');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test4');
     const proxy = await client.useServiceAsync();
     try {
@@ -110,7 +105,6 @@ test('test ipaddress', async () => {
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = new MockServer('test5');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://test5');
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');

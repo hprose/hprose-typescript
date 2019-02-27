@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -29,7 +29,6 @@ export class HttpTransport implements Transport {
     private counter: number = 0;
     private requests: { [index: number]: http.ClientRequest } = Object.create(null);
     public keepAlive: boolean = true;
-    public timeout: number = 30000;
     public httpAgent: http.Agent = new http.Agent({ keepAlive: true });
     public httpsAgent: https.Agent = new https.Agent({ keepAlive: true });
     public options: https.RequestOptions = Object.create(null);
@@ -105,7 +104,7 @@ export class HttpTransport implements Transport {
             });
             this.requests[index] = req;
             req.shouldKeepAlive = this.keepAlive;
-            req.setTimeout(this.timeout, () => {
+            req.setTimeout(context.timeout, () => {
                 delete this.requests[index];
                 reject(new TimeoutError());
             });

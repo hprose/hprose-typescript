@@ -11,7 +11,6 @@ test('test reverse RPC', async () => {
     //service.use(Log.ioHandler);
     const server = new MockServer('TestReverseRPC');
     service.bind(server);
-    server.listen();
 
     const client = new Client('mock://TestReverseRPC');
    // client.use(Log.invokeHandler);

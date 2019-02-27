@@ -7,7 +7,6 @@ test('test push', async() => {
     service.use(Log.ioHandler);
     const server = new MockServer('testpush');
     service.bind(server);
-    server.listen();
     const client1 = new Client('mock://testpush');
     // (client1.codec as any).simple = true;
     // client1.use(Log.invokeHandler);
@@ -60,7 +59,6 @@ test('test server push', async() => {
     service.add({method: hello, fullname: 'hello', passContext: true});
     const server = new MockServer('testpush2');
     service.bind(server);
-    server.listen();
     const client = new Client('mock://testpush2');
     const prosumer = new Prosumer(client, '1');
     prosumer.onsubscribe = (topic) => {

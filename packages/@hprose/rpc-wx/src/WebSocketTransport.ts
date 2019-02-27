@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Feb 5, 2019                                |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -32,7 +32,6 @@ export class WebSocketTransport implements Transport {
     private counter: number = 0;
     private results: { [uri: string]: { [index: number]: Deferred<Uint8Array> } } = Object.create(null);
     private websockets: { [uri: string]: Promise<SocketTask> } = Object.create(null);
-    public timeout: number = 30000;
     private async connect(uri: string): Promise<SocketTask> {
         let websocket = await this.websockets[uri];
         if (websocket !== undefined) {
@@ -78,11 +77,11 @@ export class WebSocketTransport implements Transport {
             this.results[uri] = Object.create(null);
         }
         this.results[uri][index] = result;
-        if (this.timeout > 0) {
+        if (context.timeout > 0) {
             const timeoutId = setTimeout(() => {
                 delete this.results[uri][index];
                 result.reject(new TimeoutError());
-            }, this.timeout);
+            }, context.timeout);
             result.promise.then(() => {
                 clearTimeout(timeoutId);
             }, () => {
