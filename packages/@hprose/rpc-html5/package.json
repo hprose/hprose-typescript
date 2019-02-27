@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-html5",
-  "version": "3.0.0-beta13",
+  "version": "3.0.0-beta.14",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-html5",
   "description": "hprose for TypeScript",
   "author": {
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@hprose/io": "^3.0.0-beta.12",
-    "@hprose/rpc-core": "^3.0.0-beta13"
+    "@hprose/rpc-core": "^3.0.0-beta.14"
   },
   "keywords": [
     "hprose",

@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-node",
-  "version": "3.0.0-beta13",
+  "version": "3.0.0-beta.14",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-node",
   "description": "hprose for TypeScript",
   "author": {
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@hprose/io": "^3.0.0-beta.12",
-    "@hprose/rpc-core": "^3.0.0-beta13",
+    "@hprose/rpc-core": "^3.0.0-beta.14",
     "@types/ws": "^6.0.1",
     "ws": "^6.1.2"
   },
