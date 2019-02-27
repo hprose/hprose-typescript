@@ -2,8 +2,8 @@
 
 # Hprose RPC CircuitBreaker Plugin 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-circuitbreaker.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-circuitbreaker)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-circuitbreaker.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-circuitbreaker)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-circuitbreaker.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-circuitbreaker)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-circuitbreaker.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

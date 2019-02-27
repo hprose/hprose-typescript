@@ -1,9 +1,9 @@
 <p align="center"><img src="https://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
 
-# Hprose RPC HTML5 3.0 for TypeScript
+# Hprose RPC 3.0 for HTML5
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-html5.svg)](https://www.npmjs.com/package/@hprose/rpc-html5)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-html5.svg)](https://www.npmjs.com/package/@hprose/rpc-html5)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-html5.svg)](https://www.npmjs.com/package/@hprose/rpc-html5)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-html5.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

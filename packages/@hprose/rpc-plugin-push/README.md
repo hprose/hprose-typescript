@@ -2,8 +2,8 @@
 
 # Hprose RPC Push Plugin 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-push.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-push)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-push.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-push)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-push.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-push)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-push.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

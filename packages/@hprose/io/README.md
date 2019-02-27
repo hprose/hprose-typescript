@@ -2,8 +2,8 @@
 
 # Hprose IO 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/io.svg)](https://www.npmjs.com/package/@hprose/io)
 [![npm version](https://img.shields.io/npm/v/@hprose/io.svg)](https://www.npmjs.com/package/@hprose/io)
+[![npm download](https://img.shields.io/npm/dm/@hprose/io.svg)](https://www.npmjs.com/package/@hprose/io)
 [![License](https://img.shields.io/npm/l/@hprose/io.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

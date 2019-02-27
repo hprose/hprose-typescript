@@ -2,8 +2,8 @@
 
 # Hprose RPC Oneway Plugin 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-oneway.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-oneway)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-oneway.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-oneway)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-oneway.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-oneway)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-oneway.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

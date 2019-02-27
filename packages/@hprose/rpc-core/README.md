@@ -2,8 +2,8 @@
 
 # Hprose RPC Core 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-core.svg)](https://www.npmjs.com/package/@hprose/rpc-core)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-core.svg)](https://www.npmjs.com/package/@hprose/rpc-core)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-core.svg)](https://www.npmjs.com/package/@hprose/rpc-core)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-core.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

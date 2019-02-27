@@ -1,9 +1,9 @@
 <p align="center"><img src="https://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
 
-# Hprose RPC on Node.js 3.0 for TypeScript
+# Hprose RPC 3.0 for Node.js
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-node.svg)](https://www.npmjs.com/package/@hprose/rpc-node)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-node.svg)](https://www.npmjs.com/package/@hprose/rpc-node)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-node.svg)](https://www.npmjs.com/package/@hprose/rpc-node)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-node.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction

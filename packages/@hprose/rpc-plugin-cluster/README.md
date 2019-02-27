@@ -2,8 +2,8 @@
 
 # Hprose RPC Cluster Plugin 3.0 for TypeScript
 
-[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-cluster.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-cluster)
 [![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-cluster.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-cluster)
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-cluster.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-cluster)
 [![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-cluster.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction
