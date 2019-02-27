@@ -1,6 +1,10 @@
 <p align="center"><img src="https://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
 
-# Hprose 3.0 for TypeScript
+# Hprose RPC Limiter Plugin 3.0 for TypeScript
+
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-limiter.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-limiter)
+[![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-limiter.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-limiter)
+[![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-limiter.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction
 

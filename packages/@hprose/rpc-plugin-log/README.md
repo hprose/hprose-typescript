@@ -1,6 +1,10 @@
 <p align="center"><img src="https://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
 
-# Hprose 3.0 for TypeScript
+# Hprose RPC Log Plugin 3.0 for TypeScript
+
+[![npm download](https://img.shields.io/npm/dm/@hprose/rpc-plugin-log.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-log)
+[![npm version](https://img.shields.io/npm/v/@hprose/rpc-plugin-log.svg)](https://www.npmjs.com/package/@hprose/rpc-plugin-log)
+[![License](https://img.shields.io/npm/l/@hprose/rpc-plugin-log.svg)](http://opensource.org/licenses/MIT)
 
 ## Introduction
 
