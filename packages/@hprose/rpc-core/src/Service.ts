@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,6 @@ import { TimeoutError } from './TimeoutError';
 
 export interface Handler {
     bind(server: any): void;
-    handler: Function;
 }
 
 export interface HandlerConstructor {
