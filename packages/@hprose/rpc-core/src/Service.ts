@@ -92,7 +92,7 @@ export class Service {
         try {
             const [ fullname, args ] = codec.decode(request, context as ServiceContext);
             if (this.timeout > 0) {
-                result = await new Promise<Uint8Array>((resolve, reject) => {
+                result = await new Promise<any>((resolve, reject) => {
                     const timeoutId = setTimeout(() => {
                         reject(new TimeoutError());
                     }, this.timeout);
