@@ -40,7 +40,7 @@ export class HttpHandler implements Handler {
     private _crossDomainXmlContent: Buffer = Buffer.alloc(0);
     private _clientAccessPolicyXmlFile: string = '';
     private _clientAccessPolicyXmlContent: Buffer = Buffer.alloc(0);
-    public onclose?: () => void;
+    public onclose?: (request: http.IncomingMessage) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) {}
     public bind(server: http.Server | https.Server): void {
@@ -229,7 +229,7 @@ export class HttpHandler implements Handler {
                 reject(error);
             });
             request.on('close', () => {
-                if (this.onclose) this.onclose();
+                if (this.onclose) this.onclose(request);
                 reject();
             });
         });

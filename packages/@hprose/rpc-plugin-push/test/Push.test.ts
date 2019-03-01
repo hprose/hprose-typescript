@@ -1,4 +1,4 @@
-import { Context, Service, Client, MockServer } from '@hprose/rpc-core';
+import { Context, Service, Client, MockServer, defer } from '@hprose/rpc-core';
 import { Log } from '@hprose/rpc-plugin-log';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
@@ -84,4 +84,32 @@ test('test server push', async() => {
             resolve();
         }, 100);
     });
+});
+
+test('test push3', async() => {
+    const service = new Service();
+    const broker = new Broker(service);
+    broker.messageQueueMaxLength = 1000;
+    service.use(Log.ioHandler);
+    const server = new MockServer('testpush3');
+    service.bind(server);
+    const client1 = new Client('mock://testpush3');
+    const prosumer1 = new Prosumer(client1, '1');
+    const client2 = new Client('mock://testpush3');
+    const prosumer2 = new Prosumer(client2, '2');
+    let count = 0;
+    const done = defer();
+    await prosumer1.subscribe('test', (message) => {
+        count++;
+        console.log(message);
+        if (count === 100) {
+            done.resolve();
+        }
+    });
+    for (let i = 0; i < 100; i++) {
+        await prosumer2.push('hello' + i, 'test', '1');
+    }
+    await done.promise;
+    await prosumer1.unsubscribe('test');
+    server.close();
 });
