@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -87,40 +87,32 @@ export class HttpTransport implements Transport {
                 delete self.requests[index];
                 reject(new TimeoutError());
             };
-            xhr.onreadystatechange = function (this: XMLHttpRequest, ev: Event): any {
-                switch (this.readyState) {
-                    case this.OPENED:
-                        xhr.withCredentials = true;
-                        xhr.responseType = 'arraybuffer';
-                        xhr.timeout = context.timeout;
-                        for (const name in httpRequestHeaders) {
-                            this.setRequestHeader(name, httpRequestHeaders[name]);
-                        }
-                        if (ArrayBuffer.isView) {
-                            this.send(request);
-                        } else if (request.buffer.slice) {
-                            this.send(request.buffer.slice(request.byteOffset, request.length));
-                        } else {
-                            const bytes = new Uint8Array(request.length);
-                            bytes.set(request);
-                            this.send(bytes.buffer);
-                        }
-                        break;
-                    case this.HEADERS_RECEIVED:
-                        (context as HttpClientContext).httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
-                        break;
-                    case this.DONE:
-                        delete self.requests[index];
-                        if (this.status >= 200 && this.status < 300) {
-                            resolve(new Uint8Array(this.response));
-                        } else {
-                            reject(new Error(this.status + ':' + this.statusText));
-                        }
-                        break;
+            xhr.onload = function (this: XMLHttpRequest, ev: ProgressEvent): any {
+                delete self.requests[index];
+                if (this.status >= 200 && this.status < 300) {
+                    (context as HttpClientContext).httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
+                    resolve(new Uint8Array(this.response));
+                } else {
+                    reject(new Error(this.status + ':' + this.statusText));
                 }
             };
         });
         xhr.open('POST', context.uri, true);
+        xhr.withCredentials = true;
+        xhr.responseType = 'arraybuffer';
+        xhr.timeout = context.timeout;
+        for (const name in httpRequestHeaders) {
+            xhr.setRequestHeader(name, httpRequestHeaders[name]);
+        }
+        if (ArrayBuffer.isView) {
+            xhr.send(request);
+        } else if (request.buffer.slice) {
+            xhr.send(request.buffer.slice(request.byteOffset, request.length));
+        } else {
+            const bytes = new Uint8Array(request.length);
+            bytes.set(request);
+            xhr.send(bytes.buffer);
+        }
         return result;
     }
     public async abort(): Promise<void> {
