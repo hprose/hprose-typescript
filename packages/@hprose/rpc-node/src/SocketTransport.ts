@@ -123,7 +123,9 @@ export class SocketTransport implements Transport {
                             if (result) {
                                 result.reject(new Error(fromUint8Array(response)));
                             }
-                            socket.end();
+                            socket.removeListener('data', ondata);
+                            socket.destroy();
+                            return;
                         }
                         else if (result) {
                             result.resolve(response);
@@ -204,10 +206,10 @@ export class SocketTransport implements Transport {
     }
     public async abort(): Promise<void> {
         for (const uri in this.sockets) {
-            const sockets = this.sockets[uri];
+            const socket = this.sockets[uri];
             delete this.sockets[uri];
-            if (sockets) {
-                (await sockets).end();
+            if (socket) {
+                (await socket).end();
             }
         }
     }
