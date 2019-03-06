@@ -41,7 +41,7 @@ export class CircuitBreaker {
         }
         const response = next(request, context);
         response.then(() => {
-            if (this.failCount > 0) this.failCount = 0;
+            this.failCount = 0;
         }, () => {
             this.failCount++;
             this.lastFailTime = Date.now();
