@@ -50,7 +50,7 @@ export class HttpHandler implements Handler {
         });
     }
     protected crossDomainXmlHandler(request: http.IncomingMessage, response: http.ServerResponse): boolean {
-        if (request.url && request.url.toLowerCase() === '/crossdomain.xml') {
+        if (request.url && request.url.toLowerCase().endsWith('/crossdomain.xml')) {
             if (request.headers['if-modified-since'] === lastModified &&
                 request.headers['if-none-match'] === etag) {
                 response.statusCode = 304;
@@ -68,7 +68,7 @@ export class HttpHandler implements Handler {
     }
 
     protected clientAccessPolicyXmlHandler(request: http.IncomingMessage, response: http.ServerResponse): boolean {
-        if (request.url && request.url.toLowerCase() === '/clientaccesspolicy.xml') {
+        if (request.url && request.url.toLowerCase().endsWith('/clientaccesspolicy.xml')) {
             if (request.headers['if-modified-since'] === lastModified &&
                 request.headers['if-none-match'] === etag) {
                 response.statusCode = 304;
