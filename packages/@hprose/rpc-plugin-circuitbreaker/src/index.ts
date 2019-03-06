@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-circuitbreaker for TypeScript.        |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Mar 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ export interface MockService {
 }
 
 export class BreakerError extends Error {
-    constructor(message: string = 'service breaked') { super(message); }
+    constructor(message: string = 'Service breaked') { super(message); }
 }
 
 export class CircuitBreaker {
