@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-limiter for TypeScript.               |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Mar 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -18,8 +18,8 @@ import { Context, NextIOHandler, NextInvokeHandler, Deferred, defer, TimeoutErro
 export class RateLimiter {
     private readonly interval: number;
     private next: number = Date.now();
-    constructor(public readonly permitsPerSecond: number, public readonly maxPermits: number, public readonly timeout: number = 0) {
-        this.interval = 1000 % permitsPerSecond;
+    constructor(public readonly permitsPerSecond: number, public readonly maxPermits: number = Infinity, public readonly timeout: number = 0) {
+        this.interval = 1000 / permitsPerSecond;
     }
     public async acquire(tokens: number = 1): Promise<number> {
         const now = Date.now();
