@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 8, 2019                                |
+| LastModified: Mar 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -116,7 +116,7 @@ export class Broker {
         if (context.requestHeaders['id']) {
             return context.requestHeaders['id'].toString();
         }
-        throw new Error('client unique id not found');
+        throw new Error('Client unique id not found');
     }
     protected subscribe(topic: string, context: ServiceContext): boolean {
         const id = this.id(context);
@@ -140,7 +140,7 @@ export class Broker {
             }
         }
     }
-    protected offline(topics: { [topic: string]: Message[] | null }, id: string, topic: string, context: ServiceContext) {
+    protected offline(topics: { [topic: string]: Message[] | null }, id: string, topic: string, context: ServiceContext): boolean {
         if (topic in topics) {
             const messages = topics[topic];
             delete topics[topic];
