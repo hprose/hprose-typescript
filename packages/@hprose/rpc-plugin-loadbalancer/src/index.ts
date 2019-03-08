@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-loadbalance for TypeScript.           |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Mar 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -206,13 +206,10 @@ export class LeastActiveLoadBalance {
         context.uri = uris[index];
         this.actives[index]++;
         try {
-            const response = await next(request, context);
-            this.actives[index]--;
-            return response;
+            return await next(request, context);
         }
-        catch (e) {
+        finally {
             this.actives[index]--;
-            throw e;
         }
     }
 }
