@@ -8,7 +8,7 @@
 |                                                          |
 | Prosumer for TypeScript.                                 |
 |                                                          |
-| LastModified: Feb 8, 2019                                |
+| LastModified: Mar 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,7 +28,7 @@ export class Prosumer {
         if (this.client.requestHeaders['id']) {
             return this.client.requestHeaders['id'].toString();
         }
-        throw new Error('client unique id not found');
+        throw new Error('Client unique id not found');
     }
     public set id(value: string) {
         this.client.requestHeaders['id'] = value;
