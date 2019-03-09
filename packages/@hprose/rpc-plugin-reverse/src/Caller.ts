@@ -100,7 +100,7 @@ export class Caller {
         if (context.requestHeaders['id']) {
             return context.requestHeaders['id'].toString();
         }
-        throw new Error('client unique id not found');
+        throw new Error('Client unique id not found');
     }
     protected send(id: string, responder: Deferred<[number, string, any[]][]>): boolean {
         const calls = this.calls[id];
