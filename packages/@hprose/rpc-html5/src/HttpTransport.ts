@@ -68,7 +68,7 @@ export class HttpTransport implements Transport {
         return headers;
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
-        const index = this.counter++;
+        const index = (this.counter < 0x7FFFFFFF) ? ++this.counter : this.counter = 0;
         const xhr = new XMLHttpRequest();
         const self = this;
         this.requests[index] = xhr;
