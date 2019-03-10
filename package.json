@@ -37,9 +37,8 @@
     "clean": "lerna clean",
     "release": "lerna publish",
     "pretest": "lerna run compile",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "coverage": "jest --coverage",
-    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "watch": "jest --watch"
   },
   "jest": {
