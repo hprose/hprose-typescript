@@ -1,5 +1,5 @@
 import { Service, Client, MockServer } from '@hprose/rpc-core';
-import { Log } from '@hprose/rpc-plugin-log';
+// import { Log } from '@hprose/rpc-plugin-log';
 import { Caller, Provider } from '../src/index';
 
 test('test reverse RPC', async () => {
@@ -8,14 +8,14 @@ test('test reverse RPC', async () => {
     }
     const service = new Service();
     const caller = new Caller(service);
-    //service.use(Log.ioHandler);
+    // service.use(Log.ioHandler);
     const server = new MockServer('TestReverseRPC');
     service.bind(server);
 
     const client = new Client('mock://TestReverseRPC');
    // client.use(Log.invokeHandler);
     const provider = new Provider(client, '1');
-    provider.use(Log.invokeHandler);
+    // provider.use(Log.invokeHandler);
     provider.addFunction(hello);
     provider.listen();
 
