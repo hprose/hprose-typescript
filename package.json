@@ -32,6 +32,20 @@
     "serialize",
     "microservices"
   ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "release": "lerna publish",
+    "pretest": "lerna run compile",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "watch": "jest --watch"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "workspaces": [
     "packages/@hprose/*"
   ]

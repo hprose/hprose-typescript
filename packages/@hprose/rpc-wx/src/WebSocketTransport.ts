@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -113,9 +113,3 @@ export class WebSocketTransport implements Transport {
 }
 
 Client.register('websocket', WebSocketTransport);
-
-declare module '@hprose/rpc-core' {
-    export interface Client {
-        websocket: WebSocketTransport;
-    }
-}

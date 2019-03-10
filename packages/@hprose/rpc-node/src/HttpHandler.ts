@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -237,8 +237,3 @@ export class HttpHandler implements Handler {
 }
 
 Service.register('http', HttpHandler, [http.Server, https.Server]);
-declare module '@hprose/rpc-core' {
-    export interface Service {
-        http: HttpHandler;
-    }
-}

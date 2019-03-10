@@ -30,6 +30,10 @@ export interface HandlerConstructor {
     new(service: Service): Handler;
 }
 
+export interface Service {
+    [name: string]: any;
+}
+
 export class Service {
     private static readonly handlers: { [name: string]: HandlerConstructor } = Object.create(null);
     private static readonly serverTypes: Map<Function, string[]> = new Map();

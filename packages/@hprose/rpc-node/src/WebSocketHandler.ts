@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -100,9 +100,3 @@ export class WebSocketHandler implements Handler {
 }
 
 Service.register('websocket', WebSocketHandler, [http.Server, https.Server, WebSocket.Server]);
-
-declare module '@hprose/rpc-core' {
-    export interface Service {
-        websocket: WebSocketHandler;
-    }
-}

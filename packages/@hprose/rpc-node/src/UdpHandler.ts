@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Feb 12, 2019                               |
+| LastModified: Mar 11, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -80,9 +80,3 @@ export class UdpHandler implements Handler {
 }
 
 Service.register('udp', UdpHandler, [dgram.Socket]);
-
-declare module '@hprose/rpc-core' {
-    export interface Service {
-        udp: UdpHandler;
-    }
-}

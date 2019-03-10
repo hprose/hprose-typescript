@@ -85,6 +85,10 @@ export interface TransportConstructor {
     new(): Transport
 }
 
+export interface Client {
+    [name: string]: any;
+}
+
 export class Client {
     private static transports: { name: string, ctor: TransportConstructor }[] = [];
     private static protocols: { [protocol: string]: string } = Object.create(null);
