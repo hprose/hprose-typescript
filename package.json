@@ -37,7 +37,7 @@
     "clean": "lerna clean",
     "release": "lerna publish",
     "pretest": "lerna run compile",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles && exit",
     "coverage": "jest --coverage",
     "watch": "jest --watch"
   },
