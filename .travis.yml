@@ -6,4 +6,4 @@ node_js:
 
 sudo: false
 
-script: yarn test
+script: yarn test && exit
