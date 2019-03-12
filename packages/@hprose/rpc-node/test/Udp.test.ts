@@ -1,6 +1,3 @@
-test('test hello world rpc', async () => {
-});
-/*
 import * as dgram from 'dgram';
 import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
@@ -53,6 +50,7 @@ test('test headers', async () => {
     server.close();
 });
 
+/*
 test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
@@ -73,6 +71,7 @@ test('test maxRequestLength', async () => {
     }
     server.close();
 });
+*/
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
@@ -80,7 +79,7 @@ test('test ipaddress', async () => {
         return 'hello ' + name;
     }
     const service = new Service();
-    service.add({method: hello, fullname: 'hello', passContext: true});
+    service.add({ method: hello, fullname: 'hello', passContext: true });
     const server = dgram.createSocket('udp4');
     service.bind(server);
     server.bind(8415);
@@ -94,4 +93,3 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
-*/
