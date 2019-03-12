@@ -1,6 +1,7 @@
 import * as http from 'http';
 import WebSocket from 'ws';
-import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
+// import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
+import { Service, Client } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -22,6 +23,7 @@ test('test hello world rpc', async () => {
     server.close();
 });
 
+/*
 test('test headers', async () => {
     const clientHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         context.requestHeaders['ping'] = true;
@@ -55,7 +57,6 @@ test('test headers', async () => {
     server.close();
 });
 
-/*
 test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
@@ -77,7 +78,6 @@ test('test maxRequestLength', async () => {
     }
     server.close();
 });
-*/
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
@@ -102,3 +102,4 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
+*/
