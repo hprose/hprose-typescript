@@ -42,7 +42,7 @@ export class HttpHandler implements Handler {
     private _clientAccessPolicyXmlContent: Buffer = Buffer.alloc(0);
     public onclose?: (request: http.IncomingMessage) => void;
     public onerror?: (error: Error) => void;
-    constructor(public readonly service: Service) {}
+    constructor(public readonly service: Service) { }
     public bind(server: http.Server | https.Server): void {
         server.on('request', this.handler);
         server.on('error', (error: Error) => {
