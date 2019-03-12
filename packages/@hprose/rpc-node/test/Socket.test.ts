@@ -1,8 +1,6 @@
-test('test hello world rpc', async () => {
-});
-/*
 import * as net from 'net';
-import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
+// import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
+import { Service, Client } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -21,6 +19,7 @@ test('test hello world rpc', async () => {
     server.close();
 });
 
+/*
 test('test headers', async () => {
     const clientHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         context.requestHeaders['ping'] = true;
