@@ -49,7 +49,7 @@ export class WebSocketHandler implements Handler {
             if (this.onaccept) this.onaccept(websocket);
         }
         catch {
-            websocket.close();
+            websocket.terminate();
             return;
         }
         websocket.on('close', () => {
