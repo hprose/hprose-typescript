@@ -50,7 +50,6 @@ test('test headers', async () => {
     server.close();
 });
 
-/*
 test('test maxRequestLength', async () => {
     function hello(name: string): string {
         return 'hello ' + name;
@@ -67,11 +66,10 @@ test('test maxRequestLength', async () => {
         await proxy.hello('world');
     }
     catch (e) {
-        expect(e).toEqual(new Error('Request entity too large'));
+        expect(e.message).toEqual('Request entity too large');
     }
     server.close();
 });
-*/
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
