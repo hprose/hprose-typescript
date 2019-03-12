@@ -1,6 +1,5 @@
 import * as http from 'http';
-// import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
-import { Context, NextInvokeHandler, Service, Client, ClientContext } from '@hprose/rpc-core';
+import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -82,6 +81,7 @@ test('test headers', async () => {
     expect(context.responseHeaders.pong).toBe(true);
     server.close();
 });
+
 /*
 test('test maxRequestLength', async () => {
     function hello(name: string): string {
@@ -103,6 +103,7 @@ test('test maxRequestLength', async () => {
     }
     server.close();
 });
+*/
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
@@ -124,4 +125,3 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
-*/
