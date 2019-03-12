@@ -1,6 +1,3 @@
-test('test hello world rpc', async () => {
-});
-/*
 import * as http from 'http';
 import WebSocket from 'ws';
 import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
@@ -13,7 +10,7 @@ test('test hello world rpc', async () => {
     const service = new Service();
     service.addFunction(hello);
     const server = http.createServer();
-    const wsserver = new WebSocket.Server({server});
+    const wsserver = new WebSocket.Server({ server });
     service.bind(wsserver);
     service.websocket.compress = true;
     server.listen(8087);
@@ -45,7 +42,7 @@ test('test headers', async () => {
     service.addFunction(hello);
     service.use(serviceHandler);
     const server = http.createServer();
-    const wsserver = new WebSocket.Server({server});
+    const wsserver = new WebSocket.Server({ server });
     service.bind(wsserver);
     server.listen(8088);
     const client = new Client('ws://127.0.0.1:8088/');
@@ -66,7 +63,7 @@ test('test maxRequestLength', async () => {
     service.maxRequestLength = 10;
     service.addFunction(hello);
     const server = http.createServer();
-    const wsserver = new WebSocket.Server({server});
+    const wsserver = new WebSocket.Server({ server });
     service.bind(wsserver);
     server.listen(8089);
     const client = new Client('ws://127.0.0.1:8089/');
@@ -75,7 +72,7 @@ test('test maxRequestLength', async () => {
         await proxy.hello('world');
     }
     catch (e) {
-        expect(e).toEqual(new Error('1006'));
+        expect(e.message).toEqual('1006');
     }
     server.close();
 });
@@ -86,9 +83,9 @@ test('test ipaddress', async () => {
         return 'hello ' + name;
     }
     const service = new Service();
-    service.add({method: hello, fullname: 'hello', passContext: true});
+    service.add({ method: hello, fullname: 'hello', passContext: true });
     const server = http.createServer();
-    const wsserver = new WebSocket.Server({server});
+    const wsserver = new WebSocket.Server({ server });
     service.bind(wsserver);
     service.websocket.compress = true;
     server.listen(8090);
@@ -103,4 +100,3 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
-*/
