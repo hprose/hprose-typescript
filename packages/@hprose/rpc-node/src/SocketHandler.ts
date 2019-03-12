@@ -18,7 +18,7 @@ import { ByteStream } from '@hprose/io';
 import { ServiceContext, Service, crc32, Handler } from '@hprose/rpc-core';
 
 export interface SocketServiceContext extends ServiceContext {
-    readonly socket:  net.Socket
+    readonly socket: net.Socket
     readonly handler: SocketHandler;
 }
 
@@ -54,7 +54,7 @@ export class SocketHandler implements Handler {
         try {
             response = await this.service.handle(request, context);
         }
-        catch(e) {
+        catch (e) {
             index |= 0x80000000;
             response = (new ByteStream(e.message)).bytes;
         }
