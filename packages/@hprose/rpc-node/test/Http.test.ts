@@ -1,6 +1,5 @@
 import * as http from 'http';
-// import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
-import { Service, Client } from '@hprose/rpc-core';
+import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
 
 test('test hello world rpc', async () => {
@@ -19,7 +18,6 @@ test('test hello world rpc', async () => {
     server.close();
 });
 
-/*
 test('test mssing method1', async () => {
     function missing(name: string, args: any[]): string {
         return name + JSON.stringify(args);
@@ -125,4 +123,3 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
-*/
