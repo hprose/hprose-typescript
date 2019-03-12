@@ -124,7 +124,7 @@ export class SocketTransport implements Transport {
                                 result.reject(new Error(fromUint8Array(response)));
                             }
                             socket.removeListener('data', ondata);
-                            socket.destroy();
+                            socket.end();
                             return;
                         }
                         else if (result) {
