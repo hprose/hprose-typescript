@@ -65,7 +65,7 @@ export class UdpHandler implements Handler {
             try {
                 response = await this.service.handle(request, context);
             }
-            catch(e) {
+            catch (e) {
                 index |= 0x8000;
                 response = (new ByteStream(e.message)).bytes;
             }
