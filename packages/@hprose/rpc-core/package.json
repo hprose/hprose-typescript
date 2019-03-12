@@ -21,7 +21,7 @@
   },
   "scripts": {
     "clean": "rm -rf lib",
-    "test": "jest --detectOpenHandles",
+    "test": "jest",
     "compile": "tsc -b tsconfig.json",
     "prepublish": "npm run compile"
   },

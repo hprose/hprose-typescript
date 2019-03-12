@@ -1,6 +1,3 @@
-test('test hello world rpc', async () => {
-});
-/*
 import * as http from 'http';
 import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import '../src/index';
@@ -126,4 +123,3 @@ test('test ipaddress', async () => {
     await proxy.hello('world 3');
     server.close();
 });
-*/
