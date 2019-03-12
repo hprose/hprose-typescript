@@ -42,6 +42,7 @@ export class UdpHandler implements Handler {
         this.handler(socket);
     }
     public handler = (socket: dgram.Socket): void => {
+        socket.unref();
         socket.on('message', async (msg: Buffer, rinfo: AddressInfo) => {
             const crc = msg.readInt32BE(0);
             const header = msg.subarray(4, 8);

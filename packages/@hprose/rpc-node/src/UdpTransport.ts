@@ -44,6 +44,7 @@ export class UdpTransport implements Transport {
                 throw new Error('unsupported ' + protocol + ' protocol');
         }
         socket = dgram.createSocket(type);
+        socket.unref();
         socket.on('listening', () => {
             udp.resolve(socket);
         });
