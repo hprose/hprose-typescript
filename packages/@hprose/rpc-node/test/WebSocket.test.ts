@@ -20,7 +20,7 @@ test('test hello world rpc', async () => {
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
-    server.close();
+    wsserver.close();
 });
 
 /*
