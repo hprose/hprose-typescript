@@ -109,7 +109,7 @@ test('test ipaddress', async () => {
         return 'hello ' + name;
     }
     const service = new Service();
-    service.add({method: hello, fullname: 'hello', passContext: true});
+    service.add({ method: hello, fullname: 'hello', passContext: true });
     const server = http.createServer();
     service.bind(server);
     server.listen(8003);
