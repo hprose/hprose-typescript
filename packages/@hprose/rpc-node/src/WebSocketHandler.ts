@@ -33,7 +33,7 @@ export class WebSocketHandler implements Handler {
     constructor(public readonly service: Service) { }
     public bind(server: http.Server | https.Server | WebSocket.Server): void {
         if (server instanceof http.Server || server instanceof https.Server) {
-            server = new WebSocket.Server({server});
+            server = new WebSocket.Server({ server });
         }
         server.options.perMessageDeflate = false;
         server.options.maxPayload = this.service.maxRequestLength + 4;
@@ -72,7 +72,7 @@ export class WebSocketHandler implements Handler {
             try {
                 response = await this.service.handle(instream.remains, context);
             }
-            catch(e) {
+            catch (e) {
                 index |= 0x80000000;
                 response = (new ByteStream(e.message)).bytes;
             }
