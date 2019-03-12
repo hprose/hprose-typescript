@@ -101,6 +101,7 @@ export class SocketHandler implements Handler {
         socket.on('data', ondata);
     }
     public handler = (socket: net.Socket): void => {
+        socket.unref();
         try {
             if (this.onaccept) this.onaccept(socket);
         }
