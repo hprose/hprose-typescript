@@ -92,9 +92,11 @@ export class HttpTransport implements Transport {
                             resolve(instream.takeBytes());
                         } else {
                             reject(new Error(res.statusCode + ':' + res.statusMessage));
+                            req.socket.end();
                         }
                     } else {
                         reject(new Error(instream.toString()));
+                        req.socket.end();
                     }
                 });
                 res.on('error', (err) => {
@@ -107,6 +109,7 @@ export class HttpTransport implements Transport {
             req.setTimeout(context.timeout, () => {
                 delete this.requests[index];
                 reject(new TimeoutError());
+                req.abort();
             });
             req.on('error', (err) => {
                 delete this.requests[index];
