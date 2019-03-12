@@ -13,6 +13,8 @@
 |                                                          |
 \*________________________________________________________*/
 
+import * as http from 'http';
+import * as https from 'https';
 import WebSocket from 'ws';
 import { Client, Context, Transport, TimeoutError, Deferred, defer } from '@hprose/rpc-core';
 import { writeInt32BE, ByteStream, fromUint8Array } from '@hprose/io';
@@ -22,6 +24,8 @@ export class WebSocketTransport implements Transport {
     private counter: number = 0;
     private results: Map<WebSocket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private websockets: { [uri: string]: Promise<WebSocket> } = Object.create(null);
+    public httpAgent: http.Agent = new http.Agent({ keepAlive: true });
+    public httpsAgent: https.Agent = new https.Agent({ keepAlive: true });
     public options: WebSocket.ClientOptions = Object.create(null);
     public compress: boolean = false;
     private async connect(uri: string): Promise<WebSocket> {
@@ -34,6 +38,11 @@ export class WebSocketTransport implements Transport {
         const ws = defer<WebSocket>();
         this.options.perMessageDeflate = false;
         this.options.protocol = 'hprose';
+        if (uri.toLowerCase().startsWith('https://')) {
+            this.options.agent = this.httpsAgent;
+        } else {
+            this.options.agent = this.httpAgent;
+        }
         websocket = new WebSocket(uri, this.options);
         websocket.binaryType = 'arraybuffer';
         websocket.on('open', () => ws.resolve(websocket));
