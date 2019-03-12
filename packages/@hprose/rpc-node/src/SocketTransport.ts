@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Mar 12, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -145,6 +145,7 @@ export class SocketTransport implements Transport {
         }
         const conn = defer<net.Socket>();
         socket = this.connect(uri);
+        socket.unref();
         socket.setNoDelay(this.noDelay);
         socket.setKeepAlive(this.keepAlive);
         socket.on('connect', () => {
