@@ -98,7 +98,7 @@ test('test maxRequestLength', async () => {
         await proxy.hello('world');
     }
     catch (e) {
-//        expect(e).toEqual(new Error('413:Request Entity Too Large'));
+        expect(e.message).toEqual('413:Request Entity Too Large');
     }
     server.close();
 });
