@@ -45,7 +45,10 @@ export class WebSocketTransport implements Transport {
         }
         websocket = new WebSocket(uri, this.options);
         websocket.binaryType = 'arraybuffer';
-        websocket.on('open', () => ws.resolve(websocket));
+        websocket.on('open', () => {
+            (websocket as any)._socket.unref();
+            ws.resolve(websocket);
+        });
         websocket.on('message', async (data: ArrayBuffer) => {
             const instream = new ByteStream(data);
             let index = instream.readInt32BE();
