@@ -38,15 +38,16 @@ export class WebSocketTransport implements Transport {
         const ws = defer<WebSocket>();
         this.options.perMessageDeflate = false;
         this.options.protocol = 'hprose';
-        if (uri.toLowerCase().startsWith('https://')) {
-            this.options.agent = this.httpsAgent;
-        } else {
-            this.options.agent = this.httpAgent;
+        if (this.options.agent === undefined) {
+            if (uri.toLowerCase().startsWith('https://')) {
+                this.options.agent = this.httpsAgent;
+            } else {
+                this.options.agent = this.httpAgent;
+            }
         }
         websocket = new WebSocket(uri, this.options);
         websocket.binaryType = 'arraybuffer';
         websocket.on('open', () => {
-            (websocket as any)._socket.unref();
             ws.resolve(websocket);
         });
         websocket.on('message', async (data: ArrayBuffer) => {
