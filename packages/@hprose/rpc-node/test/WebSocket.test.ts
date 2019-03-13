@@ -13,10 +13,10 @@ test('test hello world rpc', async () => {
     //const server = http.createServer();
     const wsserver = new WebSocket.Server({ port: 8087 });
     service.bind(wsserver);
-    //service.websocket.compress = true;
+    service.websocket.compress = true;
     //server.listen(8087);
     const client = new Client('ws://127.0.0.1:8087/');
-    //client.websocket.compress = true;
+    client.websocket.compress = true;
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
     expect(result).toBe('hello world');
