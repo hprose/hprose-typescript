@@ -1,4 +1,4 @@
-import * as http from 'http';
+// import * as http from 'http';
 import WebSocket from 'ws';
 // import { Context, NextInvokeHandler, Service, Client, ClientContext, ServiceContext } from '@hprose/rpc-core';
 import { Service, Client } from '@hprose/rpc-core';
@@ -10,11 +10,11 @@ test('test hello world rpc', async () => {
     }
     const service = new Service();
     service.addFunction(hello);
-    const server = http.createServer();
-    const wsserver = new WebSocket.Server({ server });
+    //const server = http.createServer();
+    const wsserver = new WebSocket.Server({ port: 8087 });
     service.bind(wsserver);
     //service.websocket.compress = true;
-    server.listen(8087);
+    //server.listen(8087);
     const client = new Client('ws://127.0.0.1:8087/');
     //client.websocket.compress = true;
     const proxy = await client.useServiceAsync();
