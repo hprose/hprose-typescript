@@ -1,6 +1,6 @@
 {
   "name": "@hprose/io",
-  "version": "3.0.0-beta.17",
+  "version": "3.0.0-beta.19",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/io",
   "description": "hprose for TypeScript",
   "author": {
