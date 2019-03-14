@@ -8,13 +8,13 @@
 |                                                          |
 | @hprose/rpc-core for TypeScript.                         |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Mar 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 export { Client, Transport, TransportConstructor } from './Client';
-export { ClientCodec } from './ClientCodec';
+export { ClientCodec, DefaultClientCodec } from './ClientCodec';
 export { ClientContext } from './ClientContext';
 export { Context } from './Context';
 export { getCookie, setCookie } from './CookieManager';
@@ -28,7 +28,7 @@ export { TimeoutError } from './TimeoutError';
 export { URI, parseURI, normalize, promisify, crc32 } from './Utils';
 
 export { Service, Handler, HandlerConstructor } from './Service';
-export { ServiceCodec } from './ServiceCodec';
+export { ServiceCodec, DefaultServiceCodec } from './ServiceCodec';
 export { ServiceContext } from './ServiceContext';
 
 export { MockServer, MockHandler } from './MockHandler';

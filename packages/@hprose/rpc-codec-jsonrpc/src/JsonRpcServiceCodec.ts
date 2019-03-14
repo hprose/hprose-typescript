@@ -8,14 +8,13 @@
 |                                                          |
 | JsonRpc ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Feb 12, 2019                               |
+| LastModified: Mar 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { ByteStream, Tags } from '@hprose/io';
-import { ServiceCodec, ServiceContext, MethodLike } from '@hprose/rpc-core';
-import { DefaultServiceCodec } from 'rpc-core/lib/ServiceCodec';
+import { ServiceCodec, ServiceContext, MethodLike, DefaultServiceCodec } from '@hprose/rpc-core';
 
 export class JsonRpcServiceCodec implements ServiceCodec {
     public static instance: ServiceCodec = new JsonRpcServiceCodec();
@@ -27,6 +26,9 @@ export class JsonRpcServiceCodec implements ServiceCodec {
             jsonrpc: '2.0',
             id: context['jsonrpc.id']
         };
+        if (Object.keys(context.responseHeaders).length > 0) {
+            response.headers = context.responseHeaders;
+        }
         if (result instanceof SyntaxError) {
             response.error = { code: -32700, message: 'Parse error' };
         } else if (result instanceof Error) {
@@ -65,6 +67,12 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         const call = JSON.parse(ByteStream.toString(request));
         if (call.jsonrpc !== '2.0' || !('method' in call) || !('id' in call)) {
             throw new Error('Invalid Request');
+        }
+        if ('headers' in call) {
+            const headers = call.headers;
+            for (const name in headers) {
+                context.requestHeaders[name] = headers[name];
+            }
         }
         context['jsonrpc.id'] = call.id;
         const fullname = call.method;
