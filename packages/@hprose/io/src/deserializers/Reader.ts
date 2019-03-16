@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Reader interface for TypeScript.                  |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 16, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,7 +21,7 @@ export interface Reader {
     longType: 'number' | 'bigint' | 'string';
     dictType: 'object' | 'map';
     deserialize(type?: Function): any;
-    read(tag: number): any;
+    read(tag: number, type?: Function | null): any;
     readClass(): void;
     getTypeInfo(index: number): TypeInfo;
     readReference(): any;
