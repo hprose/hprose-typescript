@@ -133,7 +133,7 @@ export class Caller {
     }
     protected close(context: ServiceContext): void {
         const id = this.stop(context);
-        this.onlines[id] = false;
+        delete this.onlines[id];
     }
     protected async begin(context: ServiceContext): Promise<[number, string, any[]][]> {
         const id = this.stop(context);
@@ -204,7 +204,7 @@ export class Caller {
         return useService(this, id, fullnames);
     }
     public exists(id: string): boolean {
-        return this.onlines[id];
+        return id in this.onlines;
     }
     public idlist(): string[] {
         return Object.keys(this.onlines);
