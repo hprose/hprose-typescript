@@ -8,7 +8,7 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 8, 2019                                |
+| LastModified: Mar 19, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -79,7 +79,7 @@ export class Caller {
     protected calls: { [id: string]: [number, string, any[]][] } = Object.create(null);
     protected results: { [id: string]: { [index: number]: Deferred<any> } } = Object.create(null);
     protected responders: { [id: string]: Deferred<[number, string, any[]][]> } = Object.create(null);
-    protected timers: { [id: string]: Deferred<void> } = Object.create(null);
+    protected onlines: { [id: string]: boolean } = Object.create(null);
     public timeout: number = 120000;
     constructor(public service: Service) {
         const close = new Method(this.close, '!!', this);
@@ -122,7 +122,7 @@ export class Caller {
             }
         }
     }
-    protected close(context: ServiceContext): string {
+    protected stop(context: ServiceContext): string {
         const id = this.id(context);
         if (this.responders[id]) {
             const responder = this.responders[id];
@@ -131,8 +131,13 @@ export class Caller {
         }
         return id;
     }
+    protected close(context: ServiceContext): void {
+        const id = this.stop(context);
+        this.onlines[id] = false;
+    }
     protected async begin(context: ServiceContext): Promise<[number, string, any[]][]> {
-        const id = this.close(context);
+        const id = this.stop(context);
+        this.onlines[id] = true;
         const responder = defer<[number, string, any[]][]>();
         if (!this.send(id, responder)) {
             this.responders[id] = responder;
@@ -197,6 +202,12 @@ export class Caller {
     public async useServiceAsync(id: string): Promise<any> {
         const fullnames: string[] = await this.invoke(id, '~');
         return useService(this, id, fullnames);
+    }
+    public exists(id: string): boolean {
+        return this.onlines[id];
+    }
+    public idlist(): string[] {
+        return Object.keys(this.onlines);
     }
     protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         (context as CallerContext).invoke = (fullname: string, args: any[] = []): Promise<any> => {
