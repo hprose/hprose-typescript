@@ -20,7 +20,7 @@
 
 如果希望能够更细粒度的定制和使用序列化和反序列化，可以使用 `Serializer` 类的 `register` 方法来为某个类型注册一个序列化器，或者使用 `Deserializer` 类的 `register` 方法来为某个类型注册一个反序列化器。事实上，hprose 内部已经定义并注册了基础类型和容器类型的序列化器和反序列化器，自定义类型的通用的序列化器和反序列化器也已经定义并注册。因此，在没有特别需求的情况下，通常是不需要使用这两个方法的。另外，可以通过 `Serializer` 的 `getInstance` 方法来得到已经注册过的所指定数据类型的序列化器，或者通过 `Deserializer` 的 `getInstance` 方法来得到已经注册过的所指定数据类型的反序列化器。
 
-如果确实有特别的需求，需要自己定制某个类型的序列化器和反序列化器，那么应该了解一下 [hprose 的序列化格式](https://github.com/hprose/hprose/blob/master/3.0/serialization.spec_zh_CN.mediawiki)，`Tags` 枚举中已经定义了上面序列化格式中的所有标记。因为该枚举类型是使用 TypeScript 语言编写的常量枚举类型，因此，只能在使用 TypeScript 编写的序列化器或反序列化器中引用它。`ValueWriter` 和 `ValueReader` 中提供了基础类型的常用序列化和反序列化实现的函数片段，`ReferenceReader` 中提供了引用类型的反序列化实现的函数片段，在自己实现序列化器或反序列化器时可以直接引用它们，以节省时间。具体的使用方式可以参考 `serializers` 和 `deserializers` 目录中现有的序列化器和反序列化器的实现。
+如果确实有特别的需求，需要自己定制某个类型的序列化器和反序列化器，那么应该了解一下 [hprose 的序列化格式](https://github.com/hprose/hprose/blob/master/3.0/Hprose%203.0%20序列化协议规范.mediawiki)，`Tags` 枚举中已经定义了上面序列化格式中的所有标记。因为该枚举类型是使用 TypeScript 语言编写的常量枚举类型，因此，只能在使用 TypeScript 编写的序列化器或反序列化器中引用它。`ValueWriter` 和 `ValueReader` 中提供了基础类型的常用序列化和反序列化实现的函数片段，`ReferenceReader` 中提供了引用类型的反序列化实现的函数片段，在自己实现序列化器或反序列化器时可以直接引用它们，以节省时间。具体的使用方式可以参考 `serializers` 和 `deserializers` 目录中现有的序列化器和反序列化器的实现。
 
 ## 安装
 
