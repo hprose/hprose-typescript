@@ -199,11 +199,9 @@ export class Client {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
-        context.init(this, this.returnTypes[fullname]);
-        if (context instanceof ClientContext) {
-            return this.invokeManager.handler(fullname, args, context);
-        }
-        return this.invokeManager.handler(fullname, args, new ClientContext(context));
+        const clientContext = (context instanceof ClientContext) ? context : new ClientContext(context);
+        clientContext.init(this, this.returnTypes[fullname]);
+        return this.invokeManager.handler(fullname, args, clientContext);
     }
     public async call(fullname: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;
