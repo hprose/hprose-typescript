@@ -46,14 +46,10 @@ test('test mssing method2', async () => {
 });
 
 test('test headers', async () => {
-    const clientHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        context.requestHeaders['ping'] = true;
-        const result = await next(fullname, args, context);
-        expect(context.responseHeaders['pong']).toBe(true);
-        return result;
-    };
     const serviceHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        expect(context.requestHeaders['ping']).toBe(true);
+        if (fullname === 'hello') {
+            expect(context.requestHeaders['ping']).toBe(true);
+        }
         const result = await next(fullname, args, context);
         context.responseHeaders['pong'] = true;
         return result;
@@ -67,9 +63,8 @@ test('test headers', async () => {
     const server = new MockServer('test3');
     service.bind(server);
     const client = new Client('mock://test3');
-    client.use(clientHandler);
     const proxy = await client.useServiceAsync();
-    const context = new ClientContext();
+    const context = new ClientContext({ requestHeaders: { ping: true } });
     const result = await proxy.hello('world', context);
     expect(result).toBe('hello world');
     expect(context.responseHeaders.pong).toBe(true);
@@ -102,7 +97,7 @@ test('test ipaddress', async () => {
         return 'hello ' + name;
     }
     const service = new Service();
-    service.add({method: hello, fullname: 'hello', passContext: true});
+    service.add({ method: hello, fullname: 'hello', passContext: true });
     const server = new MockServer('test5');
     service.bind(server);
     const client = new Client('mock://test5');
