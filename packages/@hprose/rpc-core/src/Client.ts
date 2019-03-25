@@ -192,7 +192,7 @@ export class Client {
         }
         return this;
     }
-    public async invoke(fullname: string, args: any[] = [], context: ClientContext = new ClientContext()): Promise<any> {
+    public async invoke(fullname: string, args: any[] = [], context: ClientContext | { [name: string]: any }  = new ClientContext()): Promise<any> {
         if (args === null) {
             args = [];
         }
@@ -200,8 +200,10 @@ export class Client {
             args = await Promise.all(args);
         }
         context.init(this, this.returnTypes[fullname]);
-        const value = await this.invokeManager.handler(fullname, args, context);
-        return value;
+        if (context instanceof ClientContext) {
+            return this.invokeManager.handler(fullname, args, context);
+        }
+        return this.invokeManager.handler(fullname, args, new ClientContext(context));
     }
     public async call(fullname: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;

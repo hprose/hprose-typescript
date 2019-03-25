@@ -25,7 +25,7 @@ export class ClientContext extends Context {
     public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     constructor(items?: { [name: string]: any }) {
         super();
-        if (items !== undefined) {
+        if (!!items) {
             if ('requestHeaders' in items) {
                 this.copy(items['requestHeaders'], this.requestHeaders);
             }
