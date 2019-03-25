@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-oneway for TypeScript.                |
 |                                                          |
-| LastModified: Jan 23, 2019                               |
+| LastModified: Mar 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,6 +19,7 @@ export class Oneway {
     public static async handler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
         const result = next(name, args, context);
         if (context.oneway) {
+            result.catch(()=>{});
             return undefined;
         }
         return result;
