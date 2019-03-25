@@ -22,7 +22,9 @@ import { normalize, parseURI } from './Utils';
 
 function makeInvoke(client: Client, fullname: string): () => Promise<any> {
     return function (): Promise<any> {
-        return client.invoke(fullname, Array.prototype.slice.call(arguments));
+        const args = Array.prototype.slice.call(arguments);
+        const context = (args.length > 0 && args[args.length - 1] instanceof ClientContext) ? args.pop() : new ClientContext();
+        return client.invoke(fullname, args, context);
     };
 }
 
@@ -190,12 +192,11 @@ export class Client {
         }
         return this;
     }
-    public async invoke(fullname: string, args: any[] = [], returnType?: Function | null): Promise<any> {
+    public async invoke(fullname: string, args: any[] = [], context: ClientContext = new ClientContext()): Promise<any> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
-        const context = (args.length > 0 && args[args.length - 1] instanceof ClientContext) ? args.pop() : new ClientContext();
-        context.init(this, (returnType !== undefined) ? returnType : this.returnTypes[fullname]);
+        context.init(this, this.returnTypes[fullname]);
         const value = await this.invokeManager.handler(fullname, args, context);
         return value;
     }

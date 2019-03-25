@@ -8,7 +8,7 @@
 |                                                          |
 | Provider for TypeScript.                                 |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Mar 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -26,6 +26,7 @@ export class Provider {
     private readonly methodManager: MethodManager = new MethodManager();
     private readonly invokeManager: InvokeManager;
     constructor(public readonly client: Client, id?: string) {
+        client.returnTypes['!'] = Array;
         this.invokeManager = new InvokeManager(this.execute.bind(this));
         if (id) this.id = id;
         this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
@@ -77,7 +78,7 @@ export class Provider {
         this.closed = false;
         do {
             try {
-                const calls: [number, string, any[]][] = await this.client.invoke('!', [], Array);
+                const calls: [number, string, any[]][] = await this.client.invoke('!');
                 if (!calls) return;
                 this.dispatch(calls);
             }
