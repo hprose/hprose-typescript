@@ -8,7 +8,7 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Mar 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -193,6 +193,9 @@ export class Client {
         return this;
     }
     public async invoke(fullname: string, args: any[] = [], context: ClientContext = new ClientContext()): Promise<any> {
+        if (args === null) {
+            args = [];
+        }
         if (args.length > 0) {
             args = await Promise.all(args);
         }
