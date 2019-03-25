@@ -19,7 +19,7 @@ export class Oneway {
     public static async handler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
         const result = next(name, args, context);
         if (context.oneway) {
-            result.catch(()=>{});
+            result.catch(() => { });
             return undefined;
         }
         return result;
