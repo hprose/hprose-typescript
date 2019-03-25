@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-codec-jsonrpc",
-  "version": "3.0.0-beta.22",
+  "version": "3.0.0-beta.23",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-codec-jsonrpc",
   "description": "hprose for TypeScript",
   "author": {
@@ -35,8 +35,8 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "@hprose/io": "^3.0.0-beta.22",
-    "@hprose/rpc-core": "^3.0.0-beta.22"
+    "@hprose/io": "^3.0.0-beta.23",
+    "@hprose/rpc-core": "^3.0.0-beta.23"
   },
   "keywords": [
     "hprose",
