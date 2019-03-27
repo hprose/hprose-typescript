@@ -60,6 +60,7 @@ export class ConcurrentLimiter {
             const timeoutId = setTimeout(() => {
                 const index = this.tasks.indexOf(task);
                 if (index > -1) {
+                    --this.counter;
                     this.tasks.splice(index, 1);
                 }
                 task.reject(new TimeoutError());
