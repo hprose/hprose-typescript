@@ -73,7 +73,7 @@ test('test maxRequestLength', async () => {
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
-        console.log(context.address + ':' + context.port);
+        console.log(context.remoteAddress.address + ':' + context.remoteAddress.port);
         return 'hello ' + name;
     }
     const service = new Service();

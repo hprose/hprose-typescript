@@ -32,7 +32,7 @@ test('test mssing method1', async () => {
 
 test('test mssing method2', async () => {
     function missing(name: string, args: any[], context: Context): string {
-        return name + JSON.stringify(args) + context.address;
+        return name + JSON.stringify(args) + context.remoteAddress.address;
     }
     const service = new Service();
     service.addMissingMethod(missing);
@@ -93,7 +93,7 @@ test('test maxRequestLength', async () => {
 
 test('test ipaddress', async () => {
     function hello(name: string, context: ServiceContext): string {
-        console.log(context.address + ':' + context.port);
+        console.log(context.remoteAddress.address + ':' + context.remoteAddress.port);
         return 'hello ' + name;
     }
     const service = new Service();

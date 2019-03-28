@@ -8,13 +8,14 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import * as http from 'http';
 import * as https from 'https';
+import { isIPv6 } from 'net';
 import * as fs from 'fs';
 import { Service, ServiceContext, TimeoutError, Handler } from '@hprose/rpc-core';
 import { ByteStream } from '@hprose/io';
@@ -166,9 +167,16 @@ export class HttpHandler implements Handler {
         const context = new ServiceContext(this.service);
         context.request = request;
         context.response = response;
-        context.address = request.socket.remoteAddress;
-        context.port = request.socket.remotePort;
-        context.family = request.socket.remoteFamily;
+        context.remoteAddress = {
+            'family': request.socket.remoteFamily,
+            'address': request.socket.remoteAddress,
+            'port': request.socket.remotePort
+        };
+        context.localAddress = {
+            'family': isIPv6(request.socket.localAddress) ? 'IPv6' : 'IPv4',
+            'address': request.socket.localAddress,
+            'port': request.socket.localPort
+        };
         context.handler = this;
         const size = Number(request.headers['content-length']);
         if (size > this.service.maxRequestLength) {

@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,7 @@
 import WebSocket from 'ws';
 import * as http from 'http';
 import * as https from 'https';
+import { isIPv6 } from 'net';
 import { Service, ServiceContext, Handler } from '@hprose/rpc-core';
 import { writeInt32BE, ByteStream } from '@hprose/io';
 
@@ -64,9 +65,16 @@ export class WebSocketHandler implements Handler {
             const context = new ServiceContext(this.service);
             context.websocket = websocket;
             context.request = request;
-            context.address = request.socket.remoteAddress;
-            context.port = request.socket.remotePort;
-            context.family = request.socket.remoteFamily;
+            context.remoteAddress = {
+                'family': request.socket.remoteFamily,
+                'address': request.socket.remoteAddress,
+                'port': request.socket.remotePort
+            };
+            context.localAddress = {
+                'family': isIPv6(request.socket.localAddress) ? 'IPv6' : 'IPv4',
+                'address': request.socket.localAddress,
+                'port': request.socket.localPort
+            };
             context.handler = this;
             let response: Uint8Array;
             try {

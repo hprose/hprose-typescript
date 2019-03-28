@@ -8,7 +8,7 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -46,9 +46,16 @@ export class SocketHandler implements Handler {
     private async run(socket: net.Socket, request: Uint8Array, index: number): Promise<void> {
         const context = new ServiceContext(this.service);
         context.socket = socket;
-        context.address = socket.remoteAddress;
-        context.port = socket.remotePort;
-        context.family = socket.remoteFamily;
+        context.remoteAddress = {
+            'family': socket.remoteFamily,
+            'address': socket.remoteAddress,
+            'port': socket.remotePort
+        };
+        context.localAddress = {
+            'family': net.isIPv6(socket.localAddress) ? 'IPv6' : 'IPv4',
+            'address': socket.localAddress,
+            'port': socket.localPort
+        };
         context.handler = this;
         let response: Uint8Array;
         try {

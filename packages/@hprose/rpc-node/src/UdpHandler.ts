@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -56,9 +56,12 @@ export class UdpHandler implements Handler {
             const request = new Uint8Array(msg.buffer, msg.byteOffset + 8, bodyLength);
             const context = new ServiceContext(this.service);
             context.socket = socket;
-            context.address = rinfo.address;
-            context.port = rinfo.port;
-            context.family = rinfo.family;
+            context.remoteAddress = {
+                'family': rinfo.family,
+                'address': rinfo.address,
+                'port': rinfo.port
+            };
+            context.localAddress = socket.address() as AddressInfo;
             context.handler = this;
             let response: Uint8Array;
             try {

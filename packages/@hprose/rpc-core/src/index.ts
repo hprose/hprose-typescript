@@ -29,7 +29,7 @@ export { URI, parseURI, normalize, promisify, crc32 } from './Utils';
 
 export { Service, Handler, HandlerConstructor } from './Service';
 export { ServiceCodec, DefaultServiceCodec } from './ServiceCodec';
-export { ServiceContext } from './ServiceContext';
+export { ServiceContext, AddressInfo } from './ServiceContext';
 
 export { MockServer, MockHandler } from './MockHandler';
 export { MockTransport } from './MockTransport';
