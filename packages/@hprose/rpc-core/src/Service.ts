@@ -55,6 +55,7 @@ export class Service {
     private readonly ioManager: IOManager = new IOManager(this.process.bind(this));
     private readonly methodManager: MethodManager = new MethodManager();
     private readonly handlers: { [name: string]: Handler } = Object.create(null);
+    public readonly options: { [name: string]: any } = Object.create(null);
     public get names(): string[] {
         return this.methodManager.getNames();
     }
@@ -107,7 +108,10 @@ export class Service {
         return codec.encode(result, context as ServiceContext);
     }
     private timeoutHandler = (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        const timeout = (context as ServiceContext).service.timeout;
+        const serviceContext = context as ServiceContext;
+        const timeout = serviceContext.method.timeout > 0
+            ? serviceContext.method.timeout
+            : serviceContext.service.timeout;
         if (timeout <= 0) {
             return next(fullname, args, context);
         }
