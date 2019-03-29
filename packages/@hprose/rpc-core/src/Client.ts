@@ -8,7 +8,7 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Mar 26, 2019                               |
+| LastModified: Mar 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -206,8 +206,11 @@ export class Client {
     public async call(fullname: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;
         const request = codec.encode(fullname, args, context as ClientContext);
-        const response = await this.ioManager.handler(request, context);
+        const response = await this.request(request, context);
         return codec.decode(response, context as ClientContext);
+    }
+    public request(request: Uint8Array, context: Context): Promise<Uint8Array> {
+        return this.ioManager.handler(request, context);
     }
     public async transport(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const uri = parseURI(context.uri);
