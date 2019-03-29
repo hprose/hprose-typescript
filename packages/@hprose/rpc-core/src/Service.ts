@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Mar 24, 2019                               |
+| LastModified: Mar 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 import { ServiceCodec, DefaultServiceCodec } from './ServiceCodec';
 import { Context } from './Context';
 import { ServiceContext } from './ServiceContext';
-import { InvokeManager, InvokeHandler } from './InvokeManager';
+import { InvokeManager, InvokeHandler, NextInvokeHandler } from './InvokeManager';
 import { IOManager, IOHandler } from './IOManager';
 import { MethodLike, Method } from './Method';
 import { MethodManager, MissingMethod } from './MethodManager';
@@ -59,6 +59,7 @@ export class Service {
         return this.methodManager.getNames();
     }
     constructor() {
+        this.invokeManager.use(this.timeoutHandler);
         for (const name in Service.handlers) {
             const ctor = Service.handlers[name];
             let handler = new ctor(this);
@@ -97,31 +98,34 @@ export class Service {
         const codec = this.codec;
         let result: any;
         try {
-            const [ fullname, args ] = codec.decode(request, context as ServiceContext);
-            if (this.timeout > 0) {
-                result = await new Promise<any>((resolve, reject) => {
-                    const timeoutId = setTimeout(() => {
-                        reject(new TimeoutError());
-                    }, this.timeout);
-                    this.invokeManager.handler(fullname, args, context).then(
-                        (value) => {
-                            clearTimeout(timeoutId);
-                            resolve(value);
-                        },
-                        (reason) => {
-                            clearTimeout(timeoutId);
-                            reject(reason);
-                        }
-                    );
-                });
-            } else {
-                result = await this.invokeManager.handler(fullname, args, context);
-            }
+            const [fullname, args] = codec.decode(request, context as ServiceContext);
+            result = await this.invokeManager.handler(fullname, args, context);
         }
-        catch(e) {
+        catch (e) {
             result = e;
         }
         return codec.encode(result, context as ServiceContext);
+    }
+    private timeoutHandler = (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+        const timeout = (context as ServiceContext).service.timeout;
+        if (timeout <= 0) {
+            return next(fullname, args, context);
+        }
+        return new Promise<any>((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(new TimeoutError());
+            }, timeout);
+            next(fullname, args, context).then(
+                (value) => {
+                    clearTimeout(timeoutId);
+                    resolve(value);
+                },
+                (reason) => {
+                    clearTimeout(timeoutId);
+                    reject(reason);
+                }
+            );
+        });
     }
     public async execute(fullname: string, args: any[], context: Context): Promise<any> {
         const method = (context as ServiceContext).method;
