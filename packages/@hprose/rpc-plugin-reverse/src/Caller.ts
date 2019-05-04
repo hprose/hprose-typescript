@@ -8,12 +8,12 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: Mar 19, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Service, normalize, Context, Deferred, Method, defer, NextInvokeHandler, ServiceContext } from '@hprose/rpc-core';
+import { Service, normalize, Context, Deferred, Method, defer, NextInvokeHandler, ServiceContext, TimeoutError } from '@hprose/rpc-core';
 
 function makeInvoke(caller: Caller, id: string, fullname: string): () => Promise<any> {
     return function (): Promise<any> {
@@ -80,21 +80,22 @@ export class Caller {
     protected results: { [id: string]: { [index: number]: Deferred<any> } } = Object.create(null);
     protected responders: { [id: string]: Deferred<[number, string, any[]][]> } = Object.create(null);
     protected onlines: { [id: string]: boolean } = Object.create(null);
-    public timeout: number = 120000;
+    public heartbeat: number = 120000;
+    public timeout: number = 30000;
     constructor(public service: Service) {
-        const close = new Method(this.close, '!!', this);
+        const close = new Method(this.close.bind(this), '!!');
         close.passContext = true;
 
-        const begin = new Method(this.begin, '!', this);
+        const begin = new Method(this.begin.bind(this), '!');
         begin.passContext = true;
 
-        const end = new Method(this.end, '=', this, [Array]);
+        const end = new Method(this.end.bind(this), '=', null, [Array]);
         end.passContext = true;
 
         this.service.add(close)
             .add(begin)
             .add(end)
-            .use(this.handler)
+            .use(this.handler);
     }
     protected id(context: ServiceContext): string {
         if (context.requestHeaders['id']) {
@@ -141,10 +142,10 @@ export class Caller {
         const responder = defer<[number, string, any[]][]>();
         if (!this.send(id, responder)) {
             this.responders[id] = responder;
-            if (this.timeout > 0) {
+            if (this.heartbeat > 0) {
                 const timeoutId = setTimeout(() => {
                     responder.resolve([]);
-                }, this.timeout);
+                }, this.heartbeat);
                 responder.promise.then(() => {
                     clearTimeout(timeoutId);
                 });
@@ -180,12 +181,26 @@ export class Caller {
         if (this.calls[id] === undefined) {
             this.calls[id] = [];
         }
-        this.calls[id].push([index, fullname, args]);
+        const call: [number, string, any[]] = [index, fullname, args];
+        this.calls[id].push(call);
         if (this.results[id] === undefined) {
             this.results[id] = Object.create(null);
         }
         this.results[id][index] = result;
         this.response(id);
+        if (this.timeout > 0) {
+            const timeoutId = setTimeout(() => {
+                const i = this.calls[id].indexOf(call);
+                if (i >= 0) {
+                    this.calls[id].splice(i, 1);
+                }
+                delete this.results[id][index];
+                result.reject(new TimeoutError());
+            }, this.timeout);
+            result.promise.then(() => {
+                clearTimeout(timeoutId);
+            });
+        }
         return result.promise;
     }
     public useService<T extends object>(id: string, namespace?: string): T;
