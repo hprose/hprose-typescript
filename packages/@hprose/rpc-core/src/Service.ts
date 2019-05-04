@@ -75,7 +75,7 @@ export class Service {
                 configurable: true
             });
         }
-        this.add(new Method(this.methodManager.getNames, '~', this.methodManager));
+        this.add(new Method(this.methodManager.getNames.bind(this.methodManager), '~'));
     }
     public bind(server: any, name?: string): this {
         const type = server.constructor;
@@ -109,7 +109,7 @@ export class Service {
     }
     private timeoutHandler = (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         const serviceContext = context as ServiceContext;
-        const timeout = serviceContext.method.timeout > 0
+        const timeout = serviceContext.method.timeout !== undefined && serviceContext.method.timeout > 0
             ? serviceContext.method.timeout
             : serviceContext.service.timeout;
         if (timeout <= 0) {

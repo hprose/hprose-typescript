@@ -16,7 +16,7 @@
 export class Method {
     public missing?: boolean;
     public passContext?: boolean;
-    public timeout: number = 0;
+    public timeout?: number = 0;
     [name: string]: any;
     constructor(
         public method: Function,
