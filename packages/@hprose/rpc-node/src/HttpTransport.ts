@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,6 +20,8 @@ import { ClientContext, Context, getCookie, setCookie, TimeoutError, Client, Tra
 import { ByteStream } from '@hprose/io';
 
 export interface HttpClientContext extends ClientContext {
+    httpStatusCode?: number;
+    httpStatusText?: string;
     httpRequestHeaders?: http.OutgoingHttpHeaders;
     httpResponseHeaders?: http.IncomingHttpHeaders;
 }
@@ -68,8 +70,9 @@ export class HttpTransport implements Transport {
                 (options as any)[key] = (this.options as any)[key];
             }
         }
+        const httpContext = context as HttpClientContext;
         options.method = 'POST';
-        options.headers = this.getRequestHeader((context as HttpClientContext).httpRequestHeaders);
+        options.headers = this.getRequestHeader(httpContext.httpRequestHeaders);
         options.headers['Content-Length'] = request.length;
         const cookie = getCookie(options.host, options.path, secure);
         if (cookie) {
@@ -85,9 +88,11 @@ export class HttpTransport implements Transport {
                 });
                 res.on('end', () => {
                     delete this.requests[index];
+                    httpContext.httpStatusCode = res.statusCode;
+                    httpContext.httpStatusText = res.statusMessage;
                     if (res.statusCode) {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
-                            (context as HttpClientContext).httpResponseHeaders = res.headers;
+                            httpContext.httpResponseHeaders = res.headers;
                             setCookie(res.headers, options.host);
                             resolve(instream.takeBytes());
                         } else {
