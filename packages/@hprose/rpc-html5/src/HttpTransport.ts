@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,8 @@
 import { Client, ClientContext, TimeoutError, Context, Transport } from '@hprose/rpc-core';
 
 export interface HttpClientContext extends ClientContext {
+    httpStatusCode: number;
+    httpStatusText: string;
     httpRequestHeaders?: { [name: string]: string | string[] };
     httpResponseHeaders?: { [name: string]: string | string[] };
 }
@@ -72,7 +74,8 @@ export class HttpTransport implements Transport {
         const xhr = new XMLHttpRequest();
         const self = this;
         this.requests[index] = xhr;
-        let httpRequestHeaders = this.getRequestHeaders((context as HttpClientContext).httpRequestHeaders);
+        const httpContext = context as HttpClientContext;
+        let httpRequestHeaders = this.getRequestHeaders(httpContext.httpRequestHeaders);
         let result = new Promise<Uint8Array>((resolve, reject) => {
             xhr.upload.onprogress = xhr.onprogress = this.onprogress;
             xhr.upload.onerror = xhr.onerror = function (this: XMLHttpRequest, ev: ProgressEvent): any {
@@ -89,8 +92,10 @@ export class HttpTransport implements Transport {
             };
             xhr.onload = function (this: XMLHttpRequest, ev: ProgressEvent): any {
                 delete self.requests[index];
+                httpContext.httpStatusCode = this.status;
+                httpContext.httpStatusText = this.statusText;
                 if (this.status >= 200 && this.status < 300) {
-                    (context as HttpClientContext).httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
+                    httpContext.httpResponseHeaders = getResponseHeaders(this.getAllResponseHeaders());
                     resolve(new Uint8Array(this.response));
                 } else {
                     reject(new Error(this.status + ':' + this.statusText));
