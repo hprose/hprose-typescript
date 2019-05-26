@@ -1,24 +1,12 @@
 {
   "name": "hprose",
-  "version": "3.0.0",
+  "private": true,
   "homepage": "https://github.com/hprose/hprose-typescript",
   "description": "hprose for TypeScript",
-  "keywords": [
-    "hprose",
-    "rpc",
-    "webservice",
-    "serialize",
-    "serialization"
-  ],
   "author": {
     "name": "Ma Bingyao",
     "email": "mabingyao@gmail.com",
     "url": "http://hprose.com/"
-  },
-  "main": "./dist/hprose.js",
-  "types": "./dist/hprose.d.ts",
-  "engines": {
-    "node": "*"
   },
   "repository": {
     "type": "git",
@@ -29,29 +17,35 @@
     "email": "andot@hprose.com"
   },
   "license": "MIT",
-  "scripts": {
-    "test": "jest",
-    "compile": "rm -rf dist && cd src && rollup -c && rm -rf .rpt2_cache",
-    "prepublish": "npm run compile"
-  },
   "devDependencies": {
-    "@types/jest": "^23.3.10",
-    "@types/node": "^10.12.18",
-    "jest": "^23.6.0",
-    "rollup": "^1.0.2",
-    "rollup-plugin-typescript2": "^0.18.1",
-    "ts-jest": "^23.10.5",
-    "tslint": "^5.12.0",
-    "typescript": "^3.2.2"
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.11.0",
+    "jest": "^24.3.1",
+    "ts-jest": "^24.0.0",
+    "tslint": "^5.13.1",
+    "typescript": "^3.3.3333",
+    "lerna": "^3.13.1"
   },
-  "optionalDependencies": {
-    "@types/ws": ">=6.0.1",
-    "ws": ">=6.1.2"
+  "keywords": [
+    "hprose",
+    "rpc",
+    "serialize",
+    "microservices"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "release": "lerna publish",
+    "pretest": "lerna run compile",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "watch": "jest --watch"
   },
-  "dependencies": {
-    "guid-typescript": "^1.0.9"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   },
-  "files": [
-    "/dist/"
+  "workspaces": [
+    "packages/@hprose/*"
   ]
 }

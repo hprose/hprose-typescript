@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "packages/@hprose/*"
+  ],
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md"
+      ]
+    }
+  },
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "3.0.1"
+}

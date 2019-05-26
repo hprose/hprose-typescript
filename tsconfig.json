@@ -1,26 +1,38 @@
 {
-  "compilerOptions": {
-    "target": "es2015",                    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
-    "module": "es2015",                    /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    "lib": ["dom", "esnext"],              /* Specify library files to be included in the compilation. */
-    "declaration": true,                   /* Generates corresponding '.d.ts' file. */
-    "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
-    "sourceMap": true,                     /* Generates corresponding '.map' file. */
-    "outDir": "dist",                      /* Redirect output structure to the directory. */
-    "strict": true,                        /* Enable all strict type-checking options. */
-    "esModuleInterop": true,               /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
-		"types" : ["jest", "node"],
-		"noImplicitAny": true,
-		"noUnusedLocals": true,
-		"noImplicitThis": true,
-		"diagnostics": true,
-		"listFiles": true,
-		"pretty": true,
-		"moduleResolution": "node",
-		"noEmitOnError": false,
-		"strictNullChecks": true,
-		"forceConsistentCasingInFileNames": true,
-		"noImplicitReturns": true,
-		"allowSyntheticDefaultImports": true
-  }
+	"compilerOptions": {
+		"baseUrl": "./packages/@hprose",
+		"paths": {
+			"@hprose/*": [
+				"./*/src/"
+			]
+		},
+        "target": "es5",
+        "module": "commonjs",
+        "lib": [
+            "dom",
+            "esnext"
+        ],
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "types": [
+            "jest",
+            "node"
+        ],
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noImplicitThis": true,
+        "diagnostics": true,
+        "listFiles": true,
+        "pretty": true,
+        "moduleResolution": "node",
+        "noEmitOnError": false,
+        "strictNullChecks": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+		"allowSyntheticDefaultImports": true,
+		"composite": true
+	}
 }
