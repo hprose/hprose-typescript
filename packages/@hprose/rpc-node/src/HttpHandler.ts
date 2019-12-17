@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -32,6 +32,7 @@ export interface HttpServiceContext extends ServiceContext {
 }
 
 export class HttpHandler implements Handler {
+    public static serverTypes: Function[] = [http.Server, https.Server];
     public p3p: boolean = true;
     public get: boolean = true;
     public crossDomain: boolean = true;
@@ -86,7 +87,7 @@ export class HttpHandler implements Handler {
         return false;
     }
 
-    protected sendHeader(request: http.IncomingMessage, response: http.ServerResponse) {
+    protected sendHeader(request: http.IncomingMessage, response: http.ServerResponse): void {
         response.statusCode = 200;
         response.setHeader('Content-Type', 'text/plain');
         if (this.p3p) {
@@ -108,19 +109,19 @@ export class HttpHandler implements Handler {
         }
     }
 
-    protected end(data: Uint8Array, response: http.ServerResponse) {
+    protected end(data: Uint8Array, response: http.ServerResponse): void {
         response.setHeader('Content-Length', data.length);
         response.end(Buffer.from(data.buffer, data.byteOffset, data.length));
     }
 
-    public addAccessControlAllowOrigin(origin: string) {
+    public addAccessControlAllowOrigin(origin: string): void {
         if (!this.origins[origin]) {
             this.origins[origin] = true;
             this.originCount++;
         }
     }
 
-    public removeAccessControlAllowOrigin(origin: string) {
+    public removeAccessControlAllowOrigin(origin: string): void {
         if (this.origins[origin]) {
             delete this.origins[origin];
             this.originCount--;
@@ -244,4 +245,25 @@ export class HttpHandler implements Handler {
     }
 }
 
-Service.register('http', HttpHandler, [http.Server, https.Server]);
+Service.register('http', HttpHandler);
+
+declare module '@hprose/rpc-core' {
+    export interface HttpHandler {
+        p3p: boolean;
+        get: boolean;
+        crossDomain: boolean;
+        crossDomainXmlFile: string;
+        crossDomainXmlContent: Buffer;
+        clientAccessPolicyXmlFile: string;
+        clientAccessPolicyXmlContent: Buffer;
+        onclose?: (request: http.IncomingMessage) => void;
+        onerror?: (error: Error) => void;
+        bind(server: http.Server | https.Server): void;
+        addAccessControlAllowOrigin(origin: string): void;
+        removeAccessControlAllowOrigin(origin: string): void;
+        handler(request: http.IncomingMessage, response: http.ServerResponse): Promise<void>;
+    }
+    export interface Service {
+        http: HttpHandler;
+    }
+}

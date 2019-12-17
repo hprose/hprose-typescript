@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -87,7 +87,7 @@ export class WebSocketTransport implements Transport {
         outstream.writeInt32BE(index);
         outstream.write(request);
         const message = outstream.takeBytes();
-        if (ArrayBuffer.isView) {
+        if (typeof ArrayBuffer.isView === 'function') {
             websocket.send(message);
         } else {
             websocket.send(message.buffer);
@@ -106,3 +106,13 @@ export class WebSocketTransport implements Transport {
 }
 
 Client.register('websocket', WebSocketTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface WebSocketTransport {
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        websocket: WebSocketTransport;
+    }
+}

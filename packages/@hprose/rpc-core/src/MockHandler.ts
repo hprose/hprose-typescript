@@ -8,7 +8,7 @@
 |                                                          |
 | MockHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -29,6 +29,7 @@ export class MockServer {
 }
 
 export class MockHandler implements Handler {
+    public static serverTypes: Function[] = [MockServer];
     constructor(public readonly service: Service) { }
     public bind(server: MockServer): void {
         MockAgent.register(server.address, this.handler);
@@ -46,8 +47,10 @@ export class MockHandler implements Handler {
     }
 }
 
-Service.register('mock', MockHandler, [MockServer]);
+Service.register('mock', MockHandler);
 
-export interface Service {
-    mock: MockHandler;
+declare module '@hprose/rpc-core' {
+    export interface Service {
+        mock: MockHandler;
+    }
 }

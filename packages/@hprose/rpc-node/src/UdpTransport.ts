@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for TypeScript.                             |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,7 +23,6 @@ export class UdpTransport implements Transport {
     private counter: number = 0;
     private results: Map<dgram.Socket, { [index: number]: Deferred<Uint8Array> }> = new Map();
     private sockets: { [uri: string]: Promise<dgram.Socket> } = Object.create(null);
-    public compress: boolean = false;
     private async getSocket(uri: string): Promise<dgram.Socket> {
         let socket = await this.sockets[uri];
         if (socket !== undefined) {
@@ -143,3 +142,13 @@ export class UdpTransport implements Transport {
 }
 
 Client.register('udp', UdpTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface UdpTransport {
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        udp: UdpTransport;
+    }
+}

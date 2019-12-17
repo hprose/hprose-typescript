@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: May 4, 2019                                |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -18,12 +18,12 @@ import { Client, ClientContext, TimeoutError, Context, Transport } from '@hprose
 export interface HttpClientContext extends ClientContext {
     httpStatusCode: number;
     httpStatusText: string;
-    httpRequestHeaders?: { [name: string]: string | string[] };
-    httpResponseHeaders?: { [name: string]: string | string[] };
+    httpRequestHeaders?: { [header: string]: number | string | string[] | undefined };
+    httpResponseHeaders?: { [name: string]: string | string[] | undefined };
 }
 
-function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | string[] } {
-    const httpHeaders: { [name: string]: string | string[] } = Object.create(null);
+function getResponseHeaders(rawHttpHeaders: string): { [name: string]: string | string[] | undefined } {
+    const httpHeaders: { [name: string]: string | string[] | undefined } = Object.create(null);
     if (rawHttpHeaders) {
         const headers = rawHttpHeaders.split('\r\n');
         for (let i = 0, n = headers.length; i < n; i++) {
@@ -48,24 +48,27 @@ export class HttpTransport implements Transport {
     public static readonly schemes: string[] = ['http', 'https'];
     private counter: number = 0;
     private requests: { [index: number]: XMLHttpRequest } = Object.create(null);
-    public readonly httpRequestHeaders: { [name: string]: string } = Object.create(null);
+    public readonly httpRequestHeaders: { [header: string]: number | string | string[] | undefined } = Object.create(null);
     public onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null = null;
-    private getRequestHeaders(httpRequestHeaders?: { [name: string]: string | string[] }): { [name: string]: string } {
-        const headers: { [name: string]: string } = Object.create(null);
-        for (const name in this.httpRequestHeaders) {
-            headers[name] = this.httpRequestHeaders[name];
-        }
-        if (httpRequestHeaders) {
-            for (const name in httpRequestHeaders) {
-                if (!httpRequestHeaders.hasOwnProperty || httpRequestHeaders.hasOwnProperty(name)) {
-                    const value = httpRequestHeaders[name];
+    private setRequestHeaders(headers: { [name: string]: string }, httpRequestHeaders: { [header: string]: number | string | string[] | undefined }) {
+        for (const name in httpRequestHeaders) {
+            if (!httpRequestHeaders.hasOwnProperty || httpRequestHeaders.hasOwnProperty(name)) {
+                const value = httpRequestHeaders[name];
+                if (value !== undefined) {
                     if (Array.isArray(value)) {
                         headers[name] = value.join(', ');
                     } else {
-                        headers[name] = value;
+                        headers[name] = value + "";
                     }
                 }
             }
+        }
+    }
+    private getRequestHeaders(httpRequestHeaders?: { [header: string]: number | string | string[] | undefined }): { [name: string]: string } {
+        const headers: { [name: string]: string } = Object.create(null);
+        this.setRequestHeaders(headers, this.httpRequestHeaders);
+        if (httpRequestHeaders) {
+            this.setRequestHeaders(headers, httpRequestHeaders);
         }
         return headers;
     }
@@ -109,9 +112,9 @@ export class HttpTransport implements Transport {
         for (const name in httpRequestHeaders) {
             xhr.setRequestHeader(name, httpRequestHeaders[name]);
         }
-        if (ArrayBuffer.isView) {
+        if (typeof ArrayBuffer.isView === 'function') {
             xhr.send(request);
-        } else if (request.buffer.slice) {
+        } else if (typeof request.buffer.slice === 'function') {
             xhr.send(request.buffer.slice(request.byteOffset, request.length));
         } else {
             const bytes = new Uint8Array(request.length);
@@ -132,3 +135,15 @@ export class HttpTransport implements Transport {
 }
 
 Client.register('http', HttpTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface HttpTransport {
+        readonly httpRequestHeaders: { [header: string]: number | string | string[] | undefined };
+        onprogress: ((this: XMLHttpRequest, ev: ProgressEvent) => any) | null;
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        http: HttpTransport;
+    }
+}

@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,6 +27,7 @@ export interface Handler {
 }
 
 export interface HandlerConstructor {
+    serverTypes: Function[];
     new(service: Service): Handler;
 }
 
@@ -37,9 +38,9 @@ export interface Service {
 export class Service {
     private static readonly handlers: { [name: string]: HandlerConstructor } = Object.create(null);
     private static readonly serverTypes: Map<Function, string[]> = new Map();
-    public static register(name: string, ctor: HandlerConstructor, serverTypes: Function[]): void {
+    public static register(name: string, ctor: HandlerConstructor): void {
         Service.handlers[name] = ctor;
-        serverTypes.forEach((type) => {
+        ctor.serverTypes.forEach((type) => {
             if (Service.serverTypes.has(type)) {
                 (Service.serverTypes.get(type) as string[]).push(name);
             }

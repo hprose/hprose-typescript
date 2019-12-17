@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for TypeScript.                            |
 |                                                          |
-| LastModified: May 4, 2019                                |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,8 +22,8 @@ import { ByteStream } from '@hprose/io';
 export interface HttpClientContext extends ClientContext {
     httpStatusCode?: number;
     httpStatusText?: string;
-    httpRequestHeaders?: http.OutgoingHttpHeaders;
-    httpResponseHeaders?: http.IncomingHttpHeaders;
+    httpRequestHeaders?: { [header: string]: number | string | string[] | undefined };
+    httpResponseHeaders?: { [name: string]: string | string[] | undefined };
 }
 
 export class HttpTransport implements Transport {
@@ -138,5 +138,19 @@ export class HttpTransport implements Transport {
     }
 }
 
-
 Client.register('http', HttpTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface HttpTransport {
+        keepAlive: boolean;
+        httpAgent: http.Agent;
+        httpsAgent: https.Agent;
+        options: https.RequestOptions;
+        readonly httpRequestHeaders: { [header: string]: number | string | string[] | undefined };
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        http: HttpTransport;
+    }
+}

@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Mar 12, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -217,3 +217,16 @@ export class SocketTransport implements Transport {
 }
 
 Client.register('socket', SocketTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface SocketTransport {
+        noDelay: boolean;
+        keepAlive: boolean;
+        options: tls.SecureContextOptions;
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        socket: SocketTransport;
+    }
+}

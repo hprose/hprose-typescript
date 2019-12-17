@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for TypeScript.                         |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,6 +27,7 @@ export interface WebSocketServiceContext extends ServiceContext {
 }
 
 export class WebSocketHandler implements Handler {
+    public static serverTypes: Function[] = [http.Server, https.Server, WebSocket.Server];
     public compress: boolean = false;
     public onaccept?: (websocket: WebSocket) => void;
     public onclose?: (websocket: WebSocket) => void;
@@ -107,4 +108,18 @@ export class WebSocketHandler implements Handler {
     }
 }
 
-Service.register('websocket', WebSocketHandler, [http.Server, https.Server, WebSocket.Server]);
+Service.register('websocket', WebSocketHandler);
+
+declare module '@hprose/rpc-core' {
+    export interface WebSocketHandler {
+        compress: boolean;
+        onaccept?: (websocket: WebSocket) => void;
+        onclose?: (websocket: WebSocket) => void;
+        onerror?: (error: Error) => void;
+        bind(server: http.Server | https.Server | WebSocket.Server): void;
+        handler(websocket: WebSocket, request: http.IncomingMessage): void;
+    }
+    export interface Service {
+        websocket: WebSocketHandler;
+    }
+}

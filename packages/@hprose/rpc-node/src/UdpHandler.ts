@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for TypeScript.                               |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,10 +24,11 @@ export interface UdpServiceContext extends ServiceContext {
 }
 
 export class UdpHandler implements Handler {
+    public static serverTypes: Function[] = [dgram.Socket];
     public onclose?: (socket: dgram.Socket) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
-    public send(socket: dgram.Socket, body: Buffer, index: number, rinfo: AddressInfo) {
+    private send(socket: dgram.Socket, body: Buffer, index: number, rinfo: AddressInfo) {
         const n = body.length;
         const header = Buffer.allocUnsafe(8);
         header.writeUInt16BE(n, 4);
@@ -82,4 +83,16 @@ export class UdpHandler implements Handler {
     }
 }
 
-Service.register('udp', UdpHandler, [dgram.Socket]);
+Service.register('udp', UdpHandler);
+
+declare module '@hprose/rpc-core' {
+    export interface UdpHandler {
+        onclose?: (socket: dgram.Socket) => void;
+        onerror?: (error: Error) => void;
+        bind(socket: dgram.Socket): void
+        handler(socket: dgram.Socket): void;
+    }
+    export interface Service {
+        udp: UdpHandler;
+    }
+}

@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketTransport for TypeScript.                       |
 |                                                          |
-| LastModified: Mar 11, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -106,10 +106,20 @@ export class WebSocketTransport implements Transport {
             const websocket = this.websockets[uri];
             delete this.websockets[uri];
             if (websocket) {
-                (await websocket).close({code: 1000, reason: 'abort'});
+                (await websocket).close({ code: 1000, reason: 'abort' });
             }
         }
     }
 }
 
 Client.register('websocket', WebSocketTransport);
+
+declare module '@hprose/rpc-core' {
+    export interface WebSocketTransport {
+        transport(request: Uint8Array, context: Context): Promise<Uint8Array>;
+        abort(): Promise<void>;
+    }
+    export interface Client {
+        websocket: WebSocketTransport;
+    }
+}

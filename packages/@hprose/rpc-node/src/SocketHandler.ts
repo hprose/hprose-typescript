@@ -8,7 +8,7 @@
 |                                                          |
 | SocketHandler for TypeScript.                            |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,6 +23,7 @@ export interface SocketServiceContext extends ServiceContext {
 }
 
 export class SocketHandler implements Handler {
+    public static serverTypes: Function[] = [net.Server];
     public onaccept?: (socket: net.Socket) => void;
     public onclose?: (socket: net.Socket) => void;
     public onerror?: (error: Error) => void;
@@ -126,4 +127,17 @@ export class SocketHandler implements Handler {
     }
 }
 
-Service.register('socket', SocketHandler, [net.Server]);
+Service.register('socket', SocketHandler);
+
+declare module '@hprose/rpc-core' {
+    export interface SocketHandler {
+        onaccept?: (socket: net.Socket) => void;
+        onclose?: (socket: net.Socket) => void;
+        onerror?: (error: Error) => void;
+        bind(server: net.Server): void;
+        handler(socket: net.Socket): void;
+    }
+    export interface Service {
+        socket: SocketHandler;
+    }
+}
