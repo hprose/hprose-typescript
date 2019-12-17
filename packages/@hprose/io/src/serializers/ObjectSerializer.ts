@@ -8,7 +8,7 @@
 |                                                          |
 | hprose object serializer for TypeScript.                 |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Dec 18, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,10 +25,10 @@ export class ObjectSerializer<T> extends ReferenceSerializer<T> {
     public readonly metadata: Uint8Array;
     constructor(obj: T, name: string, fields: string[] = []) {
         super();
-        this.type = obj.constructor;
+        this.type = (obj as any).constructor;
         if (fields.length === 0) {
             for (const key in obj) {
-                if (obj.hasOwnProperty(key) && typeof obj[key] !== 'function') {
+                if ((obj as Object).hasOwnProperty(key) && typeof obj[key] !== 'function') {
                     fields[fields.length] = key.toString();
                 }
             }
