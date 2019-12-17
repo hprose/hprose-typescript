@@ -77,10 +77,10 @@ test('test ipaddress', async () => {
     }
     const service = new Service();
     service.add({ method: hello, fullname: 'hello', passContext: true });
-    const server = new WebSocket.Server({ port: 8090 });
+    const server = new WebSocket.Server({ port: 8091 });
     service.bind(server);
     service.websocket.compress = true;
-    const client = new Client('ws://127.0.0.1:8090/');
+    const client = new Client('ws://127.0.0.1:8091/');
     client.websocket.compress = true;
     const proxy = await client.useServiceAsync();
     const result = await proxy.hello('world');
