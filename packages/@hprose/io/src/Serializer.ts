@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for TypeScript.                        |
 |                                                          |
-| LastModified: Feb 8, 2019                                |
+| LastModified: Dec 18, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -54,7 +54,7 @@ export function register(type: Function, serializer: Serializer) {
 }
 
 export function getInstance<T>(value: T): Serializer {
-    const type = value.constructor;
+    const type = (value as any).constructor;
     switch (type) {
         case Function: return nullSerializer;
         case Number: return numberSerializer;
