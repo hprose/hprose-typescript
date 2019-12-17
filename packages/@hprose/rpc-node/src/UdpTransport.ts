@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for TypeScript.                             |
 |                                                          |
-| LastModified: Dec 17, 2019                               |
+| LastModified: Dec 18, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -122,7 +122,7 @@ export class UdpTransport implements Transport {
         const crc = crc32(new Uint8Array(header.buffer, header.byteOffset + 4, 4));
         header.writeInt32BE(crc, 0);
         const body = Buffer.from(request.buffer, request.byteOffset, request.length);
-        socket.send([header, body], parser.port ? parseInt(parser.port, 10) : 8412, parser.hostname, (error) => {
+        socket.send([header, body], parser.port ? parseInt(parser.port, 10) : 8412, parser.hostname ?? undefined, (error) => {
             if (error) {
                 delete results[index];
                 result.reject(error);
