@@ -8,7 +8,7 @@
 |                                                          |
 | SocketTransport for TypeScript.                          |
 |                                                          |
-| LastModified: Dec 17, 2019                               |
+| LastModified: Dec 18, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -41,7 +41,7 @@ export class SocketTransport implements Transport {
             case 'ssl4:':
             case 'ssl6:': {
                 const options: net.TcpNetConnectOpts = Object.create(null);
-                options.host = parser.hostname;
+                options.host = parser.hostname ?? undefined;
                 options.port = parser.port ? parseInt(parser.port, 10) : 8412;
                 switch (protocol) {
                     case 'tcp4:':
