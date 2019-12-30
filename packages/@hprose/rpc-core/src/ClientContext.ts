@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for TypeScript.                            |
 |                                                          |
-| LastModified: Mar 25, 2019                               |
+| LastModified: Dec 30, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,20 +21,12 @@ export class ClientContext extends Context {
     public uri!: string;
     public returnType?: Function | null;
     public timeout!: number;
-    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
-    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
     constructor(items?: { [name: string]: any }) {
         super();
         if (!!items) {
+            this.copy(items, this);
             if ('requestHeaders' in items) {
                 this.copy(items['requestHeaders'], this.requestHeaders);
-            }
-            for (const name in items) {
-                if ((name !== 'requestHeaders') &&
-                    (name !== 'responseHeaders') &&
-                    (!items.hasOwnProperty || items.hasOwnProperty(name))) {
-                    this[name] = items[name];
-                }
             }
         }
     }
