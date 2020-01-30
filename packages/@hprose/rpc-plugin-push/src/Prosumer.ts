@@ -49,7 +49,7 @@ export class Prosumer {
                             try {
                                 callback(messages[i]);
                             }
-                            catch(e) {
+                            catch (e) {
                                 if (this.onerror) {
                                     this.onerror(e);
                                 }
@@ -66,7 +66,7 @@ export class Prosumer {
         }
     }
     private async message(): Promise<void> {
-        while(true) {
+        while (true) {
             try {
                 const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<');
                 if (!topics) return;

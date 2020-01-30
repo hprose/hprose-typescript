@@ -19,15 +19,15 @@ export { WebSocketTransport } from './WebSocketTransport';
 declare const wx: any;
 
 export function wxPromisify(name: string) {
-    return function(args: any): Promise<any> {
+    return function (args: any): Promise<any> {
         args = args || {};
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             args.success = resolve;
             args.fail = reject;
             try {
                 wx[name](args);
             }
-            catch(e) {
+            catch (e) {
                 reject(e);
             }
         });
@@ -52,7 +52,7 @@ for (let name in wx) {
         && wx[name].length > 0
         && exclusionList.indexOf(name) === 1
         && name.search(/(^(on|off|create))|((Sync)$)/) < 0) {
-        WX[name] = wxPromisify(name); 
+        WX[name] = wxPromisify(name);
     }
     else {
         WX[name] = wx[name].bind(wx);

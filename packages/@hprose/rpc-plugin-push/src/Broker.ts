@@ -53,14 +53,14 @@ export class Broker {
         const exists = new Method(this.exists, '?', this, [String, String]);
         const idlist = new Method(this.idlist, '|', this, [String]);
         this.service.add(subscribe)
-                    .add(unsubscribe)
-                    .add(message)
-                    .add(unicast)
-                    .add(multicast)
-                    .add(broadcast)
-                    .add(exists)
-                    .add(idlist)
-                    .use(this.handler)
+            .add(unsubscribe)
+            .add(message)
+            .add(unicast)
+            .add(multicast)
+            .add(broadcast)
+            .add(exists)
+            .add(idlist)
+            .use(this.handler)
     }
     protected send(id: string, responder: Deferred<any>): boolean {
         const topics = this.messages[id];
@@ -256,7 +256,7 @@ export class Broker {
     }
     protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         const from = (context.requestHeaders['id']) ? context.requestHeaders['id'].toString() : '';
-        switch(name) {
+        switch (name) {
             case '>':
             case '>?':
                 if (args.length === 3) args.push(from);

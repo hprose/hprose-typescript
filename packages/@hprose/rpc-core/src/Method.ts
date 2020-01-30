@@ -27,7 +27,7 @@ export class Method {
         if (fullname === '') {
             throw new Error('fullname must not be empty');
         }
-     }
+    }
 }
 
 export interface MethodLike extends Method { }

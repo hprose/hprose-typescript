@@ -18,7 +18,7 @@ import { Context, NextIOHandler, NextInvokeHandler } from '@hprose/rpc-core';
 
 export class Log {
     private static readonly instance: Log = new Log();
-    public constructor(public enabled: boolean = true) {}
+    public constructor(public enabled: boolean = true) { }
     public static ioHandler(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
         return Log.instance.ioHandler(request, context, next);
     }
@@ -31,7 +31,7 @@ export class Log {
         try {
             console.log(ByteStream.toString(request));
         }
-        catch(e) {
+        catch (e) {
             console.error(e);
         }
         const response = next(request, context);
@@ -49,7 +49,7 @@ export class Log {
         try {
             a = JSON.stringify((args.length > 0 && context.method && context.method.passContext && !context.method.missing) ? args.slice(0, args.length - 1) : args);
         }
-        catch(e) {
+        catch (e) {
             console.error(e);
         }
         const result = next(name, args, context);

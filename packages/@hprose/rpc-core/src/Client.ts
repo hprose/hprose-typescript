@@ -192,7 +192,7 @@ export class Client {
         }
         return this;
     }
-    public async invoke(fullname: string, args: any[] = [], context: ClientContext | { [name: string]: any }  = new ClientContext()): Promise<any> {
+    public async invoke(fullname: string, args: any[] = [], context: ClientContext | { [name: string]: any } = new ClientContext()): Promise<any> {
         if (args === null) {
             args = [];
         }

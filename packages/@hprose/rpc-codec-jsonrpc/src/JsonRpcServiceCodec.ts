@@ -59,7 +59,7 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         context.method = method;
         return method;
     }
-    decode(request: Uint8Array, context: ServiceContext): [ string, any[] ] {
+    decode(request: Uint8Array, context: ServiceContext): [string, any[]] {
         context['jsonrpc'] = (request.length > 0 && request[0] === Tags.TagOpenbrace);
         if (!context['jsonrpc']) {
             return DefaultServiceCodec.instance.decode(request, context);
