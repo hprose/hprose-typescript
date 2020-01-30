@@ -8,7 +8,7 @@
 |                                                          |
 | MethodManager for TypeScript.                            |
 |                                                          |
-| LastModified: Jan 26, 2019                               |
+| LastModified: Jan 30, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,22 +21,31 @@ export type MissingMethod2 = (fullname: string, args: any[], context: Context) =
 export type MissingMethod = MissingMethod1 | MissingMethod2;
 
 export class MethodManager {
-    public readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
-    public getNames() : string[] {
-        return Object.keys(this.methods);
+    private readonly methods: { [fullname: string]: MethodLike } = Object.create(null);
+    private names: string[] = [];
+    public getNames(): string[] {
+        return this.names;
     }
     public get(fullname: string): MethodLike | undefined {
+        fullname = fullname.toLowerCase();
         return (fullname in this.methods) ? this.methods[fullname] : this.methods['*'];
     }
     public remove(fullname: string): void {
-        delete this.methods[fullname];
+        delete this.methods[fullname.toLowerCase()];
+        const index = this.names.indexOf(fullname);
+        if (index > -1) {
+            this.names.splice(index, 1);
+        }
     }
     public add(method: MethodLike): void {
         const fullname = method.fullname;
         if (fullname === '') {
             throw new Error('fullname must not be empty');
         }
-        this.methods[fullname] = method;
+        this.methods[fullname.toLowerCase()] = method;
+        if (this.names.indexOf(fullname) === -1) {
+            this.names.push(fullname);
+        }
     }
     public addFunction(fn: Function, fullname?: string, paramTypes?: Function[]): void;
     public addFunction(fn: Function, paramTypes: Function[]): void;
@@ -69,7 +78,7 @@ export class MethodManager {
                 throw new Error('obj[fullname] must be a function');
             }
         } else {
-            switch(args.length) {
+            switch (args.length) {
                 case 2:
                     this.add(new Method(args[0], undefined, args[1]));
                     break;
@@ -146,13 +155,13 @@ export class MethodManager {
         }
         switch (args.length) {
             case 3:
-            if (args[2].length > 0 && typeof args[2][0] === 'string') {
-                fullnames = args[2] as string[];
-            }
-            else {
-                paramTypes = args[2];
-            }
-            break;
+                if (args[2].length > 0 && typeof args[2][0] === 'string') {
+                    fullnames = args[2] as string[];
+                }
+                else {
+                    paramTypes = args[2];
+                }
+                break;
             case 4:
                 fullnames = args[2];
                 paramTypes = args[3];
