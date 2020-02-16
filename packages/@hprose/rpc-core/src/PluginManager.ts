@@ -4,16 +4,16 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| HandlerManager.ts                                        |
+| PluginManager.ts                                         |
 |                                                          |
-| HandlerManager for TypeScript.                           |
+| PluginManager for TypeScript.                            |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Feb 16, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-export abstract class HandlerManager<Handler, NextHandler> {
+export abstract class PluginManager<Handler, NextHandler> {
     private handlers: Handler[] = [];
     private firstHandler: NextHandler;
     constructor(private readonly defaultHandler: NextHandler) {
