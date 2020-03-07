@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-wx",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-wx",
   "description": "hprose for TypeScript",
   "author": {
@@ -34,8 +34,8 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "@hprose/io": "^3.0.2",
-    "@hprose/rpc-core": "^3.0.5"
+    "@hprose/io": "^3.0.6",
+    "@hprose/rpc-core": "^3.0.6"
   },
   "keywords": [
     "hprose",

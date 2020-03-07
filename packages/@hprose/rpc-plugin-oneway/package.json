@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-oneway",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-oneway",
   "description": "hprose for TypeScript",
   "author": {
@@ -34,7 +34,7 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "@hprose/rpc-core": "^3.0.5"
+    "@hprose/rpc-core": "^3.0.6"
   },
   "keywords": [
     "hprose",
