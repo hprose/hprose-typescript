@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Dec 17, 2019                               |
+| LastModified: Mar 7, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,11 +16,10 @@
 import { ServiceCodec, DefaultServiceCodec } from './ServiceCodec';
 import { Context } from './Context';
 import { ServiceContext } from './ServiceContext';
-import { InvokeManager, InvokeHandler, NextInvokeHandler } from './InvokeManager';
+import { InvokeManager, InvokeHandler } from './InvokeManager';
 import { IOManager, IOHandler } from './IOManager';
 import { MethodLike, Method } from './Method';
 import { MethodManager, MissingMethod } from './MethodManager';
-import { TimeoutError } from './TimeoutError';
 
 export interface Handler {
     bind(server: any): void;
@@ -49,7 +48,6 @@ export class Service {
             }
         });
     }
-    public timeout: number = 30000;
     public codec: ServiceCodec = DefaultServiceCodec.instance;
     public maxRequestLength: number = 0x7FFFFFFF;
     private readonly invokeManager: InvokeManager = new InvokeManager(this.execute.bind(this));
@@ -61,7 +59,6 @@ export class Service {
         return this.methodManager.getNames();
     }
     constructor() {
-        this.invokeManager.use(this.timeoutHandler);
         for (const name in Service.handlers) {
             const ctor = Service.handlers[name];
             let handler = new ctor(this);
@@ -107,30 +104,6 @@ export class Service {
             result = e;
         }
         return codec.encode(result, context as ServiceContext);
-    }
-    private timeoutHandler = (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        const serviceContext = context as ServiceContext;
-        const timeout = serviceContext.method.timeout !== undefined && serviceContext.method.timeout > 0
-            ? serviceContext.method.timeout
-            : serviceContext.service.timeout;
-        if (timeout <= 0) {
-            return next(fullname, args, context);
-        }
-        return new Promise<any>((resolve, reject) => {
-            const timeoutId = setTimeout(() => {
-                reject(new TimeoutError());
-            }, timeout);
-            next(fullname, args, context).then(
-                (value) => {
-                    clearTimeout(timeoutId);
-                    resolve(value);
-                },
-                (reason) => {
-                    clearTimeout(timeoutId);
-                    reject(reason);
-                }
-            );
-        });
     }
     public async execute(fullname: string, args: any[], context: Context): Promise<any> {
         const method = (context as ServiceContext).method;

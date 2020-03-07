@@ -8,7 +8,7 @@
 |                                                          |
 | Method for TypeScript.                                   |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Mar 7, 2020                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,6 @@
 export class Method {
     public missing?: boolean;
     public passContext?: boolean;
-    public timeout?: number = 0;
     [name: string]: any;
     constructor(
         public method: Function,

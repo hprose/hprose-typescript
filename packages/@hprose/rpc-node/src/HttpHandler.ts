@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Dec 17, 2019                               |
+| LastModified: Mar 7, 2020                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,6 +36,7 @@ export class HttpHandler implements Handler {
     public p3p: boolean = true;
     public get: boolean = true;
     public crossDomain: boolean = true;
+    public timeout: number = 30000;
     private origins: { [origin: string]: boolean } = Object.create(null);
     private originCount: number = 0;
     private _crossDomainXmlFile: string = '';
@@ -186,9 +187,11 @@ export class HttpHandler implements Handler {
             response.end();
             return Promise.resolve();
         }
-        request.setTimeout(this.service.timeout, () => {
-            request.destroy(new TimeoutError());
-        });
+        if (this.timeout > 0) {
+            request.setTimeout(this.timeout, () => {
+                request.destroy(new TimeoutError());
+            });
+        }
         return new Promise<void>((resolve, reject) => {
             const instream = size ? new ByteStream(size) : new ByteStream();
             const ondata = function (chunk: Buffer) {
