@@ -8,7 +8,7 @@
 |                                                          |
 | Client for TypeScript.                                   |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,11 +20,11 @@ import { InvokeManager, InvokeHandler } from './InvokeManager';
 import { IOManager, IOHandler } from './IOManager';
 import { normalize, parseURI } from './Utils';
 
-function makeInvoke(client: Client, fullname: string): () => Promise<any> {
+function makeInvoke(client: Client, name: string): () => Promise<any> {
     return function (): Promise<any> {
         const args = Array.prototype.slice.call(arguments);
         const context = (args.length > 0 && args[args.length - 1] instanceof ClientContext) ? args.pop() : new ClientContext();
-        return client.invoke(fullname, args, context);
+        return client.invoke(name, args, context);
     };
 }
 
@@ -71,9 +71,16 @@ class ServiceProxyHandler implements ProxyHandler<any> {
         if (typeof p === 'symbol') { return undefined; }
         if (p === 'then') { return undefined; }
         if (!(p in target)) {
-            target[p] = makeInvoke(this.client, this.namespace ? this.namespace + '_' + p : '' + p);
+            target[p] = new Proxy(function () { }, new ServiceProxyHandler(this.client, this.namespace ? this.namespace + '_' + p : '' + p));
         }
         return target[p];
+    }
+    public apply(target: any, thisArg: any, args: any[]) {
+        if (this.namespace) {
+            const context = (args.length > 0 && args[args.length - 1] instanceof ClientContext) ? args.pop() : new ClientContext();
+            return this.client.invoke(this.namespace, args, context);
+        }
+        throw new TypeError("target is not a function");
     }
 }
 
@@ -98,7 +105,7 @@ export class Client {
         Client.transports.push({ name, ctor });
         ctor.schemes.forEach((scheme) => Client.protocols[scheme + ':'] = name);
     }
-    public readonly returnTypes: { [fullname: string]: Function | null } = Object.create(null);
+    public readonly returnTypes: { [name: string]: Function | null } = Object.create(null);
     public readonly requestHeaders: { [name: string]: any } = Object.create(null);
     public codec: ClientCodec = DefaultClientCodec.instance;
     public timeout: number = 30000;
@@ -139,7 +146,7 @@ export class Client {
     }
     public useService<T extends object>(returnTypes?: { [name in keyof T]: Function | null }): T;
     public useService<T extends object>(namespace: string, returnTypes?: { [name in keyof T]: Function | null }): T;
-    public useService(fullnames: string[]): any;
+    public useService(names: string[]): any;
     public useService(...args: any[]): any {
         let namespace: string | undefined;
         let returnTypes: { [name in keyof any]: Function | null } | undefined;
@@ -171,8 +178,8 @@ export class Client {
         return new Proxy(service, new ServiceProxyHandler(this, namespace));
     }
     public async useServiceAsync(): Promise<any> {
-        const fullnames: string[] = await this.invoke('~');
-        return useService(this, fullnames);
+        const names: string[] = await this.invoke('~');
+        return useService(this, names);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         if (handlers.length <= 0) return this;
@@ -192,7 +199,7 @@ export class Client {
         }
         return this;
     }
-    public async invoke(fullname: string, args: any[] = [], context: ClientContext | { [name: string]: any } = new ClientContext()): Promise<any> {
+    public async invoke(name: string, args: any[] = [], context: ClientContext | { [name: string]: any } = new ClientContext()): Promise<any> {
         if (args === null) {
             args = [];
         }
@@ -200,12 +207,12 @@ export class Client {
             args = await Promise.all(args);
         }
         const clientContext = (context instanceof ClientContext) ? context : new ClientContext(context);
-        clientContext.init(this, this.returnTypes[fullname]);
-        return this.invokeManager.handler(fullname, args, clientContext);
+        clientContext.init(this, this.returnTypes[name]);
+        return this.invokeManager.handler(name, args, clientContext);
     }
-    public async call(fullname: string, args: any[], context: Context): Promise<any> {
+    public async call(name: string, args: any[], context: Context): Promise<any> {
         const codec = this.codec;
-        const request = codec.encode(fullname, args, context as ClientContext);
+        const request = codec.encode(name, args, context as ClientContext);
         const response = await this.request(request, context);
         return codec.decode(response, context as ClientContext);
     }

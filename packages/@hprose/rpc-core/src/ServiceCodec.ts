@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceCodec for TypeScript.                             |
 |                                                          |
-| LastModified: Jan 27, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -54,11 +54,11 @@ export class DefaultServiceCodec {
         stream.writeByte(Tags.TagEnd);
         return stream.takeBytes();
     }
-    private decodeMethod(fullname: string, context: ServiceContext): MethodLike {
+    private decodeMethod(name: string, context: ServiceContext): MethodLike {
         const service = context.service;
-        const method: MethodLike | undefined = service.get(fullname);
+        const method: MethodLike | undefined = service.get(name);
         if (method === undefined) {
-            throw new Error('Can\'t find this method ' + fullname + '().');
+            throw new Error('Can\'t find this method ' + name + '().');
         }
         context.method = method;
         return method;
@@ -121,9 +121,9 @@ export class DefaultServiceCodec {
                 if (context.requestHeaders.simple) {
                     reader.simple = true;
                 }
-                const fullname = reader.deserialize(String);
-                const args = this.decodeArguments(this.decodeMethod(fullname, context), reader, context);
-                return [fullname, args];
+                const name = reader.deserialize(String);
+                const args = this.decodeArguments(this.decodeMethod(name, context), reader, context);
+                return [name, args];
             case Tags.TagEnd:
                 this.decodeMethod('~', context);
                 return ['~', []];

@@ -27,6 +27,12 @@ test('test mssing method1', async () => {
     const proxy = client.useService<any>();
     const result = await proxy.hello('world');
     expect(result).toBe('hello["world"]');
+    const result2 = await proxy.hello.world();
+    expect(result2).toBe('hello_world[]');
+    const result3 = await proxy.how.are.you();
+    expect(result3).toBe('how_are_you[]');
+    const result4 = await proxy.how.do.you.do();
+    expect(result4).toBe('how_do_you_do[]');
     server.close();
 });
 
@@ -42,15 +48,21 @@ test('test mssing method2', async () => {
     const proxy = client.useService<any>();
     const result = await proxy.hello('world');
     expect(result).toBe('hello["world"]test2');
+    const result2 = await proxy.hello.world();
+    expect(result2).toBe('hello_world[]test2');
+    const result3 = await proxy.how.are.you();
+    expect(result3).toBe('how_are_you[]test2');
+    const result4 = await proxy.how.do.you.do();
+    expect(result4).toBe('how_do_you_do[]test2');
     server.close();
 });
 
 test('test headers', async () => {
-    const serviceHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        if (fullname === 'hello') {
+    const serviceHandler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+        if (name === 'hello') {
             expect(context.requestHeaders['ping']).toBe(true);
         }
-        const result = await next(fullname, args, context);
+        const result = await next(name, args, context);
         context.responseHeaders['pong'] = true;
         return result;
     };
@@ -97,7 +109,7 @@ test('test ipaddress', async () => {
         return 'hello ' + name;
     }
     const service = new Service();
-    service.add({ method: hello, fullname: 'hello', passContext: true });
+    service.add({ method: hello, passContext: true });
     const server = new MockServer('test5');
     service.bind(server);
     const client = new Client('mock://test5');

@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Mar 7, 2019                                |
+| LastModified: Mar 20, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -97,17 +97,17 @@ export class Service {
         const codec = this.codec;
         let result: any;
         try {
-            const [fullname, args] = codec.decode(request, context as ServiceContext);
-            result = await this.invokeManager.handler(fullname, args, context);
+            const [name, args] = codec.decode(request, context as ServiceContext);
+            result = await this.invokeManager.handler(name, args, context);
         }
         catch (e) {
             result = e;
         }
         return codec.encode(result, context as ServiceContext);
     }
-    public async execute(fullname: string, args: any[], context: Context): Promise<any> {
+    public async execute(name: string, args: any[], context: Context): Promise<any> {
         const method = (context as ServiceContext).method;
-        return method.method.apply(method.target, method.missing ? method.passContext ? [fullname, args, context] : [fullname, args] : args);
+        return method.method.apply(method.target, method.missing ? method.passContext ? [name, args, context] : [name, args] : args);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         if (handlers.length <= 0) return this;
@@ -127,26 +127,26 @@ export class Service {
         }
         return this;
     }
-    public get(fullname: string): MethodLike | undefined {
-        return this.methodManager.get(fullname);
+    public get(name: string): MethodLike | undefined {
+        return this.methodManager.get(name);
     }
     public add(method: MethodLike): this {
         this.methodManager.add(method);
         return this;
     }
-    public remove(fullname: string): this {
-        this.methodManager.remove(fullname);
+    public remove(name: string): this {
+        this.methodManager.remove(name);
         return this;
     }
-    public addFunction(fn: Function, fullname?: string, paramTypes?: Function[]): this;
+    public addFunction(fn: Function, name?: string, paramTypes?: Function[]): this;
     public addFunction(fn: Function, paramTypes: Function[]): this;
     public addFunction(fn: Function, ...args: any[]): this {
         this.methodManager.addFunction(fn, ...args);
         return this;
     }
-    public addMethod(method: Function, target: any, fullname?: string, paramTypes?: Function[]): this;
+    public addMethod(method: Function, target: any, name?: string, paramTypes?: Function[]): this;
     public addMethod(method: Function, target: any, paramTypes: Function[]): this;
-    public addMethod(fullname: string, target: any, paramTypes?: Function[]): this;
+    public addMethod(name: string, target: any, paramTypes?: Function[]): this;
     public addMethod(...args: any[]): this {
         this.methodManager.addMethod(args[0], args[1], ...args.slice(2));
         return this;
@@ -155,15 +155,15 @@ export class Service {
         this.methodManager.addMissingMethod(fn, target);
         return this;
     }
-    public addFunctions(functions: Function[], fullnames?: string[], paramTypes?: Function[]): this;
+    public addFunctions(functions: Function[], names?: string[], paramTypes?: Function[]): this;
     public addFunctions(functions: Function[], paramTypes: Function[]): this;
     public addFunctions(functions: Function[], ...args: any[]): this {
         this.methodManager.addFunctions(functions, ...args);
         return this;
     }
-    public addMethods(methods: Function[], target: any, fullnames?: string[], paramTypes?: Function[]): this;
+    public addMethods(methods: Function[], target: any, names?: string[], paramTypes?: Function[]): this;
     public addMethods(methods: Function[], target: any, paramTypes: Function[]): this;
-    public addMethods(fullnames: string[], target: any, paramTypes?: Function[]): this;
+    public addMethods(names: string[], target: any, paramTypes?: Function[]): this;
     public addMethods(...args: any[]): this {
         this.methodManager.addMethods(args[0], args[1], ...args.slice(2));
         return this;

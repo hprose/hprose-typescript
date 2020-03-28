@@ -8,7 +8,7 @@
 |                                                          |
 | Provider for TypeScript.                                 |
 |                                                          |
-| LastModified: Mar 26, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -101,23 +101,23 @@ export class Provider {
         this.invokeManager.unuse(...handlers);
         return this;
     }
-    public get(fullname: string): MethodLike | undefined {
-        return this.methodManager.get(fullname);
+    public get(name: string): MethodLike | undefined {
+        return this.methodManager.get(name);
     }
     public add(method: MethodLike): this {
         this.methodManager.add(method);
         return this;
     }
-    public remove(fullname: string): this {
-        this.methodManager.remove(fullname);
+    public remove(name: string): this {
+        this.methodManager.remove(name);
         return this;
     }
-    public addFunction(f: Function, fullname?: string): this {
-        this.methodManager.addFunction(f, fullname);
+    public addFunction(f: Function, name?: string): this {
+        this.methodManager.addFunction(f, name);
         return this;
     }
-    public addMethod(method: Function, target: any, fullname?: string): this;
-    public addMethod(fullname: string, target: any): this;
+    public addMethod(method: Function, target: any, name?: string): this;
+    public addMethod(name: string, target: any): this;
     public addMethod(...args: any[]): this {
         this.methodManager.addMethod(args[0], args[1], ...args.slice(2));
         return this;
@@ -126,12 +126,12 @@ export class Provider {
         this.methodManager.addMissingMethod(fn, target);
         return this;
     }
-    public addFunctions(functions: Function[], fullnames?: string[]): this {
-        this.methodManager.addFunctions(functions, fullnames);
+    public addFunctions(functions: Function[], names?: string[]): this {
+        this.methodManager.addFunctions(functions, names);
         return this;
     }
-    public addMethods(methods: Function[], target: any, fullnames?: string[]): this;
-    public addMethods(fullnames: string[], target: any): this;
+    public addMethods(methods: Function[], target: any, names?: string[]): this;
+    public addMethods(names: string[], target: any): this;
     public addMethods(...args: any[]): this {
         this.methodManager.addMethods(args[0], args[1], ...args.slice(2));
         return this;

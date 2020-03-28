@@ -53,15 +53,15 @@ test('test mssing method2', async () => {
 });
 
 test('test headers', async () => {
-    const clientHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+    const clientHandler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         context.requestHeaders['ping'] = true;
-        const result = await next(fullname, args, context);
+        const result = await next(name, args, context);
         expect(context.responseHeaders['pong']).toBe(true);
         return result;
     };
-    const serviceHandler = async (fullname: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+    const serviceHandler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         expect(context.requestHeaders['ping']).toBe(true);
-        const result = await next(fullname, args, context);
+        const result = await next(name, args, context);
         context.responseHeaders['pong'] = true;
         return result;
     };
@@ -114,7 +114,7 @@ test('test ipaddress', async () => {
     }
     const service = new Service();
     service.codec = JsonRpcServiceCodec.instance;
-    service.add({ method: hello, fullname: 'hello', passContext: true });
+    service.add({ method: hello, passContext: true });
     const server = new MockServer('test5');
     service.bind(server);
     const client = new Client('mock://test5');

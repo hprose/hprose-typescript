@@ -1,7 +1,7 @@
 import { Context, Service, Client, MockServer, defer } from '@hprose/rpc-core';
 import { Broker, Prosumer, BrokerContext } from '../src/index';
 
-test('test push', async() => {
+test('test push', async () => {
     const service = new Broker(new Service()).service;
     // service.use(Log.ioHandler);
     const server = new MockServer('testpush');
@@ -46,7 +46,7 @@ test('test push', async() => {
     });
 });
 
-test('test server push', async() => {
+test('test server push', async () => {
     function hello(name: string, context: Context): string {
         const cxt = context as BrokerContext;
         cxt.producer.push('hello', 'test');
@@ -55,7 +55,7 @@ test('test server push', async() => {
     const service = new Service();
     // service.use(Log.ioHandler);
     const broker = new Broker(service);
-    service.add({method: hello, fullname: 'hello', passContext: true});
+    service.add({ method: hello, passContext: true });
     const server = new MockServer('testpush2');
     service.bind(server);
     const client = new Client('mock://testpush2');
@@ -85,7 +85,7 @@ test('test server push', async() => {
     });
 });
 
-test('test push3', async() => {
+test('test push3', async () => {
     const service = new Service();
     const broker = new Broker(service);
     broker.messageQueueMaxLength = 1000;

@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpc ServiceCodec for TypeScript.                     |
 |                                                          |
-| LastModified: Mar 14, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -50,9 +50,9 @@ export class JsonRpcServiceCodec implements ServiceCodec {
         }
         return new ByteStream(JSON.stringify(response)).takeBytes();
     }
-    private decodeMethod(fullname: string, context: ServiceContext): MethodLike {
+    private decodeMethod(name: string, context: ServiceContext): MethodLike {
         const service = context.service;
-        const method: MethodLike | undefined = service.get(fullname);
+        const method: MethodLike | undefined = service.get(name);
         if (method === undefined) {
             throw new Error('Method not found');
         }
@@ -75,8 +75,8 @@ export class JsonRpcServiceCodec implements ServiceCodec {
             }
         }
         context['jsonrpc.id'] = call.id;
-        const fullname = call.method;
-        const method = this.decodeMethod(fullname, context);
+        const name = call.method;
+        const method = this.decodeMethod(name, context);
         const args = call.params ? call.params : [];
         if (!method.missing) {
             if (method.passContext) args.push(context);
@@ -84,6 +84,6 @@ export class JsonRpcServiceCodec implements ServiceCodec {
                 throw new Error('Invalid params');
             }
         }
-        return [fullname, args];
+        return [name, args];
     }
 }
