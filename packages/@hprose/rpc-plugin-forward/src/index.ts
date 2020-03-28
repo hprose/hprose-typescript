@@ -23,11 +23,12 @@ export class Forward {
     }
     public ioHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         const clientContext = new ClientContext({ timeout: this.timeout });
-        clientContext.init(this.client, null);
+        clientContext.init(this.client);
         return this.client.request(request, clientContext);
     }
     public invokeHandler = (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        return this.client.invoke(name, args);
+        const clientContext = new ClientContext({ timeout: this.timeout });
+        return this.client.invoke(name, args, clientContext);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         this.client.use(...handlers);
