@@ -8,16 +8,16 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: May 4, 2019                                |
+| LastModified: May 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 import { Service, normalize, Context, Deferred, Method, defer, NextInvokeHandler, ServiceContext, TimeoutError } from '@hprose/rpc-core';
 
-function makeInvoke(caller: Caller, id: string, fullname: string): () => Promise<any> {
+function makeInvoke(caller: Caller, id: string, name: string): () => Promise<any> {
     return function (): Promise<any> {
-        return caller.invoke(id, fullname, Array.prototype.slice.call(arguments));
+        return caller.invoke(id, name, Array.prototype.slice.call(arguments));
     };
 }
 
@@ -64,14 +64,21 @@ class ServiceProxyHandler implements ProxyHandler<any> {
         if (typeof p === 'symbol') { return undefined; }
         if (p === 'then') { return undefined; }
         if (!(p in target)) {
-            target[p] = makeInvoke(this.client, this.id, this.namespace ? this.namespace + '_' + p : '' + p);
+            target[p] = new Proxy(function () { }, new ServiceProxyHandler(this.client, this.id, this.namespace ? this.namespace + '_' + p : '' + p));
         }
         return target[p];
     }
+    public apply(target: any, thisArg: any, args: any[]) {
+        if (this.namespace) {
+            return this.client.invoke(this.id, this.namespace, args);
+        }
+        throw new TypeError("target is not a function");
+    }
 }
 
-export interface CallerContext extends ServiceContext {
-    invoke<T>(fullname: string, args?: any[]): Promise<T>;
+export interface CallerContext<I extends object> extends ServiceContext {
+    proxy: I;
+    invoke<T>(name: string, args?: any[]): Promise<T>;
 }
 
 export class Caller {
@@ -168,7 +175,7 @@ export class Caller {
             }
         }
     }
-    public async invoke(id: string, fullname: string, args: any[] = []): Promise<any> {
+    public async invoke(id: string, name: string, args: any[] = []): Promise<any> {
         if (args.length > 0) {
             args = await Promise.all(args);
         }
@@ -181,7 +188,7 @@ export class Caller {
         if (this.calls[id] === undefined) {
             this.calls[id] = [];
         }
-        const call: [number, string, any[]] = [index, fullname, args];
+        const call: [number, string, any[]] = [index, name, args];
         this.calls[id].push(call);
         if (this.results[id] === undefined) {
             this.results[id] = Object.create(null);
@@ -204,7 +211,7 @@ export class Caller {
         return result.promise;
     }
     public useService<T extends object>(id: string, namespace?: string): T;
-    public useService(id: string, fullnames: string[]): any;
+    public useService(id: string, names: string[]): any;
     public useService(id: string, arg?: string | string[]): any {
         let namespace: string | undefined;
         if (Array.isArray(arg)) {
@@ -215,8 +222,8 @@ export class Caller {
         return new Proxy(Object.create(null), new ServiceProxyHandler(this, id, namespace));
     }
     public async useServiceAsync(id: string): Promise<any> {
-        const fullnames: string[] = await this.invoke(id, '~');
-        return useService(this, id, fullnames);
+        const names: string[] = await this.invoke(id, '~');
+        return useService(this, id, names);
     }
     public exists(id: string): boolean {
         return id in this.onlines;
@@ -224,10 +231,12 @@ export class Caller {
     public idlist(): string[] {
         return Object.keys(this.onlines);
     }
-    protected handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
-        (context as CallerContext).invoke = (fullname: string, args: any[] = []): Promise<any> => {
-            return this.invoke(this.id(context as ServiceContext), fullname, args);
+    protected handler = (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+        const callerContext = context as CallerContext<any>;
+        callerContext.proxy = this.useService(this.id(context as ServiceContext));
+        callerContext.invoke = (name: string, args: any[] = []): Promise<any> => {
+            return this.invoke(this.id(context as ServiceContext), name, args);
         };
-        return next(name, args, context);
+        return next(name, args, callerContext);
     }
 }
