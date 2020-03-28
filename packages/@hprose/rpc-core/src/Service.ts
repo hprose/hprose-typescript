@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Mar 20, 2020                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -107,7 +107,17 @@ export class Service {
     }
     public async execute(name: string, args: any[], context: Context): Promise<any> {
         const method = (context as ServiceContext).method;
-        return method.method.apply(method.target, method.missing ? method.passContext ? [name, args, context] : [name, args] : args);
+        const func = method.method;
+        if (method.missing) {
+            if (method.passContext) {
+                return func.apply(method.target, [name, args, context]);
+            }
+            return func.apply(method.target, [name, args]);
+        }
+        if (method.passContext) {
+            args.push(context)
+        }
+        return func.apply(method.target, args);
     }
     public use(...handlers: InvokeHandler[] | IOHandler[]): this {
         if (handlers.length <= 0) return this;

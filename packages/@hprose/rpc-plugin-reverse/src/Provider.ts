@@ -42,7 +42,17 @@ export class Provider {
     }
     private async execute(name: string, args: any[], context: Context): Promise<any> {
         const method = (context as ProviderContext).method;
-        return method.method.apply(method.target, method.missing ? method.passContext ? [name, args, context] : [name, args] : args);
+        const func = method.method;
+        if (method.missing) {
+            if (method.passContext) {
+                return func.apply(method.target, [name, args, context]);
+            }
+            return func.apply(method.target, [name, args]);
+        }
+        if (method.passContext) {
+            args.push(context)
+        }
+        return func.apply(method.target, args);
     }
     private async process(call: [number, string, any[]]): Promise<[number, any, string | undefined]> {
         const [index, name, args] = call;
@@ -52,7 +62,6 @@ export class Provider {
                 throw new Error('Can\'t find this method ' + name + '().');
             }
             const context = new ProviderContext(this.client, method);
-            if (!method.missing && method.passContext) args.push(context);
             return [index, await this.invokeManager.handler(name, args, context), undefined];
         }
         catch (e) {

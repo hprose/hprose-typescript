@@ -1,5 +1,5 @@
 import { Service, Client, MockServer } from '@hprose/rpc-core';
-// import { Log } from '@hprose/rpc-plugin-log';
+import { Log } from '@hprose/rpc-plugin-log';
 import { Caller, Provider, CallerContext } from '../src/index';
 
 test('test reverse RPC', async () => {
@@ -49,6 +49,7 @@ test('test reverse RPC 2', async () => {
         return context.proxy.hi(name);
     }
     const service = new Service();
+    service.use(Log.invokeHandler);
     new Caller(service);
     service.add({ method: hello, passContext: true });
     const server = new MockServer('TestReverseRPC2');

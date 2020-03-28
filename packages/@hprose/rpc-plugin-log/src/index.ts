@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-log for TypeScript.                   |
 |                                                          |
-| LastModified: Feb 3, 2019                                |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -47,7 +47,7 @@ export class Log {
         if (!enabled) return next(name, args, context);
         let a: string = '';
         try {
-            a = JSON.stringify((args.length > 0 && context.method && context.method.passContext && !context.method.missing) ? args.slice(0, args.length - 1) : args);
+            a = JSON.stringify(args);
         }
         catch (e) {
             console.error(e);
