@@ -6,9 +6,9 @@
 |                                                          |
 | index.ts                                                 |
 |                                                          |
-| @hprose/rpc-plugin-oneway for TypeScript.                |
+| @hprose/rpc-plugin-timeout for TypeScript.               |
 |                                                          |
-| LastModified: Mar 25, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ import { Context, NextInvokeHandler, ServiceContext, TimeoutError } from '@hpros
 
 export class Timeout {
     public constructor(public timeout: number = 30000) { }
-    public handler(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
+    public handler = (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
         const method = (context as ServiceContext).method;
         const timeout = method.timeout !== undefined && method.timeout > 0
             ? method.timeout
