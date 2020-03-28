@@ -27,7 +27,7 @@ export interface Producer {
     idlist(topic: string): string[];
 }
 
-export interface BrokerContext extends Context {
+export interface BrokerContext extends ServiceContext {
     producer: Producer;
 }
 
