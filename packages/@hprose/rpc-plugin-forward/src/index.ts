@@ -17,11 +17,12 @@ import { Context, NextIOHandler, NextInvokeHandler, ClientContext, Client, IOHan
 
 export class Forward {
     private readonly client: Client;
+    public timeout?: number;
     public constructor(uri?: string | string[]) {
         this.client = new Client(uri)
     }
     public ioHandler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
-        const clientContext = new ClientContext();
+        const clientContext = new ClientContext({ timeout: this.timeout });
         clientContext.init(this.client, null);
         return this.client.request(request, clientContext);
     }
