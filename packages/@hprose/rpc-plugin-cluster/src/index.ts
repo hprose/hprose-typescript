@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-cluster for TypeScript.               |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -109,8 +109,8 @@ export class Cluster {
             throw e;
         }
     }
-    public static forking(name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
+    public static forking(request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> {
+        return new Promise<Uint8Array>((resolve, reject) => {
             const clientContext = context as ClientContext;
             const uris = clientContext.client.uris;
             const n = uris.length;
@@ -118,7 +118,7 @@ export class Cluster {
             for (let i = 0; i < n; ++i) {
                 const forkingContext = clientContext.clone();
                 forkingContext.uri = uris[i];
-                next(name, args, forkingContext).then(resolve, (reason) => {
+                next(request, forkingContext).then(resolve, (reason) => {
                     if (--count === 0) {
                         reject(reason);
                     }
