@@ -8,7 +8,7 @@
 |                                                          |
 | @hprose/rpc-plugin-limiter for TypeScript.               |
 |                                                          |
-| LastModified: Mar 27, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -78,10 +78,10 @@ export class ConcurrentLimiter {
         const task = this.tasks.shift();
         if (task) task.resolve();
     }
-    public handler = async (name: string, args: any[], context: Context, next: NextInvokeHandler): Promise<any> => {
+    public handler = async (request: Uint8Array, context: Context, next: NextIOHandler): Promise<Uint8Array> => {
         await this.acquire();
         try {
-            return await next(name, args, context);
+            return await next(request, context);
         }
         finally {
             this.release();
