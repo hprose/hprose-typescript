@@ -27,7 +27,14 @@ export class GuidDeserializer extends BaseDeserializer implements Deserializer {
         switch (tag) {
             case Tags.TagGuid: return ReferenceReader.readGuid(reader);
             case Tags.TagString: return Guid.parse(ReferenceReader.readString(reader));
-            case Tags.TagRef: return Guid.parse(reader.readReference().toString());
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Guid) {
+                    return result;
+                } else {
+                    return Guid.parse(result.toString());
+                }
+            }
             default: return super.read(reader, tag);
         }
     }
