@@ -8,7 +8,7 @@
 |                                                          |
 | hprose array deserializer for TypeScript.                |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,6 +28,16 @@ export class ArrayDeserializer extends BaseDeserializer implements Deserializer 
             case Tags.TagEmpty: return [];
             case Tags.TagString: return ReferenceReader.readString(reader).split('');
             case Tags.TagBytes: return Array.from(ReferenceReader.readBytes(reader));
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Uint8Array) {
+                    return Array.from(result);
+                } else if (result instanceof String) {
+                    return result.split('');
+                } else {
+                    return result;
+                }
+            }
             default:
                 return super.read(reader, tag);
         }

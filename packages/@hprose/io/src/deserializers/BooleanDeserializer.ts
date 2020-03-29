@@ -8,7 +8,7 @@
 |                                                          |
 | hprose boolean deserializer for TypeScript.              |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -37,6 +37,7 @@ export class BooleanDeserializer extends BaseDeserializer implements Deserialize
             case Tags.TagString: return Boolean(ReferenceReader.readString(reader));
             case Tags.TagUTF8Char: return '0\0'.indexOf(stream.readString(1)) === -1;
             case Tags.TagInfinity: stream.readByte(); return true;
+            case Tags.TagRef: return Boolean(reader.readReference().toString());
             default:
                 if (tag >= 0x31 && tag <= 0x39) {
                     return true;

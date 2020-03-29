@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Deserializer for TypeScript.                      |
 |                                                          |
-| LastModified: Feb 8, 2019                                |
+| LastModified: Mar 29, 2029                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,10 +34,12 @@ import { DateDeserializer } from './deserializers/DateDeserializer';
 import { ByteStreamDeserializer } from './deserializers/ByteStreamDeserializer';
 import { SetDeserializer } from './deserializers/SetDeserializer';
 import { MapDeserializer } from './deserializers/MapDeserializer';
+import { GuidDeserializer } from './deserializers/GuidDeserializer';
 import { ErrorDeserializer } from './deserializers/ErrorDeserializer';
 import { NullDeserializer } from './deserializers/NullDeserializer';
 import { DefaultDeserializer } from './deserializers/DefaultDeserializer';
 import { Deserializer } from './deserializers/Deserializer';
+import { Guid } from 'guid-typescript';
 
 const deserializers: Map<Function, Deserializer> = new Map<Function, Deserializer>();
 
@@ -66,6 +68,7 @@ export function getInstance(type?: Function | null): Deserializer {
             case Float64Array: return Float64ArrayDeserializer.instance;
             case Set: return SetDeserializer.instance;
             case Map: return MapDeserializer.instance;
+            case Guid: return GuidDeserializer.instance;
             case Error: return ErrorDeserializer.instance;
         }
         const deserializer = deserializers.get(type);

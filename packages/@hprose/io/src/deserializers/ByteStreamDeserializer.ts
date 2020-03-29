@@ -8,7 +8,7 @@
 |                                                          |
 | hprose ByteStream deserializer for TypeScript.           |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -31,6 +31,14 @@ export class ByteStreamDeserializer extends BaseDeserializer implements Deserial
             case Tags.TagList: return new ByteStream(readIntArray(reader, Uint8Array) as Uint8Array);
             case Tags.TagUTF8Char: return new ByteStream(reader.stream.readString(1));
             case Tags.TagString: return new ByteStream(readString(reader));
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Uint8Array) {
+                    return new ByteStream(result);
+                } else {
+                    return new ByteStream(result.toString());
+                }
+            }
             default:
                 return super.read(reader, tag);
         }

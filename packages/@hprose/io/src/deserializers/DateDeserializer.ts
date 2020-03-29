@@ -8,7 +8,7 @@
 |                                                          |
 | hprose date deserializer for TypeScript.                 |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -35,6 +35,14 @@ export class DateDeserializer extends BaseDeserializer implements Deserializer {
             case Tags.TagTrue: return new Date(1);
             case Tags.TagFalse:
             case Tags.TagEmpty: return new Date(0);
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Date) {
+                    return result;
+                } else {
+                    return new Date(result.toString());
+                }
+            }
             default:
                 if (tag >= 0x30 && tag <= 0x39) {
                     return new Date(tag - 0x30);

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose TypedArray deserializer for TypeScript.           |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -120,6 +120,14 @@ export class Uint8ArrayDeserializer extends BaseDeserializer implements Deserial
             case Tags.TagList: return readIntArray(reader, Uint8Array) as Uint8Array;
             case Tags.TagUTF8Char: return new ByteStream(reader.stream.readString(1)).bytes;
             case Tags.TagString: return new ByteStream(readString(reader)).bytes;
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Uint8Array) {
+                    return result;
+                } else {
+                    return new ByteStream(result.toString()).bytes;
+                }
+            }
             default:
                 return super.read(reader, tag);
         }
@@ -139,6 +147,18 @@ export class Uint8ClampedArrayDeserializer extends BaseDeserializer implements D
             case Tags.TagBytes: bytes = readBytes(reader); break;
             case Tags.TagUTF8Char: bytes = new ByteStream(reader.stream.readString(1)).bytes; break;
             case Tags.TagString: bytes = new ByteStream(readString(reader)).bytes; break;
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Uint8ClampedArray) {
+                    return result;
+                }
+                if (result instanceof Uint8Array) {
+                    bytes = result;
+                } else {
+                    bytes = new ByteStream(result.toString()).bytes;
+                }
+                break;
+            }
             default:
                 return super.read(reader, tag);
         }

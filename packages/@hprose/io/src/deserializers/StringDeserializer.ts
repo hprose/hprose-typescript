@@ -8,7 +8,7 @@
 |                                                          |
 | hprose string deserializer for TypeScript.               |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -44,6 +44,7 @@ export class StringDeserializer extends BaseDeserializer implements Deserializer
             case Tags.TagInfinity: return ValueReader.readInfinity(stream).toString();
             case Tags.TagUTF8Char: return stream.readString(1);
             case Tags.TagList: return ReferenceReader.readArray(reader).join('');
+            case Tags.TagRef: return reader.readReference().toString();
             default: return super.read(reader, tag);
         }
     }

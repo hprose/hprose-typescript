@@ -8,7 +8,7 @@
 |                                                          |
 | hprose bigint deserializer for TypeScript.               |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -40,6 +40,14 @@ if (typeof BigInt !== 'undefined') {
                 case Tags.TagUTF8Char: return BigInt(stream.readString(1).charCodeAt(1));
                 case Tags.TagDate: return BigInt(ReferenceReader.readDateTime(reader).getTime());
                 case Tags.TagTime: return BigInt(ReferenceReader.readTime(reader).getTime());
+                case Tags.TagRef: {
+                    const result = reader.readReference();
+                    if (result instanceof Date) {
+                        return BigInt(result.getTime());
+                    } else {
+                        return BigInt(result.toString());
+                    }
+                }
                 default: return super.read(reader, tag);
             }
         }

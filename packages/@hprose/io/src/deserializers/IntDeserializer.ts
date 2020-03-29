@@ -8,7 +8,7 @@
 |                                                          |
 | hprose int deserializer for TypeScript.                  |
 |                                                          |
-| LastModified: Jan 11, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -39,6 +39,14 @@ export class IntDeserializer extends BaseDeserializer implements Deserializer {
             case Tags.TagUTF8Char: return stream.readString(1).charCodeAt(1);
             case Tags.TagDate: return ReferenceReader.readDateTime(reader).getTime();
             case Tags.TagTime: return ReferenceReader.readTime(reader).getTime();
+            case Tags.TagRef: {
+                const result = reader.readReference();
+                if (result instanceof Date) {
+                    return result.getTime();
+                } else {
+                    return parseInt(result.toString());
+                }
+            }
             default: return super.read(reader, tag);
         }
     }
