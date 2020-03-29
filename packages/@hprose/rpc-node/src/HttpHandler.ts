@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Mar 7, 2020                                |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,7 +23,6 @@ import { ByteStream } from '@hprose/io';
 const lastModified = (new Date()).toUTCString();
 const etag = '"' + Math.floor(Math.random() * 2147483647).toString(16) +
     ':' + Math.floor(Math.random() * 2147483647).toString(16) + '"';
-const empty = new Uint8Array(0);
 
 export interface HttpServiceContext extends ServiceContext {
     readonly request: http.IncomingMessage;
@@ -37,6 +36,7 @@ export class HttpHandler implements Handler {
     public get: boolean = true;
     public crossDomain: boolean = true;
     public timeout: number = 30000;
+    public httpHeaders: http.OutgoingHttpHeaders = Object.create(null);
     private origins: { [origin: string]: boolean } = Object.create(null);
     private originCount: number = 0;
     private _crossDomainXmlFile: string = '';
@@ -88,8 +88,23 @@ export class HttpHandler implements Handler {
         return false;
     }
 
-    protected sendHeader(request: http.IncomingMessage, response: http.ServerResponse): void {
-        response.statusCode = 200;
+    private setHeader(response: http.ServerResponse, headers: http.OutgoingHttpHeaders): void {
+        if (headers) {
+            for (const name in headers) {
+                const value = headers[name];
+                if (value !== undefined) {
+                    response.setHeader(name, value);
+                }
+            }
+        }
+    }
+
+    protected sendHeader(request: http.IncomingMessage, response: http.ServerResponse, context: ServiceContext): void {
+        if ('httpStatusCode' in context) {
+            response.statusCode = Number(context['httpStatusCode']);
+        } else {
+            response.statusCode = 200;
+        }
         response.setHeader('Content-Type', 'text/plain');
         if (this.p3p) {
             response.setHeader('P3P',
@@ -108,6 +123,8 @@ export class HttpHandler implements Handler {
                 response.setHeader('Access-Control-Allow-Origin', '*');
             }
         }
+        this.setHeader(response, this.httpHeaders);
+        this.setHeader(response, context['httpResponseHeaders']);
     }
 
     protected end(data: Uint8Array, response: http.ServerResponse): void {
@@ -180,6 +197,7 @@ export class HttpHandler implements Handler {
             'port': request.socket.localPort
         };
         context.handler = this;
+        context['httpRequestHeaders'] = request.headers;
         const size = Number(request.headers['content-length']);
         if (size > this.service.maxRequestLength) {
             response.statusCode = 413;
@@ -206,29 +224,24 @@ export class HttpHandler implements Handler {
             };
             request.on('data', ondata);
             request.on('end', async () => {
-                if (this._clientAccessPolicyXmlContent.length > 0
-                    && this.clientAccessPolicyXmlHandler(request, response)) {
-                    return resolve();
+                if (request.method === 'GET') {
+                    if (this._clientAccessPolicyXmlContent.length > 0
+                        && this.clientAccessPolicyXmlHandler(request, response)) {
+                        return resolve();
+                    }
+                    if (this._crossDomainXmlContent.length > 0
+                        && this.crossDomainXmlHandler(request, response)) {
+                        return resolve();
+                    }
+                    if (!this.get) {
+                        response.statusCode = 403;
+                        response.statusMessage = 'Forbidden';
+                        return resolve();
+                    }
                 }
-                if (this._crossDomainXmlContent.length > 0
-                    && this.crossDomainXmlHandler(request, response)) {
-                    return resolve();
-                }
-                let result: Uint8Array = empty;
-                switch (request.method) {
-                    case 'GET':
-                        if (!this.get) {
-                            response.statusCode = 403;
-                            response.statusMessage = 'Forbidden';
-                            return resolve();
-                        }
-                    // tslint:disable-next-line:no-switch-case-fall-through
-                    case 'POST':
-                        result = await this.service.handle(instream.takeBytes(), context);
-                        break;
-                }
+                let result = await this.service.handle(instream.takeBytes(), context);
                 try {
-                    this.sendHeader(request, response);
+                    this.sendHeader(request, response, context);
                 }
                 catch (e) {
                     return reject(e);

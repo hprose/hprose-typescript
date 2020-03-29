@@ -8,15 +8,15 @@
 |                                                          |
 | Context for TypeScript.                                  |
 |                                                          |
-| LastModified: Dec 30, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 export class Context {
     [name: string]: any;
-    public readonly requestHeaders: { [name: string]: any } = Object.create(null);
-    public readonly responseHeaders: { [name: string]: any } = Object.create(null);
+    public requestHeaders: { [name: string]: any } = Object.create(null);
+    public responseHeaders: { [name: string]: any } = Object.create(null);
     protected copy(src: { [name: string]: any } | undefined, dist: { [name: string]: any }): void {
         if (src) {
             for (let name in src) {
