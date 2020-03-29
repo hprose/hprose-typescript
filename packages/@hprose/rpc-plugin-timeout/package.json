@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-timeout",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-timeout",
   "description": "hprose for TypeScript",
   "author": {
@@ -34,7 +34,7 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "@hprose/rpc-core": "^3.0.8"
+    "@hprose/rpc-core": "^3.0.9"
   },
   "keywords": [
     "hprose",
