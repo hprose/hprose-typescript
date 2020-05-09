@@ -74,7 +74,7 @@ export class SocketTransport implements Transport {
                     }
                 }
             }
-            case 'unix': {
+            case 'unix:': {
                 const options: net.IpcNetConnectOpts = Object.create(null);
                 if (parser.path) {
                     options.path = parser.path;
