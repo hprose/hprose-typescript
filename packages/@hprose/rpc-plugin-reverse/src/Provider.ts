@@ -8,12 +8,12 @@
 |                                                          |
 | Provider for TypeScript.                                 |
 |                                                          |
-| LastModified: Mar 28, 2020                               |
+| LastModified: May 17, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { MethodManager, MissingMethod, Method, MethodLike, Client, Context, InvokeManager, InvokeHandler } from '@hprose/rpc-core';
+import { MethodManager, MissingMethod, Method, MethodLike, Client, Context, InvokeManager, InvokeHandler, TimeoutError } from '@hprose/rpc-core';
 
 export class ProviderContext extends Context {
     constructor(public readonly client: Client, public readonly method: MethodLike) { super(); }
@@ -22,6 +22,7 @@ export class ProviderContext extends Context {
 export class Provider {
     private closed: boolean = true;
     public debug: boolean = false;
+    public retryInterval: number = 1000;
     public onerror?: (error: Error) => void;
     private readonly methodManager: MethodManager = new MethodManager();
     private readonly invokeManager: InvokeManager;
@@ -78,8 +79,13 @@ export class Provider {
             await this.client.invoke('=', [await Promise.all(results)]);
         }
         catch (e) {
-            if (this.onerror) {
-                this.onerror(e);
+            if (!(e instanceof TimeoutError)) {
+                if (this.retryInterval > 0) {
+                    await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
+                }
+                if (this.onerror) {
+                    this.onerror(e);
+                }
             }
         }
     }
@@ -92,8 +98,13 @@ export class Provider {
                 this.dispatch(calls);
             }
             catch (e) {
-                if (this.onerror) {
-                    this.onerror(e);
+                if (!(e instanceof TimeoutError)) {
+                    if (this.retryInterval > 0) {
+                        await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
+                    }
+                    if (this.onerror) {
+                        this.onerror(e);
+                    }
                 }
             }
         } while (!this.closed);
