@@ -8,16 +8,17 @@
 |                                                          |
 | Prosumer for TypeScript.                                 |
 |                                                          |
-| LastModified: Mar 26, 2019                               |
+| LastModified: May 17, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-import { Client } from '@hprose/rpc-core';
+import { Client, TimeoutError } from '@hprose/rpc-core';
 import { Message } from './Message';
 
 export class Prosumer {
     private readonly callbacks: { [topic: string]: (message: Message) => void } = Object.create(null);
+    public retryInterval: number = 1000;
     public onerror?: (error: Error) => void;
     public onsubscribe?: (topic: string) => void;
     public onunsubscribe?: (topic: string) => void;
@@ -73,8 +74,13 @@ export class Prosumer {
                 this.dispatch(topics);
             }
             catch (e) {
-                if (this.onerror) {
-                    this.onerror(e);
+                if (!(e instanceof TimeoutError)) {
+                    if (this.retryInterval > 0) {
+                        await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
+                    }
+                    if (this.onerror) {
+                        this.onerror(e);
+                    }
                 }
             }
         }
