@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Mar 8, 2019                                |
+| LastModified: May 17, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -85,25 +85,7 @@ export class Broker {
                 responder.resolve();
             } else if (count > 0) {
                 responder.resolve(result);
-                if (this.heartbeat > 0) {
-                    let timer = defer<boolean>();
-                    if (this.timers[id]) {
-                        this.timers[id].resolve(false);
-                    }
-                    this.timers[id] = timer;
-                    const timeoutId = setTimeout(() => {
-                        timer.resolve(true);
-                    }, this.heartbeat);
-                    timer.promise.then((value) => {
-                        clearTimeout(timeoutId);
-                        const topics = this.messages[id];
-                        if (value && topics) {
-                            for (const topic in topics) {
-                                this.offline(topics, id, topic, new ServiceContext(this.service));
-                            }
-                        }
-                    });
-                }
+                this.doHeartbeat(id);
             } else {
                 return false;
             }
@@ -111,6 +93,27 @@ export class Broker {
             responder.resolve();
         }
         return true;
+    }
+    protected doHeartbeat(id: string): void {
+        if (this.heartbeat > 0) {
+            let timer = defer<boolean>();
+            if (this.timers[id]) {
+                this.timers[id].resolve(false);
+            }
+            this.timers[id] = timer;
+            const timeoutId = setTimeout(() => {
+                timer.resolve(true);
+            }, this.heartbeat);
+            timer.promise.then((value) => {
+                clearTimeout(timeoutId);
+                const topics = this.messages[id];
+                if (value && topics) {
+                    for (const topic in topics) {
+                        this.offline(topics, id, topic, new ServiceContext(this.service));
+                    }
+                }
+            });
+        }
     }
     protected id(context: ServiceContext): string {
         if (context.requestHeaders['id']) {
@@ -177,6 +180,7 @@ export class Broker {
             if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
                     responder.resolve(Object.create(null));
+                    this.doHeartbeat(id);
                 }, this.timeout);
                 responder.promise.then(() => {
                     clearTimeout(timeoutId);
