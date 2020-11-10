@@ -29,8 +29,8 @@ export interface WebSocketServiceContext extends ServiceContext {
 export class WebSocketHandler implements Handler {
     public static serverTypes: Function[] = [http.Server, https.Server, WebSocket.Server];
     public compress: boolean = false;
-    public onaccept?: (websocket: WebSocket) => void;
-    public onclose?: (websocket: WebSocket) => void;
+    public onaccept?: (websocket: WebSocket, request: http.IncomingMessage) => void;
+    public onclose?: (websocket: WebSocket, request: http.IncomingMessage) => void;
     public onerror?: (error: Error) => void;
     constructor(public readonly service: Service) { }
     public bind(server: http.Server | https.Server | WebSocket.Server): void {
@@ -48,14 +48,14 @@ export class WebSocketHandler implements Handler {
         try {
             websocket.protocol = 'hprose';
             websocket.binaryType = 'arraybuffer';
-            if (this.onaccept) this.onaccept(websocket);
+            if (this.onaccept) this.onaccept(websocket, request);
         }
         catch {
             websocket.terminate();
             return;
         }
         websocket.on('close', () => {
-            if (this.onclose) this.onclose(websocket);
+            if (this.onclose) this.onclose(websocket, request);
         });
         websocket.on('error', (error) => {
             if (this.onerror) this.onerror(error);
