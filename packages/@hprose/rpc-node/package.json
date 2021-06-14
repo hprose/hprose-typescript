@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-node",
-  "version": "3.0.11",
+  "version": "3.0.12",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-node",
   "description": "hprose for TypeScript",
   "author": {

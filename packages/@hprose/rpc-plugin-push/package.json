@@ -1,6 +1,6 @@
 {
   "name": "@hprose/rpc-plugin-push",
-  "version": "3.0.11",
+  "version": "3.0.12",
   "homepage": "https://github.com/hprose/hprose-typescript/tree/master/packages/%40hprose/rpc-plugin-push",
   "description": "hprose for TypeScript",
   "author": {
