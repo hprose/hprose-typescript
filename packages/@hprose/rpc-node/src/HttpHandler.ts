@@ -255,7 +255,6 @@ export class HttpHandler implements Handler {
             });
             request.on('close', () => {
                 if (this.onclose) this.onclose(request);
-                reject();
             });
         });
     }
