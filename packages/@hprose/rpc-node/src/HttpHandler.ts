@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for TypeScript.                              |
 |                                                          |
-| LastModified: Mar 29, 2020                               |
+| LastModified: Jun 14, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

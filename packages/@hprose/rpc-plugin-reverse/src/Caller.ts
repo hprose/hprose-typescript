@@ -8,7 +8,7 @@
 |                                                          |
 | Caller for TypeScript.                                   |
 |                                                          |
-| LastModified: May 28, 2020                               |
+| LastModified: Jun 14, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

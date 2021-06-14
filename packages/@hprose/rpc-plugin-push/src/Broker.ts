@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: May 17, 2020                               |
+| LastModified: Jun 14, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
