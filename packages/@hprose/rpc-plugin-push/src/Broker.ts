@@ -138,8 +138,13 @@ export class Broker {
     protected response(id: string): void {
         if (this.responders[id]) {
             const responder = this.responders[id];
-            if (this.send(id, responder)) {
-                delete this.responders[id];
+            delete this.responders[id];
+            if (!this.send(id, responder)) {
+                if (id in this.responders) {
+                    responder.resolve();
+                } else {
+                    this.responders[id] = responder;
+                }
             }
         }
     }
@@ -179,7 +184,9 @@ export class Broker {
             this.responders[id] = responder;
             if (this.timeout > 0) {
                 const timeoutId = setTimeout(() => {
-                    responder.resolve(Object.create(null));
+                    if (this.responders[id] === responder) {
+                        responder.resolve(Object.create(null));
+                    }
                     this.doHeartbeat(id);
                 }, this.timeout);
                 responder.promise.then(() => {
@@ -192,12 +199,10 @@ export class Broker {
     public unicast(data: any, topic: string, id: string, from: string = ''): boolean {
         if (this.messages[id]) {
             const messages = this.messages[id][topic];
-            if (messages) {
-                if (messages.length < this.messageQueueMaxLength) {
-                    messages.push(new Message(data, from));
-                    this.response(id);
-                    return true;
-                }
+            if (messages && messages.length < this.messageQueueMaxLength) {
+                messages.push(new Message(data, from));
+                this.response(id);
+                return true;
             }
         }
         return false;
@@ -235,7 +240,7 @@ export class Broker {
     public deny(id: string, topic?: string): void {
         if (this.messages[id]) {
             if (topic) {
-                if (Array.isArray(this.messages[id][topic])) {
+                if (topic in this.messages[id]) {
                     this.messages[id][topic] = null;
                 }
             } else {

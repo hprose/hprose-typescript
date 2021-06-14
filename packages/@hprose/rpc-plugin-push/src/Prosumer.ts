@@ -68,18 +68,33 @@ export class Prosumer {
     }
     private async message(): Promise<void> {
         while (true) {
+            let err;
             try {
                 const topics: { [topic: string]: Message[] } | undefined = await this.client.invoke('<');
                 if (!topics) return;
                 this.dispatch(topics);
+                continue;
             }
             catch (e) {
-                if (!(e instanceof TimeoutError)) {
+                err = e;
+            }
+            while (err != null) {
+                if (!(err instanceof TimeoutError)) {
                     if (this.retryInterval > 0) {
                         await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
                     }
                     if (this.onerror) {
-                        this.onerror(e);
+                        this.onerror(err);
+                    }
+                }
+                err = null;
+                for (let topic in this.callbacks) {
+                    try {
+                        await this.client.invoke('+', [topic]);
+                    }
+                    catch (e) {
+                        err = e;
+                        break;
                     }
                 }
             }
