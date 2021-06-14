@@ -86,9 +86,10 @@ export class Caller {
     protected calls: { [id: string]: [number, string, any[]][] } = Object.create(null);
     protected results: { [id: string]: { [index: number]: Deferred<any> } } = Object.create(null);
     protected responders: { [id: string]: Deferred<[number, string, any[]][]> } = Object.create(null);
-    protected onlines: { [id: string]: boolean } = Object.create(null);
-    public heartbeat: number = 120000;
+    protected onlines: { [id: string]: Deferred<boolean> } = Object.create(null);
+    public idleTimeout: number = 120000;
     public timeout: number = 30000;
+    public heartbeat: number = 3000;
     constructor(public service: Service) {
         const close = new Method(this.close.bind(this), '!!');
         close.passContext = true;
@@ -125,8 +126,13 @@ export class Caller {
     protected response(id: string): void {
         if (this.responders[id]) {
             const responder = this.responders[id];
-            if (this.send(id, responder)) {
-                delete this.responders[id];
+            delete this.responders[id];
+            if (!this.send(id, responder)) {
+                if (id in this.responders) {
+                    responder.resolve();
+                } else {
+                    this.responders[id] = responder;
+                }
             }
         }
     }
@@ -143,22 +149,49 @@ export class Caller {
         const id = this.stop(context);
         delete this.onlines[id];
     }
+    protected doHeartbeat(id: string, online: Deferred<boolean>): void {
+        if (this.heartbeat > 0) {
+            const timeoutId = setTimeout(() => {
+                online.resolve(false);
+            }, this.heartbeat);
+            online.promise.then((value) => {
+                clearTimeout(timeoutId);
+                if (!value) {
+                    delete this.onlines[id];
+                }
+            });
+        }
+    }
     protected async begin(context: ServiceContext): Promise<[number, string, any[]][]> {
         const id = this.stop(context);
-        this.onlines[id] = true;
-        const responder = defer<[number, string, any[]][]>();
-        if (!this.send(id, responder)) {
-            this.responders[id] = responder;
-            if (this.heartbeat > 0) {
-                const timeoutId = setTimeout(() => {
-                    responder.resolve([]);
-                }, this.heartbeat);
-                responder.promise.then(() => {
-                    clearTimeout(timeoutId);
-                });
-            }
+        let online = this.onlines[id];
+        delete this.onlines[id];
+        if (online) {
+            online.resolve(true);
         }
-        return responder.promise;
+        online = defer<boolean>();
+        this.onlines[id] = online;
+        try {
+            const responder = defer<[number, string, any[]][]>();
+            if (!this.send(id, responder)) {
+                this.responders[id] = responder;
+                if (this.idleTimeout > 0) {
+                    const timeoutId = setTimeout(() => {
+                        if (this.responders[id] === responder) {
+                            delete this.responders[id];
+                            responder.resolve([]);
+                        }
+                    }, this.idleTimeout);
+                    await responder.promise.then(() => {
+                        clearTimeout(timeoutId);
+                    });
+                }
+            }
+            return await responder.promise;
+        }
+        finally {
+            this.doHeartbeat(id, online);
+        }
     }
     protected end(results: [number, any, string][], context: ServiceContext): void {
         const id = this.id(context);

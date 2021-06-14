@@ -75,23 +75,27 @@ export class Provider {
         for (let i = 0; i < n; ++i) {
             results[i] = this.process(calls[i]);
         }
-        try {
-            await this.client.invoke('=', [await Promise.all(results)]);
-        }
-        catch (e) {
-            if (!(e instanceof TimeoutError)) {
-                if (this.retryInterval > 0) {
-                    await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
-                }
-                if (this.onerror) {
-                    this.onerror(e);
+        while (true) {
+            try {
+                await this.client.invoke('=', [await Promise.all(results)]);
+                return;
+            }
+            catch (e) {
+                if (!(e instanceof TimeoutError)) {
+                    if (this.retryInterval > 0) {
+                        await new Promise((resolve, reject) => setTimeout(resolve, this.retryInterval));
+                    }
+                    if (this.onerror) {
+                        this.onerror(e);
+                    }
                 }
             }
         }
     }
     public async listen(): Promise<void> {
+        if (!this.closed) return;
         this.closed = false;
-        do {
+        while (!this.closed) {
             try {
                 const calls: [number, string, any[]][] = await this.client.invoke('!');
                 if (!calls) return;
@@ -107,7 +111,7 @@ export class Provider {
                     }
                 }
             }
-        } while (!this.closed);
+        }
     }
     public async close(): Promise<void> {
         this.closed = true;
