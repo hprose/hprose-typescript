@@ -8,7 +8,7 @@
 |                                                          |
 | Broker for TypeScript.                                   |
 |                                                          |
-| LastModified: Jun 14, 2021                               |
+| LastModified: Jun 24, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -35,7 +35,6 @@ export class Broker {
     protected messages: { [id: string]: { [topic: string]: Message[] | null } } = Object.create(null);
     protected responders: { [id: string]: Deferred<any> } = Object.create(null);
     protected timers: { [id: string]: Deferred<boolean> } = Object.create(null);
-    public messageQueueMaxLength: number = 10;
     public timeout: number = 120000;
     public heartbeat: number = 10000;
     public onsubscribe?: (id: string, topic: string, context: ServiceContext) => void;
@@ -199,7 +198,7 @@ export class Broker {
     public unicast(data: any, topic: string, id: string, from: string = ''): boolean {
         if (this.messages[id]) {
             const messages = this.messages[id][topic];
-            if (messages && messages.length < this.messageQueueMaxLength) {
+            if (messages) {
                 messages.push(new Message(data, from));
                 this.response(id);
                 return true;
@@ -219,13 +218,9 @@ export class Broker {
         for (const id in this.messages) {
             const messages = this.messages[id][topic];
             if (messages) {
-                if (messages.length < this.messageQueueMaxLength) {
-                    messages.push(new Message(data, from));
-                    this.response(id);
-                    result[id] = true;
-                } else {
-                    result[id] = false;
-                }
+                messages.push(new Message(data, from));
+                this.response(id);
+                result[id] = true;
             }
         }
         return result;
