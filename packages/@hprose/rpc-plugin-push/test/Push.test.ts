@@ -87,8 +87,7 @@ test('test server push', async () => {
 
 test('test push3', async () => {
     const service = new Service();
-    const broker = new Broker(service);
-    broker.messageQueueMaxLength = 1000;
+    new Broker(service);
     const server = new MockServer('testpush3');
     service.bind(server);
     const client1 = new Client('mock://testpush3');
