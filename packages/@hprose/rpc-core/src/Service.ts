@@ -8,7 +8,7 @@
 |                                                          |
 | Service for TypeScript.                                  |
 |                                                          |
-| LastModified: Mar 28, 2020                               |
+| LastModified: Sep 13, 2023                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -90,19 +90,22 @@ export class Service {
         }
         return this;
     }
-    public handle(request: Uint8Array, context: Context): Promise<Uint8Array> {
-        return this.ioManager.handler(request, context);
+    public async handle(request: Uint8Array, context: Context): Promise<Uint8Array> {
+        try {
+            let response = await this.ioManager.handler(request, context);
+            if (response === undefined || response === null) {
+                response = this.codec.encode(null, context as ServiceContext);
+            }
+            return response;
+        } catch (e) {
+            return this.codec.encode(e, context as ServiceContext);
+        }
     }
     public async process(request: Uint8Array, context: Context): Promise<Uint8Array> {
         const codec = this.codec;
         let result: any;
-        try {
-            const [name, args] = codec.decode(request, context as ServiceContext);
-            result = await this.invokeManager.handler(name, args, context);
-        }
-        catch (e) {
-            result = e;
-        }
+        const [name, args] = codec.decode(request, context as ServiceContext);
+        result = await this.invokeManager.handler(name, args, context);
         return codec.encode(result, context as ServiceContext);
     }
     public async execute(name: string, args: any[], context: Context): Promise<any> {
